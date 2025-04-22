@@ -1,6 +1,6 @@
 // services/apiClashService.ts
 
-const baseUrl = 'http://34.57.116.166:3000';
+const baseUrl = 'https://34.57.116.166:3000';
 
 export const APIClashService = {
   getClanInfo: async (clanTag: string) => {
