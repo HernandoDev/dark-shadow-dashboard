@@ -19,6 +19,114 @@ interface Member {
    heroEquipment?: { name: string, level: number, maxLevel: number, village: string }[];
 }
 
+// Define the type for requisitosPorAyuntamiento
+type RequisitosPorAyuntamiento = {
+   [key: string]: {
+      casaMascotas: { nivelMaximo: number };
+      mascotas: { [key: string]: number };
+      tropas: { [key: string]: number };
+      equipamento: {
+         comun: number;
+         epica: number;
+         recomendadoComun: number;
+         recomendadoEpica: number;
+      };
+   };
+};
+
+const requisitosPorAyuntamiento: RequisitosPorAyuntamiento = {
+   TH14: {
+      casaMascotas: { nivelMaximo: 4 },
+      mascotas: { LASSI: 10, ElectroOwl: 10, MightyYak: 10, Unicorn: 10 },
+      tropas: {},
+      equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
+   },
+   TH15: {
+      casaMascotas: { nivelMaximo: 8 },
+      mascotas: {
+         LASSI: 15, ElectroOwl: 15, MightyYak: 15, Unicorn: 10,
+         Frosty: 10, Diggy: 10, PoisonLizard: 10, Phoenix: 10,
+      },
+      tropas: {
+         Barbaro: 11, Arquera: 11, Gigante: 11, Duende: 11, Rompemuros: 11,
+         Globo: 11, Mago: 11, Sanadora: 8, Dragon: 10, PEKKA: 10,
+         BebeDragon: 9, Minero: 9, DragonElectrico: 6, Yeti: 5,
+         JineteDragon: 3, TitanElectrico: 3, Esbirro: 11, Montapuercos: 12,
+         Valquiria: 10, Golem: 12, Bruja: 6, SabuesoLava: 7,
+         Lanzarrocas: 7, GolemHielo: 7,
+      },
+      equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
+   },
+   TH16: {
+      casaMascotas: { nivelMaximo: 10 },
+      mascotas: {
+         LASSI: 15, ElectroOwl: 15, MightyYak: 15, Unicorn: 10,
+         Frosty: 10, Diggy: 10, PoisonLizard: 10, Phoenix: 10,
+         SpiritFox: 10, AngryJelly: 10,
+      },
+      tropas: {
+         Barbaro: 12, Arquera: 12, Gigante: 12, Duende: 12, Rompemuros: 12,
+         Globo: 12, Mago: 12, Sanadora: 9, Dragon: 11, PEKKA: 11,
+         BebeDragon: 10, Minero: 10, DragonElectrico: 7, Yeti: 6,
+         JineteDragon: 5, TitanElectrico: 4, Esbirro: 12, Montapuercos: 13,
+         Valquiria: 11, Golem: 13, Bruja: 7, SabuesoLava: 8,
+         Lanzarrocas: 8, GolemHielo: 8,
+      },
+      equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
+   },
+   TH17: {
+      casaMascotas: { nivelMaximo: 10 },
+      mascotas: {
+         'L.A.S.S.I': 15, 'Electro Owl': 15, 'Mighty Yak': 15, Unicorn: 15,
+         Frosty: 10, Diggy: 10, 'Poison Lizard': 10, Phoenix: 10,
+         'Spirit Fox': 10, 'Angry Jelly': 10,
+      },
+      tropas: {
+         Barbarian: 12, Archer: 12, Giant: 12, Goblin: 12, "Wall Breaker": 12,
+         Balloon: 12, Wizard: 12, Healer: 9, Dragon: 11, 'P.E.K.K.A': 11,
+         'Baby Dragon': 10, Miner: 10, 'Electro Dragon': 7, Yeti: 6,
+         'Dragon Rider': 5, 'Electro Titan': 4, Minion: 12, 'Hog Rider': 13,
+         Valkyrie: 11, Golem: 13, Witch: 7, 'Lava Hound': 8,
+         Bowler: 8, 'Ice Golem': 8,
+      },
+      equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
+   },
+};
+
+const renderValidatedList = (
+   items: { name: string; level: number; maxLevel: number }[],
+   requirements: { [key: string]: number },
+   translateName: (name: string) => string
+) => {
+   const excludedTroops = [
+      'Super Barbarian', 'Super Archer', 'Super Wall Breaker', 'Super Giant', 'Sneaky Goblin',
+      'Super Miner', 'Rocket Balloon', 'Inferno Dragon', 'Super Valkyrie', 'Super Witch',
+      'Ice Hound', 'Super Bowler', 'Super Dragon', 'Super Wizard', 'Super Minion',
+      'Super Hog Rider', 'Root Rider', 'Druid', 'Thrower', 'Troop Launcher', 'Furnace'
+   ];
+
+   return items
+      .filter(({ name }) => !excludedTroops.includes(name)) // Exclude "super" troops
+      .map(({ name, level, maxLevel }, index) => {
+         const requiredLevel = requirements[name] || maxLevel; // Default to maxLevel if no requirement is defined
+         const difference = requiredLevel - level;
+
+         // Determine color based on the difference
+         let color = '#16a34a'; // Green
+         if (difference === 1 || difference === 2) {
+            color = '#f59e0b'; // Yellow/Warning
+         } else if (difference >= 3) {
+            color = '#dc2626'; // Red
+         }
+
+         return (
+            <li key={index} style={{ color: '#1e293b' }}>
+               {translateName(name)}: <span style={{ color }}>{`Nivel ${level}`}</span> / {requiredLevel}
+            </li>
+         );
+      });
+};
+
 export const TableWrapper = () => {
    const [members, setMembers] = useState<Member[]>([]);
    const [loading, setLoading] = useState(true);
@@ -57,21 +165,21 @@ export const TableWrapper = () => {
          "Witch": "Bruja",
          "Lava Hound": "Sabueso de Lava",
          "Bowler": "Lanzarrocas",
-         "Baby Dragon": "Dragón Bebé",
+         "Baby Dragon": "Baby Dragon",
          "Miner": "Minero",
          "Super Barbarian": "Súper Bárbaro",
          "Super Archer": "Súper Arquera",
          "Super Wall Breaker": "Súper Rompe Muros",
          "Super Giant": "Súper Gigante",
-         "Wall Wrecker": "Demoledor de Muros",
+         "Wall Wrecker": "Demoledor de Muros (ASEDIO)",
          "Battle Blimp": "Dirigible de Batalla",
          "Yeti": "Yeti",
-         "Sneaky Goblin": "Duende Furtivo",
+         "Sneaky Goblin": "Super Duende",
          "Super Miner": "Súper Minero",
-         "Rocket Balloon": "Globo Cohete",
+         "Rocket Balloon": "Super Globo",
          "Ice Golem": "Gólem de Hielo",
          "Electro Dragon": "Dragón Eléctrico",
-         "Stone Slammer": "Aplastarrocas",
+         "Stone Slammer": "Stone Slammer",
          "Inferno Dragon": "Dragón Infernal",
          "Super Valkyrie": "Súper Valquiria",
          "Dragon Rider": "Jinete de Dragón",
@@ -83,15 +191,15 @@ export const TableWrapper = () => {
          "Headhunter": "Cazadora",
          "Super Wizard": "Súper Mago",
          "Super Minion": "Súper Esbirro",
-         "Log Launcher": "Lanzatrones",
+         "Log Launcher": "Lanza troncos",
          "Flame Flinger": "Lanzallamas",
          "Battle Drill": "Taladro de Batalla",
-         "Electro Titan": "Titán Eléctrico",
-         "Apprentice Warden": "Guardián Aprendiz",
+         "Electro Titan": "Titánide",
+         "Apprentice Warden": "Aprendiz Centinela ",
          "Super Hog Rider": "Súper Montapuercos",
-         "Root Rider": "Jinete de Raíces",
+         "Root Rider": "Druidas Salvajes",
          "Druid": "Druida",
-         "Thrower": "Lanzador",
+         "Thrower": "Lancero",
          // Mascotas
          "L.A.S.S.I": "L.A.S.S.I",
          "Mighty Yak": "Yak Mamut",
@@ -99,7 +207,7 @@ export const TableWrapper = () => {
          "Unicorn": "Unicornio",
          "Phoenix": "Fénix",
          "Poison Lizard": "Lagarto Venenoso",
-         "Diggy": "Cavador",
+         "Diggy": "Pangolin",
          "Frosty": "Morsa de hielo",
          "Spirit Fox": "Zorro Espiritual",
          "Angry Jelly": "Medusa Furiosa",
@@ -156,14 +264,14 @@ export const TableWrapper = () => {
    useEffect(() => {
       const fetchMembers = async () => {
          try {
-           const data = await APIClashService.getClanMembersWithDetails(clanTag);
-           setMembers(data.detailedMembers as Member[] || []);
+            const data = await APIClashService.getClanMembersWithDetails(clanTag);
+            setMembers(data.detailedMembers as Member[] || []);
          } catch (error) {
-           console.error('Error fetching members:', error);
+            console.error('Error fetching members:', error);
          } finally {
-           setLoading(false);
+            setLoading(false);
          }
-       };
+      };
 
       fetchMembers();
    }, [clanTag]);
@@ -171,6 +279,16 @@ export const TableWrapper = () => {
    const openModal = (member: any) => {
       setSelectedMember(member);
       setVisible(true);
+   };
+   // Función para determinar el color basado en la diferencia de niveles
+   const getColorByLevelDifference = (currentLevel: number, requiredLevel: number) => {
+      const difference = requiredLevel - currentLevel;
+      if (difference <= 3) {
+         return '#16a34a'; // Verde
+      } else if (difference <= 4) {
+         return '#f59e0b'; // Amarillo/Naranja
+      }
+      return '#dc2626'; // Rojo
    };
 
    const filterMembers = (members: any[], meetsRequirements: boolean) => {
@@ -266,52 +384,52 @@ export const TableWrapper = () => {
                }}
             />
          </div>
-        
+
          {isMobile ? (
             <div>
                <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
                {sortedMeetingRequirements.map((member, index) => (
-                  <div style={{padding:'15px'}}>
-                    
-                  <Card
-                     key={member.tag}
-                     position={index + 1}
-                     name={member.name}
-                     townHallLevel={member.townHallLevel}
-                     heroes={member.heroes || []}
-                     onViewDetails={() => openModal(member)}
-                     minLevels={{
-                        th: parseInt(minLevels.th),
-                        rey: parseInt(minLevels.rey),
-                        reina: parseInt(minLevels.reina),
-                        centinela: parseInt(minLevels.centinela),
-                        luchadora: parseInt(minLevels.luchadora),
-                        principe: parseInt(minLevels.principe),
-                     }}
-                  />
+                  <div style={{ padding: '15px' }}>
+
+                     <Card
+                        key={member.tag}
+                        position={index + 1}
+                        name={member.name}
+                        townHallLevel={member.townHallLevel}
+                        heroes={member.heroes || []}
+                        onViewDetails={() => openModal(member)}
+                        minLevels={{
+                           th: parseInt(minLevels.th),
+                           rey: parseInt(minLevels.rey),
+                           reina: parseInt(minLevels.reina),
+                           centinela: parseInt(minLevels.centinela),
+                           luchadora: parseInt(minLevels.luchadora),
+                           principe: parseInt(minLevels.principe),
+                        }}
+                     />
                   </div>
 
                ))}
 
                <h2 style={{ color: 'red', fontSize: '24px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
                {sortedNotMeetingRequirements.map((member, index) => (
-                  <div style={{padding:'15px'}}>
-                  <Card
-                     key={member.tag}
-                     position={index + 1}
-                     name={member.name}
-                     townHallLevel={member.townHallLevel}
-                     heroes={member.heroes || []}
-                     onViewDetails={() => openModal(member)}
-                     minLevels={{
-                        th: parseInt(minLevels.th),
-                        rey: parseInt(minLevels.rey),
-                        reina: parseInt(minLevels.reina),
-                        centinela: parseInt(minLevels.centinela),
-                        luchadora: parseInt(minLevels.luchadora),
-                        principe: parseInt(minLevels.principe),
-                     }}
-                  />
+                  <div style={{ padding: '15px' }}>
+                     <Card
+                        key={member.tag}
+                        position={index + 1}
+                        name={member.name}
+                        townHallLevel={member.townHallLevel}
+                        heroes={member.heroes || []}
+                        onViewDetails={() => openModal(member)}
+                        minLevels={{
+                           th: parseInt(minLevels.th),
+                           rey: parseInt(minLevels.rey),
+                           reina: parseInt(minLevels.reina),
+                           centinela: parseInt(minLevels.centinela),
+                           luchadora: parseInt(minLevels.luchadora),
+                           principe: parseInt(minLevels.principe),
+                        }}
+                     />
                   </div>
                ))}
             </div>
@@ -405,6 +523,9 @@ export const TableWrapper = () => {
             </>
          )}
 
+
+         {/* ESTE ES EL MODAL  */}
+
          <Modal {...bindings}>
             <Modal.Header css={{ backgroundColor: '#1e293b', color: 'white' }}>
                <Text h4>{selectedMember?.name || 'Información del jugador'}</Text>
@@ -425,45 +546,35 @@ export const TableWrapper = () => {
                      <div style={{ backgroundColor: '#fef3c7', padding: '10px', borderRadius: '8px' }}>
                         <h5 style={{ color: '#b45309' }}><strong>Tropas:</strong></h5>
                         <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                           {selectedMember.troops
-                              ?.filter((troop) => troop.village === 'home' && ![
-                                 'L.A.S.S.I', 'Mighty Yak', 'Electro Owl', 'Unicorn', 'Phoenix', 
-                                 'Poison Lizard', 'Diggy', 'Frosty', 'Spirit Fox', 'Angry Jelly', 'Sneezy'
-                              ].includes(troop.name))
-                              .map((troop, index) => (
-                                 <li key={index} style={{ color: '#1e293b' }}>
-                                    {translateName(troop.name)}: <span style={{ color: '#16a34a' }}>Nivel {troop.level}</span> / {troop.maxLevel}
-                                 </li>
-                              ))}
+                           {renderValidatedList(
+                              selectedMember.troops?.filter((troop) => troop.village === 'home') || [],
+                              requisitosPorAyuntamiento[`TH${selectedMember.townHallLevel}`]?.tropas || {},
+                              translateName
+                           )}
                         </ul>
                      </div>
 
                      <div style={{ backgroundColor: '#d1fae5', padding: '10px', borderRadius: '8px' }}>
                         <h5 style={{ color: '#047857' }}><strong>Mascotas:</strong></h5>
                         <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                           {selectedMember.troops
-                              ?.filter((troop) => [
-                                 'L.A.S.S.I', 'Mighty Yak', 'Electro Owl', 'Unicorn', 'Phoenix', 
-                                 'Poison Lizard', 'Diggy', 'Frosty', 'Spirit Fox', 'Angry Jelly', 'Sneezy'
-                              ].includes(troop.name))
-                              .map((pet, index) => (
-                                 <li key={index} style={{ color: '#1e293b' }}>
-                                    {translateName(pet.name)}: <span style={{ color: '#16a34a' }}>Nivel {pet.level}</span> / {pet.maxLevel}
-                                 </li>
-                              ))}
+                           {renderValidatedList(
+                              selectedMember.troops?.filter((troop) =>
+                                 ['L.A.S.S.I', 'Mighty Yak', 'Electro Owl', 'Unicorn', 'Phoenix', 'Poison Lizard', 'Diggy', 'Frosty', 'Spirit Fox', 'Angry Jelly'].includes(troop.name)
+                              ) || [],
+                              requisitosPorAyuntamiento[`TH${selectedMember.townHallLevel}`]?.mascotas || {},
+                              translateName
+                           )}
                         </ul>
                      </div>
 
                      <div style={{ backgroundColor: '#e0f2fe', padding: '10px', borderRadius: '8px' }}>
                         <h5 style={{ color: '#0369a1' }}><strong>Equipamiento de Héroes:</strong></h5>
                         <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                           {selectedMember.heroEquipment
-                              ?.filter((equipment) => equipment.village === 'home')
-                              .map((equipment, index) => (
-                                 <li key={index} style={{ color: '#1e293b' }}>
-                                    {translateName(equipment.name)}: <span style={{ color: '#16a34a' }}>Nivel {equipment.level}</span> / {equipment.maxLevel}
-                                 </li>
-                              ))}
+                           {renderValidatedList(
+                              selectedMember.heroEquipment || [],
+                              requisitosPorAyuntamiento[`TH${selectedMember.townHallLevel}`]?.equipamento || {},
+                              translateName
+                           )}
                         </ul>
                      </div>
                   </div>
@@ -475,6 +586,7 @@ export const TableWrapper = () => {
                </Button>
             </Modal.Footer>
          </Modal>
+
       </Box>
    );
 };
