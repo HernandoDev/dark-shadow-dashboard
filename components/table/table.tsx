@@ -5,6 +5,7 @@ import { Table, Input, Button, Pagination, Modal, useModal, Text } from '@nextui
 import { Box } from '../styles/box';
 import { APIClashService } from '../../services/apiClashService';
 import { useMediaQuery } from 'react-responsive'; // Import useMediaQuery for responsiveness
+import Card from '../card/Card'; // Import the Card component
 
 interface Member {
    tag: string;
@@ -223,33 +224,50 @@ export const TableWrapper = () => {
                onChange={(e) => setSearchQuery(e.target.value)}
             />
          </div>
+        
          {isMobile ? (
             <div>
                <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
                {membersMeetingRequirements.map((member, index) => (
-                  <div key={member.tag} style={{ marginBottom: '20px', padding: '15px', border: '2px solid violet', borderRadius: '8px', backgroundColor: 'gray' }}>
-                     <p><strong>{`${index + 1}. ${member.name || 'N/A'}`}</strong></p>
-                     <p>TH: {member.townHallLevel || 'N/A'}</p>
-                     <p>Rey: {member.heroes?.[0]?.level || 'N/A'}</p>
-                     <p>Reina: {member.heroes?.[1]?.level || 'N/A'}</p>
-                     <p>Centinela: {member.heroes?.[2]?.level || 'N/A'}</p>
-                     <p>Luchadora: {member.heroes?.[4]?.level || 'N/A'}</p>
-                     <p>Principe: {member.heroes?.[6]?.level || 'N/A'}</p>
-                     <Button auto flat onClick={() => openModal(member)}>👁️</Button>
+                  <div style={{padding:'15px'}}>
+                    
+                  <Card
+                     key={member.tag}
+                     name={member.name}
+                     townHallLevel={member.townHallLevel}
+                     heroes={member.heroes || []}
+                     onViewDetails={() => openModal(member)}
+                     minLevels={{
+                        th: parseInt(minLevels.th),
+                        rey: parseInt(minLevels.rey),
+                        reina: parseInt(minLevels.reina),
+                        centinela: parseInt(minLevels.centinela),
+                        luchadora: parseInt(minLevels.luchadora),
+                        principe: parseInt(minLevels.principe),
+                     }}
+                  />
                   </div>
+
                ))}
 
                <h2 style={{ color: 'red', fontSize: '24px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
                {membersNotMeetingRequirements.map((member, index) => (
-                  <div key={member.tag} style={{ marginBottom: '20px', padding: '15px', border: '2px solid violet', borderRadius: '8px', backgroundColor: 'gray' }}>
-                     <p><strong>{`${index + 1}. ${member.name || 'N/A'}`}</strong></p>
-                     <strong> <p style={{ color: member.townHallLevel < parseInt(minLevels.th) ? '#B22222' : 'inherit' }}>TH: {member.townHallLevel || 'N/A'}</p></strong>
-                     <strong><p style={{ fontWeight:'bold',fontSize:'14px',color: member.heroes?.[0]?.level < parseInt(minLevels.rey) ? '#B22222' : 'inherit' }}>Rey: {member.heroes?.[0]?.level || 'N/A'}</p></strong>
-                     <p style={{ fontWeight:'bold',fontSize:'14px', color: member.heroes?.[1]?.level < parseInt(minLevels.reina) ? '#B22222' : 'inherit' }}>Reina: {member.heroes?.[1]?.level || 'N/A'}</p>
-                     <p style={{  fontWeight:'bold',fontSize:'14px',color: member.heroes?.[2]?.level < parseInt(minLevels.centinela) ? '#B22222' : 'inherit' }}>Centinela: {member.heroes?.[2]?.level || 'N/A'}</p>
-                     <p style={{  fontWeight:'bold',fontSize:'14px',color: member.heroes?.[4]?.level < parseInt(minLevels.luchadora) ? '#B22222' : 'inherit' }}>Luchadora: {member.heroes?.[4]?.level || 'N/A'}</p>
-                     <p style={{  fontWeight:'bold',fontSize:'14px',color: member.heroes?.[6]?.level < parseInt(minLevels.principe) ? '#B22222' : 'inherit' }}>Principe: {member.heroes?.[6]?.level || 'N/A'}</p>
-                     <Button auto flat onClick={() => openModal(member)}>👁️</Button>
+                  <div style={{padding:'15px'}}>
+                  <Card
+                     key={member.tag}
+                     name={member.name}
+                     townHallLevel={member.townHallLevel}
+                     heroes={member.heroes || []}
+                     onViewDetails={() => openModal(member)}
+                     minLevels={{
+                        th: parseInt(minLevels.th),
+                        rey: parseInt(minLevels.rey),
+                        reina: parseInt(minLevels.reina),
+                        centinela: parseInt(minLevels.centinela),
+                        luchadora: parseInt(minLevels.luchadora),
+                        principe: parseInt(minLevels.principe),
+                     }}
+                  />
                   </div>
                ))}
             </div>
