@@ -173,7 +173,8 @@ const AttackLog: React.FC = () => {
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Registro de Ataques</h1>
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <p>Esta ventana muestra los ataques más usados en el clan y su rendimiento. Verás una lista con los ataques, sus resultados y los jugadores que los usan. Usa la barra de búsqueda para ver los ataques de un jugador específico y el botón "Agregar" para guardar nuevos ataques.</p>
+            <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
                 <Button auto color="success" icon={<Plus />} onClick={openModal}>
                     Agregar Ataque
                 </Button>

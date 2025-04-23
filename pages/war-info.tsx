@@ -207,6 +207,9 @@ const WarInfoPage = () => {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Información de Guerra</h1>
+      <p>En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador. Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
+
+      </p>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
         <Button
           bordered
@@ -249,9 +252,9 @@ const WarInfoPage = () => {
                 <div style={{ marginBottom: '10px' }}>
                   <h5 style={{ color: '#00ff00', textAlign: 'center' }}>Resumen de Guerra (últimos 60 días)</h5>
                   {clan.warLog.totalWars === 0 &&
-                  clan.warLog.wins === 0 &&
-                  clan.warLog.losses === 0 &&
-                  clan.warLog.ties === 0 ? (
+                    clan.warLog.wins === 0 &&
+                    clan.warLog.losses === 0 &&
+                    clan.warLog.ties === 0 ? (
                     <p style={{ color: 'red', textAlign: 'center' }}>No se pudo obtener el registro de guerras del clan enemigo.</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
