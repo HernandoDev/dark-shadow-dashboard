@@ -4,6 +4,8 @@ import React, { useEffect, useState, Fragment } from 'react';
 import { Table, Input, Button, Pagination, Modal, useModal, Text } from '@nextui-org/react';
 import { Box } from '../styles/box';
 import { APIClashService } from '../../services/apiClashService';
+import { useMediaQuery } from 'react-responsive'; // Import useMediaQuery for responsiveness
+
 interface Member {
    tag: string;
    name: string;
@@ -14,10 +16,11 @@ interface Member {
    donationsReceived?: number;
    troops?: { name: string, level: number, maxLevel: number, village: string }[];
    heroEquipment?: { name: string, level: number, maxLevel: number, village: string }[];
- }
+}
+
 export const TableWrapper = () => {
    const [members, setMembers] = useState<Member[]>([]);
-      const [loading, setLoading] = useState(true);
+   const [loading, setLoading] = useState(true);
    const [minLevels, setMinLevels] = useState({
       th: '15',
       rey: '85',
@@ -29,7 +32,9 @@ export const TableWrapper = () => {
 
    const [clanTag, setClanTag] = useState('%232QL0GCQGQ'); // Updated to use state
    const [searchQuery, setSearchQuery] = useState('');
-   const [selectedMember, setSelectedMember] = useState<Member | null>(null);   const { setVisible, bindings } = useModal(); // Modal control
+   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+   const { setVisible, bindings } = useModal(); // Modal control
+   const isMobile = useMediaQuery({ query: '(max-width: 768px)' }); // Check if the screen is mobile size
 
    const translateName = (name: string): string => {
       const translations: { [key: string]: string } = {
@@ -218,87 +223,121 @@ export const TableWrapper = () => {
                onChange={(e) => setSearchQuery(e.target.value)}
             />
          </div>
-         <h1 style={{ color: 'greenyellow', fontSize: '32px' }}>Miembros que cumplen los requisitos mínimos</h1>
-         <Table
-            aria-label="Members meeting requirements"
-            css={{ height: 'auto', minWidth: '100%' }}
-         >
-            <Table.Header>
-               <Table.Column>Jugador</Table.Column>
-               <Table.Column>Nivel TH</Table.Column>
-               <Table.Column>Rey</Table.Column>
-               <Table.Column>Reina</Table.Column>
-               <Table.Column>Centinela</Table.Column>
-               <Table.Column>Luchadora</Table.Column>
-               <Table.Column>Principe</Table.Column>
-               <Table.Column>Acciones</Table.Column>
-            </Table.Header>
-            <Table.Body>
+         {isMobile ? (
+            <div>
+               <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
                {membersMeetingRequirements.map((member, index) => (
-                  <Table.Row key={member.tag}>
-                     <Table.Cell>{`${index + 1}. ${member.name || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>{`TH ${member.townHallLevel || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>{`Rey ${member.heroes?.[0]?.level || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>{`Reina ${member.heroes?.[1]?.level || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>{`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>{`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
-                     <Table.Cell>
-                        <Button auto flat onClick={() => openModal(member)}>
-                           👁️
-                        </Button>
-                     </Table.Cell>
-                  </Table.Row>
+                  <div key={member.tag} style={{ marginBottom: '20px', padding: '15px', border: '2px solid violet', borderRadius: '8px', backgroundColor: 'gray' }}>
+                     <p><strong>{`${index + 1}. ${member.name || 'N/A'}`}</strong></p>
+                     <p>TH: {member.townHallLevel || 'N/A'}</p>
+                     <p>Rey: {member.heroes?.[0]?.level || 'N/A'}</p>
+                     <p>Reina: {member.heroes?.[1]?.level || 'N/A'}</p>
+                     <p>Centinela: {member.heroes?.[2]?.level || 'N/A'}</p>
+                     <p>Luchadora: {member.heroes?.[4]?.level || 'N/A'}</p>
+                     <p>Principe: {member.heroes?.[6]?.level || 'N/A'}</p>
+                     <Button auto flat onClick={() => openModal(member)}>👁️</Button>
+                  </div>
                ))}
-            </Table.Body>
-         </Table>
 
-         <h2 style={{ color: 'red', fontSize: '32px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
-         <Table
-            aria-label="Members not meeting requirements"
-            css={{ height: 'auto', minWidth: '100%' }}
-         >
-            <Table.Header>
-               <Table.Column>Jugador</Table.Column>
-               <Table.Column>Nivel TH</Table.Column>
-               <Table.Column>Rey</Table.Column>
-               <Table.Column>Reina</Table.Column>
-               <Table.Column>Centinela</Table.Column>
-               <Table.Column>Luchadora</Table.Column>
-               <Table.Column>Principe</Table.Column>
-               <Table.Column>Acciones</Table.Column>
-            </Table.Header>
-            <Table.Body>
+               <h2 style={{ color: 'red', fontSize: '24px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
                {membersNotMeetingRequirements.map((member, index) => (
-                  <Table.Row key={member.tag}>
-                     <Table.Cell>{`${index + 1}. ${member.name || 'N/A'}`}</Table.Cell>
-                     <Table.Cell css={{ color: member.townHallLevel < parseInt(minLevels.th) ? 'red' : 'inherit' }}>
-                        {`TH ${member.townHallLevel || 'N/A'}`}
-                     </Table.Cell>
-                     <Table.Cell css={{ color: member.heroes?.[0]?.level < parseInt(minLevels.rey) ? 'red' : 'inherit' }}>
-                        {`Rey ${member.heroes?.[0]?.level || 'N/A'}`}
-                     </Table.Cell>
-                     <Table.Cell css={{ color: member.heroes?.[1]?.level < parseInt(minLevels.reina) ? 'red' : 'inherit' }}>
-                        {`Reina ${member.heroes?.[1]?.level || 'N/A'}`}
-                     </Table.Cell>
-                     <Table.Cell css={{ color: member.heroes?.[2]?.level < parseInt(minLevels.centinela) ? 'red' : 'inherit' }}>
-                        {`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}
-                     </Table.Cell>
-                     <Table.Cell css={{ color: member.heroes?.[4]?.level < parseInt(minLevels.luchadora) ? 'red' : 'inherit' }}>
-                        {`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}
-                     </Table.Cell>
-                     <Table.Cell css={{ color: member.heroes?.[6]?.level < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
-                        {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
-                     </Table.Cell>
-                     <Table.Cell>
-                        <Button auto flat onClick={() => openModal(member)}>
-                           👁️
-                        </Button>
-                     </Table.Cell>
-                  </Table.Row>
+                  <div key={member.tag} style={{ marginBottom: '20px', padding: '15px', border: '2px solid violet', borderRadius: '8px', backgroundColor: 'gray' }}>
+                     <p><strong>{`${index + 1}. ${member.name || 'N/A'}`}</strong></p>
+                     <strong> <p style={{ color: member.townHallLevel < parseInt(minLevels.th) ? '#B22222' : 'inherit' }}>TH: {member.townHallLevel || 'N/A'}</p></strong>
+                     <strong><p style={{ fontWeight:'bold',fontSize:'14px',color: member.heroes?.[0]?.level < parseInt(minLevels.rey) ? '#B22222' : 'inherit' }}>Rey: {member.heroes?.[0]?.level || 'N/A'}</p></strong>
+                     <p style={{ fontWeight:'bold',fontSize:'14px', color: member.heroes?.[1]?.level < parseInt(minLevels.reina) ? '#B22222' : 'inherit' }}>Reina: {member.heroes?.[1]?.level || 'N/A'}</p>
+                     <p style={{  fontWeight:'bold',fontSize:'14px',color: member.heroes?.[2]?.level < parseInt(minLevels.centinela) ? '#B22222' : 'inherit' }}>Centinela: {member.heroes?.[2]?.level || 'N/A'}</p>
+                     <p style={{  fontWeight:'bold',fontSize:'14px',color: member.heroes?.[4]?.level < parseInt(minLevels.luchadora) ? '#B22222' : 'inherit' }}>Luchadora: {member.heroes?.[4]?.level || 'N/A'}</p>
+                     <p style={{  fontWeight:'bold',fontSize:'14px',color: member.heroes?.[6]?.level < parseInt(minLevels.principe) ? '#B22222' : 'inherit' }}>Principe: {member.heroes?.[6]?.level || 'N/A'}</p>
+                     <Button auto flat onClick={() => openModal(member)}>👁️</Button>
+                  </div>
                ))}
-            </Table.Body>
-         </Table>
+            </div>
+         ) : (
+            <>
+               <h1 style={{ color: 'greenyellow', fontSize: '32px' }}>Miembros que cumplen los requisitos mínimos</h1>
+               <Table
+                  aria-label="Members meeting requirements"
+                  css={{ height: 'auto', minWidth: '100%' }}
+               >
+                  <Table.Header>
+                     <Table.Column>Jugador</Table.Column>
+                     <Table.Column>Nivel TH</Table.Column>
+                     <Table.Column>Rey</Table.Column>
+                     <Table.Column>Reina</Table.Column>
+                     <Table.Column>Centinela</Table.Column>
+                     <Table.Column>Luchadora</Table.Column>
+                     <Table.Column>Principe</Table.Column>
+                     <Table.Column>Acciones</Table.Column>
+                  </Table.Header>
+                  <Table.Body>
+                     {membersMeetingRequirements.map((member, index) => (
+                        <Table.Row key={member.tag}>
+                           <Table.Cell>{`${index + 1}. ${member.name || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{`TH ${member.townHallLevel || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{`Rey ${member.heroes?.[0]?.level || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{`Reina ${member.heroes?.[1]?.level || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>
+                              <Button auto flat onClick={() => openModal(member)}>
+                                 👁️
+                              </Button>
+                           </Table.Cell>
+                        </Table.Row>
+                     ))}
+                  </Table.Body>
+               </Table>
+
+               <h2 style={{ color: 'red', fontSize: '32px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
+               <Table
+                  aria-label="Members not meeting requirements"
+                  css={{ height: 'auto', minWidth: '100%' }}
+               >
+                  <Table.Header>
+                     <Table.Column>Jugador</Table.Column>
+                     <Table.Column>Nivel TH</Table.Column>
+                     <Table.Column>Rey</Table.Column>
+                     <Table.Column>Reina</Table.Column>
+                     <Table.Column>Centinela</Table.Column>
+                     <Table.Column>Luchadora</Table.Column>
+                     <Table.Column>Principe</Table.Column>
+                     <Table.Column>Acciones</Table.Column>
+                  </Table.Header>
+                  <Table.Body>
+                     {membersNotMeetingRequirements.map((member, index) => (
+                        <Table.Row key={member.tag}>
+                           <Table.Cell>{`${index + 1}. ${member.name || 'N/A'}`}</Table.Cell>
+                           <Table.Cell css={{ color: member.townHallLevel < parseInt(minLevels.th) ? 'red' : 'inherit' }}>
+                              {`TH ${member.townHallLevel || 'N/A'}`}
+                           </Table.Cell>
+                           <Table.Cell css={{ color: member.heroes?.[0]?.level < parseInt(minLevels.rey) ? 'red' : 'inherit' }}>
+                              {`Rey ${member.heroes?.[0]?.level || 'N/A'}`}
+                           </Table.Cell>
+                           <Table.Cell css={{ color: member.heroes?.[1]?.level < parseInt(minLevels.reina) ? 'red' : 'inherit' }}>
+                              {`Reina ${member.heroes?.[1]?.level || 'N/A'}`}
+                           </Table.Cell>
+                           <Table.Cell css={{ color: member.heroes?.[2]?.level < parseInt(minLevels.centinela) ? 'red' : 'inherit' }}>
+                              {`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}
+                           </Table.Cell>
+                           <Table.Cell css={{ color: member.heroes?.[4]?.level < parseInt(minLevels.luchadora) ? 'red' : 'inherit' }}>
+                              {`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}
+                           </Table.Cell>
+                           <Table.Cell css={{ color: member.heroes?.[6]?.level < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
+                              {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
+                           </Table.Cell>
+                           <Table.Cell>
+                              <Button auto flat onClick={() => openModal(member)}>
+                                 👁️
+                              </Button>
+                           </Table.Cell>
+                        </Table.Row>
+                     ))}
+                  </Table.Body>
+               </Table>
+            </>
+         )}
 
          <Modal {...bindings}>
             <Modal.Header css={{ backgroundColor: '#1e293b', color: 'white' }}>
