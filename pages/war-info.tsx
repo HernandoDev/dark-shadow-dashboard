@@ -205,9 +205,9 @@ const WarInfoPage = () => {
   const switchToSecondaryClan = () => setClanTag('%232RG9R9JVP');
 
   return (
-    <div style={{ padding: '20px', }}>
-      <h1>Información de Guerra</h1>
-      <div style={{ display: 'flex', gap: '10px' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Información de Guerra</h1>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
         <Button
           bordered
           css={{
@@ -230,21 +230,31 @@ const WarInfoPage = () => {
         </Button>
       </div>
 
-      <div id="war-info-container">
+      <div id="war-info-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {fullWarDetails ? (
-          getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; members: any; warLog?: any; }) => (
-            <div key={clan.tag}>
-              <h2>{clan.name}</h2>
+          getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string; members: any; warLog?: any; }) => (
+            <div
+              key={clan.tag}
+              style={{
+                border: '1px solid #ccc',
+                borderRadius: '10px',
+                padding: '15px',
+                backgroundColor: '#333', // Dark background for better contrast
+                color: '#fff', // White text for readability
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <h2 style={{ textAlign: 'center', color: '#ffcc00', marginBottom: '10px' }}>{clan.name}</h2>
               {clan.warLog && (
                 <div style={{ marginBottom: '10px' }}>
-                  <h5 style={{ color: 'yellowgreen' }}>Resumen de Guerra ultimos 60 dias</h5>
+                  <h5 style={{ color: '#00ff00', textAlign: 'center' }}>Resumen de Guerra (últimos 60 días)</h5>
                   {clan.warLog.totalWars === 0 &&
-                    clan.warLog.wins === 0 &&
-                    clan.warLog.losses === 0 &&
-                    clan.warLog.ties === 0 ? (
-                    <p style={{ color: 'red' }}>No se pudo obtener el registro de guerras del clan enemigo.</p>
+                  clan.warLog.wins === 0 &&
+                  clan.warLog.losses === 0 &&
+                  clan.warLog.ties === 0 ? (
+                    <p style={{ color: 'red', textAlign: 'center' }}>No se pudo obtener el registro de guerras del clan enemigo.</p>
                   ) : (
-                    <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       <p>Total Guerras: {clan.warLog.totalWars}</p>
                       <p>Victorias: {clan.warLog.wins}</p>
                       <p>Derrotas: {clan.warLog.losses}</p>
@@ -253,18 +263,18 @@ const WarInfoPage = () => {
                       <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
                       <p>Victorias Significativas: {clan.warLog.significantWins}</p>
                       <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
-                    </>
+                    </div>
                   )}
                 </div>
               )}
               {clan.tag !== '#2QL0GCQGQ' && clan.tag !== '#2RG9R9JVP' && (
-                <div>
+                <div style={{ marginBottom: '10px' }}>
                   {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
                     const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0).toFixed(2));
                     const roundedAvgLevel = parseFloat(avgLevel.toFixed(2));
+                    const levelDifference = parseFloat(Math.abs(mainClanHeroLevel - roundedAvgLevel).toFixed(2));
                     let comparisonText = '';
                     let comparisonColor = '';
-                    const levelDifference = parseFloat(Math.abs(mainClanHeroLevel - roundedAvgLevel).toFixed(2));
 
                     if (mainClanHeroLevel > roundedAvgLevel) {
                       comparisonText = `NUESTRO CLAN ES MEJOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)} POR ${levelDifference}`;
@@ -278,7 +288,7 @@ const WarInfoPage = () => {
                     }
 
                     return (
-                      <p key={hero} style={{ color: comparisonColor }}>
+                      <p key={hero} style={{ color: comparisonColor, margin: '5px 0' }}>
                         {comparisonText}
                       </p>
                     );
@@ -302,18 +312,18 @@ const WarInfoPage = () => {
                     }
 
                     return (
-                      <p style={{ color: comparisonColor }}>
+                      <p style={{ color: comparisonColor, margin: '5px 0' }}>
                         {comparisonText}
                       </p>
                     );
                   })()}
                 </div>
               )}
-              <h5 style={{ color: 'yellowgreen' }}>Media de nivel de TH y Heroes</h5>
-              <ul>
-                <li>Nivel Ayuntamiento : {getClanSummary(clan.members).averageTownHallLevel}</li>
+              <h5 style={{ color: '#00ff00', textAlign: 'center', marginBottom: '10px' }}>Media de nivel de TH y Heroes</h5>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                <li style={{ marginBottom: '5px' }}>Nivel Ayuntamiento: {getClanSummary(clan.members).averageTownHallLevel}</li>
                 {getUniqueHeroes(clan.members).map((hero) => (
-                  <li key={hero}>
+                  <li key={hero} style={{ marginBottom: '5px' }}>
                     {translateHero(hero as keyof typeof heroTranslations)}: {getClanSummary(clan.members).heroAverages[hero] || 'N/A'}
                   </li>
                 ))}
@@ -321,7 +331,7 @@ const WarInfoPage = () => {
             </div>
           ))
         ) : (
-          <p>Cargando datos...</p>
+          <p style={{ textAlign: 'center', color: '#666' }}>Cargando datos...</p>
         )}
       </div>
     </div>
