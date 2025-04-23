@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { APIClashService } from '../services/apiClashService';
 import { Button } from '@nextui-org/react';
 
+// Move heroTranslations to the top level
+const heroTranslations = {
+  "Barbarian King": "Rey Bárbaro",
+  "Archer Queen": "Reina Arquera",
+  "Grand Warden": "Gran Centinela",
+  "Royal Champion": "Campeona Real",
+  "Battle Machine": "Máquina Bélica",
+  "Minion Prince": "Príncipe Minion",
+  "Battle Copter": "Helicóptero de Batalla",
+};
+
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
@@ -61,15 +72,6 @@ const WarInfoPage = () => {
   }, [clanTag]);
 
   const translateHero = (heroName: keyof typeof heroTranslations) => {
-    const heroTranslations = {
-      "Barbarian King": "Rey Bárbaro",
-      "Archer Queen": "Reina Arquera",
-      "Grand Warden": "Gran Centinela",
-      "Royal Champion": "Campeona Real",
-      "Battle Machine": "Máquina Bélica",
-      "Minion Prince": "Príncipe Minion",
-      "Battle Copter": "Helicóptero de Batalla",
-    };
     return heroTranslations[heroName] || heroName;
   };
 
@@ -158,12 +160,60 @@ const WarInfoPage = () => {
           getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; members: any; }) => (
             <div key={clan.tag}>
               <h2>{clan.name}</h2>
+              {clan.tag !== '#2QL0GCQGQ' && clan.tag !== '#2RG9R9JVP' && (
+                <div>
+                  {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
+                    const mainClanHeroLevel = getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0;
+                    let comparisonText = '';
+                    let comparisonColor = '';
+
+                    if (mainClanHeroLevel > avgLevel) {
+                      comparisonText = `NUESTRO CLAN ES MEJOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)}`;
+                      comparisonColor = 'green';
+                    } else if (mainClanHeroLevel < avgLevel) {
+                      comparisonText = `NUESTRO CLAN ES PEOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)}`;
+                      comparisonColor = 'red';
+                    } else {
+                      comparisonText = `NUESTRO CLAN TIENE EL MISMO NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)}`;
+                      comparisonColor = 'gray';
+                    }
+
+                    return (
+                      <p key={hero} style={{ color: comparisonColor }}>
+                        {comparisonText}
+                      </p>
+                    );
+                  })}
+                  {(() => {
+                    const mainClanTHLevel = getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel;
+                    let comparisonText = '';
+                    let comparisonColor = '';
+
+                    if (mainClanTHLevel > getClanSummary(clan.members).averageTownHallLevel) {
+                      comparisonText = 'NUESTRO CLAN ES MEJOR EN NIVEL DE AYUNTAMIENTO';
+                      comparisonColor = 'green';
+                    } else if (mainClanTHLevel < getClanSummary(clan.members).averageTownHallLevel) {
+                      comparisonText = 'NUESTRO CLAN ES PEOR EN NIVEL DE AYUNTAMIENTO';
+                      comparisonColor = 'red';
+                    } else {
+                      comparisonText = 'NUESTRO CLAN TIENE EL MISMO NIVEL DE AYUNTAMIENTO';
+                      comparisonColor = 'gray';
+                    }
+
+                    return (
+                      <p style={{ color: comparisonColor }}>
+                        {comparisonText}
+                      </p>
+                    );
+                  })()}
+                </div>
+              )}
               <h5 style={{color:'yellowgreen'}}>Media de nivel de TH y Heroes</h5>
               <ul>
                 <li>Nivel Ayuntamiento : {getClanSummary(clan.members).averageTownHallLevel}</li>
                 {getUniqueHeroes(clan.members).map((hero) => (
                   <li key={hero}>
-                    {translateHero(hero as "Barbarian King" | "Archer Queen" | "Grand Warden" | "Royal Champion" | "Battle Machine" | "Minion Prince" | "Battle Copter")}: {getClanSummary(clan.members).heroAverages[hero] || 'N/A'}
+                    {translateHero(hero as keyof typeof heroTranslations)}: {getClanSummary(clan.members).heroAverages[hero] || 'N/A'}
                   </li>
                 ))}
               </ul>
