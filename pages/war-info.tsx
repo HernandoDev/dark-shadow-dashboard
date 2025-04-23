@@ -127,7 +127,7 @@ const WarInfoPage = () => {
   const switchToSecondaryClan = () => setClanTag('%232RG9R9JVP');
 
   return (
-    <div>
+    <div style={{ padding: '20px', }}>
       <h1>Información de Guerra</h1>
       <div className="flex items-center gap-4">
         <button onClick={switchToMainClan}>Clan Principal</button>
@@ -138,24 +138,15 @@ const WarInfoPage = () => {
           getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; members: any; }) => (
             <div key={clan.tag}>
               <h2>{clan.name}</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Media Nivel Ayuntamiento</th>
-                    {getUniqueHeroes(clan.members).map((hero) => (
-                      <th key={hero}>Media {translateHero(hero as "Barbarian King" | "Archer Queen" | "Grand Warden" | "Royal Champion" | "Battle Machine" | "Minion Prince" | "Battle Copter")}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{getClanSummary(clan.members).averageTownHallLevel}</td>
-                    {getUniqueHeroes(clan.members).map((hero) => (
-                      <td key={hero}>{getClanSummary(clan.members).heroAverages[hero] || 'N/A'}</td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
+              <h5 style={{color:'yellowgreen'}}>Media de nivel de TH y Heroes</h5>
+              <ul>
+                <li>Nivel Ayuntamiento : {getClanSummary(clan.members).averageTownHallLevel}</li>
+                {getUniqueHeroes(clan.members).map((hero) => (
+                  <li key={hero}>
+                    {translateHero(hero as "Barbarian King" | "Archer Queen" | "Grand Warden" | "Royal Champion" | "Battle Machine" | "Minion Prince" | "Battle Copter")}: {getClanSummary(clan.members).heroAverages[hero] || 'N/A'}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))
         ) : (
