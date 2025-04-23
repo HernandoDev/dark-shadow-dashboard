@@ -74,6 +74,12 @@ export const SidebarWrapper = () => {
                         icon={<ReportsIcon />}
                         href="progress-info"
                      />
+                               <SidebarItem
+                        isActive={router.pathname === '/attack-log'}
+                        title="Registro de ataques"
+                        icon={<ReportsIcon />}
+                        href="attack-log"
+                     />
                   </SidebarMenu>
 
                </Sidebar.Body>

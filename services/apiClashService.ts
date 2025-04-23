@@ -1,6 +1,7 @@
 // services/apiClashService.ts
 
 const baseUrl = 'https://dark-shadows.ddns.net';
+// const baseUrl = 'http://localhost:3100';
 
 export const APIClashService = {
   getClanInfo: async (clanTag: string) => {
@@ -81,5 +82,25 @@ export const APIClashService = {
 
   saveProgress: async (clanTag: string) => {
     return APIClashService.saveClanMembersWithDetails(clanTag);
+  },
+
+  saveAttackLog: async (attackData: { member: string; attack: string; percentage: number; stars: number }) => {
+    const res = await fetch(`${baseUrl}/attack-log/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(attackData),
+    });
+    if (!res.ok) {
+        throw new Error('Error al guardar el ataque');
+    }
+    return res.json();
+  },
+
+  getAttackLogs: async () => {
+    const res = await fetch(`${baseUrl}/attack-log`);
+    if (!res.ok) {
+        throw new Error('Error al obtener los ataques guardados');
+    }
+    return res.json();
   }
 };
