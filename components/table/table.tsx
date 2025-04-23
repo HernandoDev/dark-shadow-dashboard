@@ -201,12 +201,13 @@ export const TableWrapper = () => {
 
    return (
       <Box css={{ padding: '20px' }}>
-         <div style={{ display: 'flex', gap: '10px' }}>
+         <div style={{ display: 'flex', gap: '10px', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
             <Button
                bordered
                css={{
                   backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
                   color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
+                  width: isMobile ? '100%' : 'auto',
                }}
                onClick={() => setClanTag('%232QL0GCQGQ')}
             >
@@ -217,6 +218,7 @@ export const TableWrapper = () => {
                css={{
                   backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
                   color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
+                  width: isMobile ? '100%' : 'auto',
                }}
                onClick={() => setClanTag('%232RG9R9JVP')}
             >
@@ -224,7 +226,14 @@ export const TableWrapper = () => {
             </Button>
          </div>
 
-         <div style={{ marginTop: '40px' }} className="grid grid-cols-3 gap-4 mt-4">
+         <div
+            style={{
+               marginTop: '40px',
+               display: 'grid',
+               gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+               gap: '10px',
+            }}
+         >
             {(Object.keys(minLevels) as Array<keyof typeof minLevels>).map((key) => (
                <Input
                   key={key}
@@ -232,15 +241,29 @@ export const TableWrapper = () => {
                   type="number"
                   value={minLevels[key]}
                   onChange={(e) => setMinLevels({ ...minLevels, [key]: e.target.value })}
+                  css={{
+                     width: '100%',
+                  }}
                />
             ))}
          </div>
-         <div style={{ marginTop: '30px' }} className="flex gap-4">
+
+         <div
+            style={{
+               marginTop: '30px',
+               display: 'flex',
+               flexDirection: isMobile ? 'column' : 'row',
+               gap: '10px',
+            }}
+         >
             <Input
                clearable
                placeholder="Buscar jugador"
                value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
+               css={{
+                  width: '100%',
+               }}
             />
          </div>
         
