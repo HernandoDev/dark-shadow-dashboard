@@ -1,8 +1,2 @@
-# Ignorar la carpeta node_modules
-./node_modules
-
-# Ignorar la carpeta .next
-.next
-
-# Evitar duplicados
-./.next
+node_modules/
+.next/
