@@ -24,58 +24,58 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails,
         <div className="bottom-section">
           <span className="title">{name || 'N/A'}</span>
           <div className="row row1">
-            <div className="item">
+            <div  style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">TH</span>
               <span
                 className="regular-text"
-                style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }}
+               
               >
                 {townHallLevel || 'N/A'}
               </span>
             </div>
-            <div className="item">
+            <div  style={{ color: heroes?.[0]?.level < minLevels.rey ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Rey</span>
               <span
                 className="regular-text"
-                style={{ color: heroes?.[0]?.level < minLevels.rey ? '#B22222' : 'inherit' }}
+                
               >
                 {heroes?.[0]?.level || 'N/A'}
               </span>
             </div>
-            <div className="item">
+            <div style={{ color: heroes?.[1]?.level < minLevels.reina ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Reina</span>
               <span
                 className="regular-text"
-                style={{ color: heroes?.[1]?.level < minLevels.reina ? '#B22222' : 'inherit' }}
+                
               >
                 {heroes?.[1]?.level || 'N/A'}
               </span>
             </div>
           </div>
           <div className="row row1">
-            <div className="item">
+            <div style={{ color: heroes?.[2]?.level < minLevels.centinela ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Centinela</span>
               <span
                 className="regular-text"
-                style={{ color: heroes?.[2]?.level < minLevels.centinela ? '#B22222' : 'inherit' }}
+                
               >
                 {heroes?.[2]?.level || 'N/A'}
               </span>
             </div>
-            <div className="item">
+            <div style={{ color: heroes?.[4]?.level < minLevels.luchadora ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Luchadora</span>
               <span
                 className="regular-text"
-                style={{ color: heroes?.[4]?.level < minLevels.luchadora ? '#B22222' : 'inherit' }}
+                
               >
                 {heroes?.[4]?.level || 'N/A'}
               </span>
             </div>
-            <div className="item">
+            <div  style={{ color: heroes?.[6]?.level < minLevels.principe ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Principe</span>
               <span
                 className="regular-text"
-                style={{ color: heroes?.[6]?.level < minLevels.principe ? '#B22222' : 'inherit' }}
+                
               >
                 {heroes?.[6]?.level || 'N/A'}
               </span>
