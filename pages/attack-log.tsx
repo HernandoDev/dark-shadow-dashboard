@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Text, Loading, Input, FormElement } from '@nextui-org/react';
 import { Plus } from 'react-feather';
 import { APIClashService } from '../services/apiClashService';
+import { fetchSavedAttacks } from '../utils/fetchSavedAttacks'; // Adjust the path as needed
 
 const AttackLog: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -104,23 +105,13 @@ const AttackLog: React.FC = () => {
             await APIClashService.saveAttackLog(attackData);
             console.log('Ataque guardado exitosamente.');
             closeModal();
-            fetchSavedAttacks();
+            fetchSavedAttacks().then(setSavedAttacks).catch((error) => {
+                console.error('Error al obtener los ataques guardados:', error);
+                console.log('Hubo un error al obtener los ataques guardados.');
+            }).finally(() => setLoadingSavedAttacks(false));
         } catch (error) {
             console.error('Error al guardar el ataque:', error);
             console.log('Hubo un error al guardar el ataque.');
-        }
-    };
-
-    const fetchSavedAttacks = async () => {
-        setLoadingSavedAttacks(true);
-        try {
-            const attacks = await APIClashService.getAttackLogs();
-            setSavedAttacks(attacks);
-        } catch (error) {
-            console.error('Error al obtener los ataques guardados:', error);
-            console.log('Hubo un error al obtener los ataques guardados.');
-        } finally {
-            setLoadingSavedAttacks(false);
         }
     };
 
@@ -167,7 +158,10 @@ const AttackLog: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchSavedAttacks();
+        fetchSavedAttacks().then(setSavedAttacks).catch((error) => {
+            console.error('Error al obtener los ataques guardados:', error);
+            console.log('Hubo un error al obtener los ataques guardados.');
+        }).finally(() => setLoadingSavedAttacks(false));
     }, []);
 
     return (

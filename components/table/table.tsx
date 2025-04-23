@@ -6,6 +6,7 @@ import { Box } from '../styles/box';
 import { APIClashService } from '../../services/apiClashService';
 import { useMediaQuery } from 'react-responsive'; // Import useMediaQuery for responsiveness
 import Card from '../card/Card'; // Import the Card component
+import { fetchSavedAttacks } from '../../utils/fetchSavedAttacks'; // Adjust the path as needed
 
 interface Member {
    tag: string;
@@ -17,6 +18,15 @@ interface Member {
    donationsReceived?: number;
    troops?: { name: string, level: number, maxLevel: number, village: string }[];
    heroEquipment?: { name: string, level: number, maxLevel: number, village: string }[];
+}
+
+interface AttackLog {
+   id: number;
+   member: string;
+   attack: string;
+   percentage: number;
+   stars: number;
+   timestamp: string;
 }
 
 // Define the type for requisitosPorAyuntamiento
@@ -37,40 +47,41 @@ type RequisitosPorAyuntamiento = {
 const requisitosPorAyuntamiento: RequisitosPorAyuntamiento = {
    TH14: {
       casaMascotas: { nivelMaximo: 4 },
-      mascotas: { LASSI: 10, ElectroOwl: 10, MightyYak: 10, Unicorn: 10 },
+      mascotas: { 'L.A.S.S.I': 10, 'Electro Owl': 10, 'Mighty Yak': 10, Unicorn: 10 },
       tropas: {},
       equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
    },
    TH15: {
       casaMascotas: { nivelMaximo: 8 },
       mascotas: {
-         LASSI: 15, ElectroOwl: 15, MightyYak: 15, Unicorn: 10,
-         Frosty: 10, Diggy: 10, PoisonLizard: 10, Phoenix: 10,
+         'L.A.S.S.I': 15, 'Electro Owl': 15, 'Mighty Yak': 15, Unicorn: 10,
+         Frosty: 10, Diggy: 10, 'Poison Lizard': 10, Phoenix: 10,
+         'Spirit Fox': 10, 'Angry Jelly': 10
       },
       tropas: {
-         Barbaro: 11, Arquera: 11, Gigante: 11, Duende: 11, Rompemuros: 11,
-         Globo: 11, Mago: 11, Sanadora: 8, Dragon: 10, PEKKA: 10,
-         BebeDragon: 9, Minero: 9, DragonElectrico: 6, Yeti: 5,
-         JineteDragon: 3, TitanElectrico: 3, Esbirro: 11, Montapuercos: 12,
-         Valquiria: 10, Golem: 12, Bruja: 6, SabuesoLava: 7,
-         Lanzarrocas: 7, GolemHielo: 7,
+         Barbarian: 11, Archer: 11, Giant: 11, Goblin: 11, "Wall Breaker": 11,
+         Balloon: 10, Wizard: 11, Healer: 8, Dragon: 10, 'P.E.K.K.A': 10,
+         'Baby Dragon': 9, Miner: 9, 'Electro Dragon': 6, Yeti: 5,
+         'Dragon Rider': 3, 'Electro Titan': 4, Minion: 12, 'Hog Rider': 13,
+         Valkyrie: 10, Golem: 12, Witch: 6, 'Lava Hound': 8,
+         Bowler: 7, 'Ice Golem': 7,
       },
       equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
    },
    TH16: {
       casaMascotas: { nivelMaximo: 10 },
       mascotas: {
-         LASSI: 15, ElectroOwl: 15, MightyYak: 15, Unicorn: 10,
-         Frosty: 10, Diggy: 10, PoisonLizard: 10, Phoenix: 10,
-         SpiritFox: 10, AngryJelly: 10,
+         'L.A.S.S.I': 15, 'Electro Owl': 15, 'Mighty Yak': 15, Unicorn: 10,
+         Frosty: 10, Diggy: 10, 'Poison Lizard': 10, Phoenix: 10,
+         'Spirit Fox': 10, 'Angry Jelly': 10,
       },
       tropas: {
-         Barbaro: 12, Arquera: 12, Gigante: 12, Duende: 12, Rompemuros: 12,
-         Globo: 12, Mago: 12, Sanadora: 9, Dragon: 11, PEKKA: 11,
-         BebeDragon: 10, Minero: 10, DragonElectrico: 7, Yeti: 6,
-         JineteDragon: 5, TitanElectrico: 4, Esbirro: 12, Montapuercos: 13,
-         Valquiria: 11, Golem: 13, Bruja: 7, SabuesoLava: 8,
-         Lanzarrocas: 8, GolemHielo: 8,
+         Barbarian: 12, Archer: 12, Giant: 12, Goblin: 12, "Wall Breaker": 12,
+         Balloon: 12, Wizard: 12, Healer: 9, Dragon: 11, 'P.E.K.K.A': 11,
+         'Baby Dragon': 10, Miner: 10, 'Electro Dragon': 7, Yeti: 6,
+         'Dragon Rider': 4, 'Electro Titan': 4, Minion: 12, 'Hog Rider': 13,
+         Valkyrie: 11, Golem: 13, Witch: 7, 'Lava Hound': 8,
+         Bowler: 8, 'Ice Golem': 8,
       },
       equipamento: { comun: 15, epica: 21, recomendadoComun: 18, recomendadoEpica: 24 },
    },
@@ -96,7 +107,8 @@ const requisitosPorAyuntamiento: RequisitosPorAyuntamiento = {
 const renderValidatedList = (
    items: { name: string; level: number; maxLevel: number }[],
    requirements: { [key: string]: number },
-   translateName: (name: string) => string
+   translateName: (name: string) => string,
+   isEquipment: boolean = false // Add a flag to differentiate equipment logic
 ) => {
    const excludedTroops = [
       'Super Barbarian', 'Super Archer', 'Super Wall Breaker', 'Super Giant', 'Sneaky Goblin',
@@ -109,14 +121,25 @@ const renderValidatedList = (
       .filter(({ name }) => !excludedTroops.includes(name)) // Exclude "super" troops
       .map(({ name, level, maxLevel }, index) => {
          const requiredLevel = requirements[name] || maxLevel; // Default to maxLevel if no requirement is defined
-         const difference = requiredLevel - level;
+         let color = '#16a34a'; // Default to green
 
-         // Determine color based on the difference
-         let color = '#16a34a'; // Green
-         if (difference === 1 || difference === 2) {
-            color = '#f59e0b'; // Yellow/Warning
-         } else if (difference >= 3) {
-            color = '#dc2626'; // Red
+         if (isEquipment) {
+            // Custom logic for equipment
+            if (level <= 14) {
+               color = '#dc2626'; // Red
+            } else if (level >= 15 && level <= 17) {
+               color = '#f59e0b'; // Yellow
+            } else if (level >= 18) {
+               color = '#16a34a'; // Green
+            }
+         } else {
+            // Default logic for troops
+            const difference = requiredLevel - level;
+            if (difference === 1 || difference === 2) {
+               color = '#f59e0b'; // Yellow/Warning
+            } else if (difference >= 3) {
+               color = '#dc2626'; // Red
+            }
          }
 
          return (
@@ -130,6 +153,7 @@ const renderValidatedList = (
 export const TableWrapper = () => {
    const [members, setMembers] = useState<Member[]>([]);
    const [loading, setLoading] = useState(true);
+   const [attackLogs, setAttackLogs] = useState<AttackLog[]>([]); // Explicitly type attackLogs
    const [minLevels, setMinLevels] = useState({
       th: '15',
       rey: '85',
@@ -261,6 +285,21 @@ export const TableWrapper = () => {
       });
    };
 
+   const getTopUsedArmies = (memberName: string) => {
+      const memberAttacks = attackLogs.filter((attack) => attack.member === memberName);
+      const armyUsageCount: { [key: string]: number } = {};
+
+      memberAttacks.forEach((attack) => {
+         armyUsageCount[attack.attack] = (armyUsageCount[attack.attack] || 0) + 1;
+      });
+
+      const sortedArmies = Object.entries(armyUsageCount)
+         .sort(([, countA], [, countB]) => countB - countA)
+         .map(([army]) => army);
+
+      return sortedArmies.slice(0, 2); // Return top 1 or 2 armies
+   };
+
    useEffect(() => {
       const fetchMembers = async () => {
          try {
@@ -273,7 +312,17 @@ export const TableWrapper = () => {
          }
       };
 
+      const fetchAttacks = async () => {
+         try {
+            const attacks = await fetchSavedAttacks(); // Fetch saved attacks
+            setAttackLogs(attacks);
+         } catch (error) {
+            console.error('Error fetching attack logs:', error);
+         }
+      };
+
       fetchMembers();
+      fetchAttacks(); // Fetch attack logs on component mount
    }, [clanTag]);
 
    const openModal = (member: any) => {
@@ -388,50 +437,62 @@ export const TableWrapper = () => {
          {isMobile ? (
             <div>
                <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
-               {sortedMeetingRequirements.map((member, index) => (
-                  <div style={{ padding: '15px' }}>
-
-                     <Card
-                        key={member.tag}
-                        position={index + 1}
-                        name={member.name}
-                        townHallLevel={member.townHallLevel}
-                        heroes={member.heroes || []}
-                        onViewDetails={() => openModal(member)}
-                        minLevels={{
-                           th: parseInt(minLevels.th),
-                           rey: parseInt(minLevels.rey),
-                           reina: parseInt(minLevels.reina),
-                           centinela: parseInt(minLevels.centinela),
-                           luchadora: parseInt(minLevels.luchadora),
-                           principe: parseInt(minLevels.principe),
-                        }}
-                     />
-                  </div>
-
-               ))}
+               {sortedMeetingRequirements.map((member, index) => {
+                  const topArmies = getTopUsedArmies(member.name);
+                  return (
+                     <div style={{ padding: '15px' }} key={member.tag}>
+                        <Card
+                           position={index + 1}
+                           name={member.name}
+                           townHallLevel={member.townHallLevel}
+                           heroes={member.heroes || []}
+                           onViewDetails={() => openModal(member)}
+                           minLevels={{
+                              th: parseInt(minLevels.th),
+                              rey: parseInt(minLevels.rey),
+                              reina: parseInt(minLevels.reina),
+                              centinela: parseInt(minLevels.centinela),
+                              luchadora: parseInt(minLevels.luchadora),
+                              principe: parseInt(minLevels.principe),
+                           }}
+                           topArmies={topArmies} // Pass topArmies prop
+                           
+                        />
+                        {/* {topArmies.length > 0 && (
+                           <p style={{ marginTop: '10px', color: '#1e293b' }}>
+                              <strong>Ejércitos más usados:</strong> {topArmies.join(', ')}
+                           </p>
+                        )} */}
+                     </div>
+                  );
+               })}
 
                <h2 style={{ color: 'red', fontSize: '24px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
-               {sortedNotMeetingRequirements.map((member, index) => (
-                  <div style={{ padding: '15px' }}>
-                     <Card
-                        key={member.tag}
-                        position={index + 1}
-                        name={member.name}
-                        townHallLevel={member.townHallLevel}
-                        heroes={member.heroes || []}
-                        onViewDetails={() => openModal(member)}
-                        minLevels={{
-                           th: parseInt(minLevels.th),
-                           rey: parseInt(minLevels.rey),
-                           reina: parseInt(minLevels.reina),
-                           centinela: parseInt(minLevels.centinela),
-                           luchadora: parseInt(minLevels.luchadora),
-                           principe: parseInt(minLevels.principe),
-                        }}
-                     />
-                  </div>
-               ))}
+               {sortedNotMeetingRequirements.map((member, index) => {
+                  const topArmies = getTopUsedArmies(member.name);
+                  return (
+                     <div style={{ padding: '15px' }} key={member.tag}>
+                        <Card
+                           position={index + 1}
+                           name={member.name}
+                           townHallLevel={member.townHallLevel}
+                           heroes={member.heroes || []}
+                           onViewDetails={() => openModal(member)}
+                           minLevels={{
+                              th: parseInt(minLevels.th),
+                              rey: parseInt(minLevels.rey),
+                              reina: parseInt(minLevels.reina),
+                              centinela: parseInt(minLevels.centinela),
+                              luchadora: parseInt(minLevels.luchadora),
+                              principe: parseInt(minLevels.principe),
+                           }}
+                           topArmies={topArmies} // Pass topArmies prop
+                           borderColor="#dc2626" // Add red border for non-compliant members
+                        />
+                     
+                     </div>
+                  );
+               })}
             </div>
          ) : (
             <>
@@ -523,6 +584,7 @@ export const TableWrapper = () => {
             </>
          )}
 
+         
 
          {/* ESTE ES EL MODAL  */}
 
@@ -573,7 +635,8 @@ export const TableWrapper = () => {
                            {renderValidatedList(
                               selectedMember.heroEquipment || [],
                               requisitosPorAyuntamiento[`TH${selectedMember.townHallLevel}`]?.equipamento || {},
-                              translateName
+                              translateName,
+                              true // Pass true to apply equipment-specific logic
                            )}
                         </ul>
                      </div>

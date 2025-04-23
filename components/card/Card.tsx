@@ -16,72 +16,50 @@ interface CardProps {
     principe: number;
   };
   position: number; // Add position prop
+  topArmies?: string[]; // Add topArmies prop
+  borderColor?: string; // Add borderColor prop
 }
 
-const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position }) => {
+const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position, topArmies, borderColor }) => {
   return (
-    <StyledWrapper>
+    <StyledWrapper borderColor={borderColor}>
       <div className="card">
         <div className="bottom-section">
           <span className="title">{`${position}. ${name || 'N/A'}`}</span> {/* Display position */}
           <div className="row row1">
-            <div  style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }} className="item">
+            <div style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">TH</span>
-              <span
-                className="regular-text"
-               
-              >
-                {townHallLevel || 'N/A'}
-              </span>
+              <span className="regular-text">{townHallLevel || 'N/A'}</span>
             </div>
-            <div  style={{ color: heroes?.[0]?.level < minLevels.rey ? '#B22222' : 'inherit' }} className="item">
+            <div style={{ color: heroes?.[0]?.level < minLevels.rey ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Rey</span>
-              <span
-                className="regular-text"
-                
-              >
-                {heroes?.[0]?.level || 'N/A'}
-              </span>
+              <span className="regular-text">{heroes?.[0]?.level || 'N/A'}</span>
             </div>
             <div style={{ color: heroes?.[1]?.level < minLevels.reina ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Reina</span>
-              <span
-                className="regular-text"
-                
-              >
-                {heroes?.[1]?.level || 'N/A'}
-              </span>
+              <span className="regular-text">{heroes?.[1]?.level || 'N/A'}</span>
             </div>
           </div>
           <div className="row row1">
             <div style={{ color: heroes?.[2]?.level < minLevels.centinela ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Centinela</span>
-              <span
-                className="regular-text"
-                
-              >
-                {heroes?.[2]?.level || 'N/A'}
-              </span>
+              <span className="regular-text">{heroes?.[2]?.level || 'N/A'}</span>
             </div>
             <div style={{ color: heroes?.[4]?.level < minLevels.luchadora ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Luchadora</span>
-              <span
-                className="regular-text"
-                
-              >
-                {heroes?.[4]?.level || 'N/A'}
-              </span>
+              <span className="regular-text">{heroes?.[4]?.level || 'N/A'}</span>
             </div>
-            <div  style={{ color: heroes?.[6]?.level < minLevels.principe ? '#B22222' : 'inherit' }} className="item">
+            <div style={{ color: heroes?.[6]?.level < minLevels.principe ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">Principe</span>
-              <span
-                className="regular-text"
-                
-              >
-                {heroes?.[6]?.level || 'N/A'}
-              </span>
+              <span className="regular-text">{heroes?.[6]?.level || 'N/A'}</span>
             </div>
           </div>
+          {topArmies && topArmies.length > 0 && (
+            <div style={{color:'white', fontSize:'15px'}} className="top-armies">
+             Ejércitos más usados: <br />
+             {topArmies.join(', ')}
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
             <Button onClick={onViewDetails}>👁️ Ver Detalles</Button>
           </div>
@@ -91,7 +69,7 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails,
   );
 };
 
-const StyledWrapper = styled.div`
+const StyledWrapper = styled.div<{ borderColor?: string }>`
   .card {
     border-radius: 20px;
     background: #1b233d;
@@ -99,6 +77,7 @@ const StyledWrapper = styled.div`
     overflow: hidden;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 20px 0px;
     transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid ${({ borderColor }) => borderColor || 'transparent'}; /* Apply dynamic border color */
   }
 
   .card .top-section {
@@ -219,6 +198,13 @@ const StyledWrapper = styled.div`
   .card .bottom-section .row .item:nth-child(2) {
     border-left: 1px solid rgba(255, 255, 255, 0.126);
     border-right: 1px solid rgba(255, 255, 255, 0.126);
+  }
+
+  .card .bottom-section .top-armies {
+    margin-top: 15px;
+    text-align: center;
+    color: #1e293b;
+    font-size: 14px;
   }
 `;
 
