@@ -45,8 +45,11 @@ const WarInfoPage = () => {
           const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
 
           const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
-          const opponentWarLog = await APIClashService.getWarLog(opponentTag);
-          const clanWarLogSummary = getWarSummary(opponentWarLog)
+          const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
+            console.error("Error al obtener el registro de guerra del clan");
+            return { items: [] }; // Return an empty war log to avoid errors
+          });
+          const clanWarLogSummary = getWarSummary(opponentWarLog);
           const fullDetails = [
             { ...currentWarDetails.clan, members: clanDetails },
             { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
@@ -138,10 +141,21 @@ const WarInfoPage = () => {
     return `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
   }
   const getWarSummary = (warLog: any) => {
+    if (!warLog || !warLog.items) {
+      return {
+        totalWars: 0,
+        wins: 0,
+        losses: 0,
+        ties: 0,
+        maxWinStreak: 0,
+        maxLossStreak: 0,
+        significantWins: 0,
+        significantLosses: 0,
+      };
+    }
     const now = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(now.getDate() - 60);
-
     const recentWars = warLog.items.filter((war: any) => {
       const parsedDateStr = parseCustomDate(war.endTime);
       const warEndTime = new Date(parsedDateStr);
@@ -224,28 +238,39 @@ const WarInfoPage = () => {
               {clan.warLog && (
                 <div style={{ marginBottom: '10px' }}>
                   <h5 style={{ color: 'yellowgreen' }}>Resumen de Guerra ultimos 60 dias</h5>
-                  <p>Total Guerras: {clan.warLog.totalWars}</p>
-                  <p>Victorias: {clan.warLog.wins}</p>
-                  <p>Derrotas: {clan.warLog.losses}</p>
-                  <p>Empates: {clan.warLog.ties}</p>
-                  <p>Racha Máxima de Victorias: {clan.warLog.maxWinStreak}</p>
-                  <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
-                  <p>Victorias Significativas: {clan.warLog.significantWins}</p>
-                  <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
+                  {clan.warLog.totalWars === 0 &&
+                    clan.warLog.wins === 0 &&
+                    clan.warLog.losses === 0 &&
+                    clan.warLog.ties === 0 ? (
+                    <p style={{ color: 'red' }}>No se pudo obtener el registro de guerras del clan enemigo.</p>
+                  ) : (
+                    <>
+                      <p>Total Guerras: {clan.warLog.totalWars}</p>
+                      <p>Victorias: {clan.warLog.wins}</p>
+                      <p>Derrotas: {clan.warLog.losses}</p>
+                      <p>Empates: {clan.warLog.ties}</p>
+                      <p>Racha Máxima de Victorias: {clan.warLog.maxWinStreak}</p>
+                      <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
+                      <p>Victorias Significativas: {clan.warLog.significantWins}</p>
+                      <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
+                    </>
+                  )}
                 </div>
               )}
               {clan.tag !== '#2QL0GCQGQ' && clan.tag !== '#2RG9R9JVP' && (
                 <div>
                   {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
-                    const mainClanHeroLevel = getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0;
+                    const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0).toFixed(2));
+                    const roundedAvgLevel = parseFloat(avgLevel.toFixed(2));
                     let comparisonText = '';
                     let comparisonColor = '';
+                    const levelDifference = parseFloat(Math.abs(mainClanHeroLevel - roundedAvgLevel).toFixed(2));
 
-                    if (mainClanHeroLevel > avgLevel) {
-                      comparisonText = `NUESTRO CLAN ES MEJOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)}`;
+                    if (mainClanHeroLevel > roundedAvgLevel) {
+                      comparisonText = `NUESTRO CLAN ES MEJOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)} POR ${levelDifference}`;
                       comparisonColor = 'green';
-                    } else if (mainClanHeroLevel < avgLevel) {
-                      comparisonText = `NUESTRO CLAN ES PEOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)}`;
+                    } else if (mainClanHeroLevel < roundedAvgLevel) {
+                      comparisonText = `NUESTRO CLAN ES PEOR EN NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)} POR ${levelDifference}`;
                       comparisonColor = 'red';
                     } else {
                       comparisonText = `NUESTRO CLAN TIENE EL MISMO NIVEL DE ${translateHero(hero as keyof typeof heroTranslations)}`;
@@ -259,15 +284,17 @@ const WarInfoPage = () => {
                     );
                   })}
                   {(() => {
-                    const mainClanTHLevel = getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel;
+                    const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel.toFixed(2));
+                    const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
+                    const levelDifference = parseFloat(Math.abs(mainClanTHLevel - opponentTHLevel).toFixed(2));
                     let comparisonText = '';
                     let comparisonColor = '';
 
-                    if (mainClanTHLevel > getClanSummary(clan.members).averageTownHallLevel) {
-                      comparisonText = 'NUESTRO CLAN ES MEJOR EN NIVEL DE AYUNTAMIENTO';
+                    if (mainClanTHLevel > opponentTHLevel) {
+                      comparisonText = `NUESTRO CLAN ES MEJOR EN NIVEL DE AYUNTAMIENTO POR ${levelDifference}`;
                       comparisonColor = 'green';
-                    } else if (mainClanTHLevel < getClanSummary(clan.members).averageTownHallLevel) {
-                      comparisonText = 'NUESTRO CLAN ES PEOR EN NIVEL DE AYUNTAMIENTO';
+                    } else if (mainClanTHLevel < opponentTHLevel) {
+                      comparisonText = `NUESTRO CLAN ES PEOR EN NIVEL DE AYUNTAMIENTO POR ${levelDifference}`;
                       comparisonColor = 'red';
                     } else {
                       comparisonText = 'NUESTRO CLAN TIENE EL MISMO NIVEL DE AYUNTAMIENTO';
