@@ -204,20 +204,31 @@ const ProgressInfo: React.FC = () => {
                     </p>
                 )}
             </div>
-            <ul>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                 {translateChanges(timeline).map((entry, index) => (
-                    <li key={index}>
-                        <strong style={{ color: 'violet' }}>{entry.name}</strong>
-                        <ul>
+                    <div
+                        key={index}
+                        style={{
+                            border: '1px solid #ccc',
+                            borderRadius: '10px',
+                            padding: '15px',
+                            backgroundColor: '#333', // Dark background for better contrast
+                            color: '#fff', // White text for readability
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                            width: '300px',
+                        }}
+                    >
+                        <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                             {entry.changes.map((change: any, idx: number) => (
-                                <li key={idx}>
+                                <li key={idx} style={{ marginBottom: '5px' }}>
                                     {change.type}: {change.name} (De nivel {change.oldLevel} a nivel {change.newLevel})
                                 </li>
                             ))}
                         </ul>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 };
