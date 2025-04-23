@@ -207,12 +207,12 @@ const StyledWrapper = styled.div`
   }
 
   .card .bottom-section .row .item .big-text {
-    font-size: 12px;
+    font-size: 15px;
     display: block;
   }
 
   .card .bottom-section .row .item .regular-text {
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .card .bottom-section .row .item:nth-child(2) {
