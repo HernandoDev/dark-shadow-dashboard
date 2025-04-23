@@ -15,14 +15,15 @@ interface CardProps {
     luchadora: number;
     principe: number;
   };
+  position: number; // Add position prop
 }
 
-const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels }) => {
+const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position }) => {
   return (
     <StyledWrapper>
       <div className="card">
         <div className="bottom-section">
-          <span className="title">{name || 'N/A'}</span>
+          <span className="title">{`${position}. ${name || 'N/A'}`}</span> {/* Display position */}
           <div className="row row1">
             <div  style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }} className="item">
               <span className="big-text">TH</span>

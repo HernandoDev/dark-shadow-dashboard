@@ -137,6 +137,22 @@ export const TableWrapper = () => {
       return translations[name] || name;
    };
 
+   const calculateHeroAverage = (heroes: { level: number }[] = []) => {
+      const totalLevels = heroes.reduce((sum, hero) => sum + hero.level, 0);
+      return heroes.length > 0 ? totalLevels / heroes.length : 0;
+   };
+
+   const sortMembers = (members: Member[]) => {
+      return [...members].sort((a, b) => {
+         const avgA = calculateHeroAverage(a.heroes);
+         const avgB = calculateHeroAverage(b.heroes);
+         if (avgB === avgA) {
+            return b.townHallLevel - a.townHallLevel; // Sort by Town Hall level if hero averages are equal
+         }
+         return avgB - avgA; // Sort by hero average
+      });
+   };
+
    useEffect(() => {
       const fetchMembers = async () => {
          try {
@@ -179,6 +195,9 @@ export const TableWrapper = () => {
 
    const membersMeetingRequirements = filterMembers(members, true);
    const membersNotMeetingRequirements = filterMembers(members, false);
+
+   const sortedMeetingRequirements = sortMembers(membersMeetingRequirements);
+   const sortedNotMeetingRequirements = sortMembers(membersNotMeetingRequirements);
 
    return (
       <Box css={{ padding: '20px' }}>
@@ -228,11 +247,12 @@ export const TableWrapper = () => {
          {isMobile ? (
             <div>
                <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
-               {membersMeetingRequirements.map((member, index) => (
+               {sortedMeetingRequirements.map((member, index) => (
                   <div style={{padding:'15px'}}>
                     
                   <Card
                      key={member.tag}
+                     position={index + 1}
                      name={member.name}
                      townHallLevel={member.townHallLevel}
                      heroes={member.heroes || []}
@@ -251,10 +271,11 @@ export const TableWrapper = () => {
                ))}
 
                <h2 style={{ color: 'red', fontSize: '24px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
-               {membersNotMeetingRequirements.map((member, index) => (
+               {sortedNotMeetingRequirements.map((member, index) => (
                   <div style={{padding:'15px'}}>
                   <Card
                      key={member.tag}
+                     position={index + 1}
                      name={member.name}
                      townHallLevel={member.townHallLevel}
                      heroes={member.heroes || []}
@@ -279,6 +300,7 @@ export const TableWrapper = () => {
                   css={{ height: 'auto', minWidth: '100%' }}
                >
                   <Table.Header>
+                     <Table.Column>#</Table.Column>
                      <Table.Column>Jugador</Table.Column>
                      <Table.Column>Nivel TH</Table.Column>
                      <Table.Column>Rey</Table.Column>
@@ -289,9 +311,10 @@ export const TableWrapper = () => {
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
-                     {membersMeetingRequirements.map((member, index) => (
+                     {sortedMeetingRequirements.map((member, index) => (
                         <Table.Row key={member.tag}>
-                           <Table.Cell>{`${index + 1}. ${member.name || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{index + 1}</Table.Cell>
+                           <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
                            <Table.Cell>{`TH ${member.townHallLevel || 'N/A'}`}</Table.Cell>
                            <Table.Cell>{`Rey ${member.heroes?.[0]?.level || 'N/A'}`}</Table.Cell>
                            <Table.Cell>{`Reina ${member.heroes?.[1]?.level || 'N/A'}`}</Table.Cell>
@@ -314,6 +337,7 @@ export const TableWrapper = () => {
                   css={{ height: 'auto', minWidth: '100%' }}
                >
                   <Table.Header>
+                     <Table.Column>#</Table.Column>
                      <Table.Column>Jugador</Table.Column>
                      <Table.Column>Nivel TH</Table.Column>
                      <Table.Column>Rey</Table.Column>
@@ -324,25 +348,26 @@ export const TableWrapper = () => {
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
-                     {membersNotMeetingRequirements.map((member, index) => (
+                     {sortedNotMeetingRequirements.map((member, index) => (
                         <Table.Row key={member.tag}>
-                           <Table.Cell>{`${index + 1}. ${member.name || 'N/A'}`}</Table.Cell>
+                           <Table.Cell>{index + 1}</Table.Cell>
+                           <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
                            <Table.Cell css={{ color: member.townHallLevel < parseInt(minLevels.th) ? 'red' : 'inherit' }}>
                               {`TH ${member.townHallLevel || 'N/A'}`}
                            </Table.Cell>
-                           <Table.Cell css={{ color: member.heroes?.[0]?.level < parseInt(minLevels.rey) ? 'red' : 'inherit' }}>
+                           <Table.Cell css={{ color: (member.heroes?.[0]?.level ?? 0) < parseInt(minLevels.rey) ? 'red' : 'inherit' }}>
                               {`Rey ${member.heroes?.[0]?.level || 'N/A'}`}
                            </Table.Cell>
-                           <Table.Cell css={{ color: member.heroes?.[1]?.level < parseInt(minLevels.reina) ? 'red' : 'inherit' }}>
+                           <Table.Cell css={{ color: (member.heroes?.[1]?.level ?? 0) < parseInt(minLevels.reina) ? 'red' : 'inherit' }}>
                               {`Reina ${member.heroes?.[1]?.level || 'N/A'}`}
                            </Table.Cell>
-                           <Table.Cell css={{ color: member.heroes?.[2]?.level < parseInt(minLevels.centinela) ? 'red' : 'inherit' }}>
+                           <Table.Cell css={{ color: (member.heroes?.[2]?.level ?? 0) < parseInt(minLevels.centinela) ? 'red' : 'inherit' }}>
                               {`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}
                            </Table.Cell>
-                           <Table.Cell css={{ color: member.heroes?.[4]?.level < parseInt(minLevels.luchadora) ? 'red' : 'inherit' }}>
+                           <Table.Cell css={{ color: (member.heroes?.[4]?.level ?? 0) < parseInt(minLevels.luchadora) ? 'red' : 'inherit' }}>
                               {`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}
                            </Table.Cell>
-                           <Table.Cell css={{ color: member.heroes?.[6]?.level < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
+                           <Table.Cell css={{ color: (member.heroes?.[6]?.level ?? 0) < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
                               {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
                            </Table.Cell>
                            <Table.Cell>
