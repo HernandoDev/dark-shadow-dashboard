@@ -207,7 +207,7 @@ const ProgressInfo: React.FC = () => {
             <ul>
                 {translateChanges(timeline).map((entry, index) => (
                     <li key={index}>
-                        <strong>{entry.name}</strong>
+                        <strong style={{ color: 'violet' }}>{entry.name}</strong>
                         <ul>
                             {entry.changes.map((change: any, idx: number) => (
                                 <li key={idx}>
