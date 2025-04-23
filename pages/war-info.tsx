@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { APIClashService } from '../services/apiClashService';
+import { Button } from '@nextui-org/react';
 
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
@@ -129,10 +130,29 @@ const WarInfoPage = () => {
   return (
     <div style={{ padding: '20px', }}>
       <h1>Información de Guerra</h1>
-      <div className="flex items-center gap-4">
-        <button onClick={switchToMainClan}>Clan Principal</button>
-        <button onClick={switchToSecondaryClan}>Clan Cantera</button>
-      </div>
+               <div style={{ display: 'flex', gap: '10px' }}>
+                  <Button
+                     bordered
+                     css={{
+                        backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
+                        color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
+                     }}
+                     onClick={() => switchToMainClan()}
+                  >
+                     Clan Principal
+                  </Button>
+                  <Button
+                     bordered
+                     css={{
+                        backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
+                        color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
+                     }}
+                     onClick={() => switchToSecondaryClan()}
+                  >
+                     Clan Cantera
+                  </Button>
+               </div>
+      
       <div id="war-info-container">
         {fullWarDetails ? (
           getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; members: any; }) => (
