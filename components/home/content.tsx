@@ -9,7 +9,10 @@ import {CardBalance1} from './card-balance1';
 import {CardBalance2} from './card-balance2';
 import {CardBalance3} from './card-balance3';
 import {CardAgents} from './card-agents';
+import { APIClashService } from '../../services/apiClashService';
+
 import {CardTransactions} from './card-transactions';
+const clanTag = '%232QL0GCQGQ';
 
 const Chart = dynamic(
    () => import('../charts/steam').then((mod) => mod.Steam),
@@ -18,174 +21,227 @@ const Chart = dynamic(
    }
 );
 
-export const Content = () => (
-   <Box css={{overflow: 'hidden', height: '100%'}}>
-      <Flex
-         css={{
-            'gap': '$8',
-            'pt': '$5',
-            'height': 'fit-content',
-            'flexWrap': 'wrap',
-            '@lg': {
-               flexWrap: 'nowrap',
-            },
-            '@sm': {
-               pt: '$10',
-            },
-         }}
-         justify={'center'}
-      >
+type Player = {
+   member: string;
+   stars: number;
+   percentage: number;
+   army: string; // Add army property
+};
+
+export const Content = () => {
+   const [attackLogs, setAttackLogs] = React.useState<any[] | null>(null);
+   const [topPlayers, setTopPlayers] = React.useState<Player[]>([]);
+   const [chartData, setChartData] = React.useState<{attack: string; stars: number}[]>([]);
+
+   React.useEffect(() => {
+      const fetchAttackLogs = async () => {
+         const data = await APIClashService.getAttackLogs();
+         setAttackLogs(data);
+
+         // Define the type for playerStats
+
+         // Group attacks by player and calculate total stars, average percentage, and most used army
+          interface Attack {
+            member: string;
+            stars: number;
+            percentage: number;
+            attack: string;
+          }
+
+          interface PlayerStats {
+            stars: number;
+            percentage: number;
+            attacks: number;
+            army: string;
+          }
+
+          const playerStats: Record<string, PlayerStats> = data.reduce((acc: Record<string, PlayerStats>, attack: Attack) => {
+            if (!acc[attack.member]) {
+               acc[attack.member] = { stars: 0, percentage: 0, attacks: 0, army: attack.attack };
+            }
+            acc[attack.member].stars += attack.stars;
+            acc[attack.member].percentage += attack.percentage;
+            acc[attack.member].attacks += 1;
+            return acc;
+          }, {} as Record<string, PlayerStats>);
+
+         // Calculate average percentage and sort players by total stars and average percentage
+         const sortedPlayers = Object.entries(playerStats)
+            .map(([member, stats]: [string, PlayerStats]) => ({
+               member,
+               stars: stats.stars,
+               percentage: stats.percentage / stats.attacks,
+               army: stats.army, // Include army
+            }))
+            .sort((a, b) => b.stars - a.stars || b.percentage - a.percentage)
+            .slice(0, 3); // Get top 3 players
+
+         setTopPlayers(sortedPlayers);
+
+         // Calculate total stars for each type of attack
+         const attackStats = data.reduce((acc: Record<string, number>, log: { attack: string; stars: number }) => {
+            acc[log.attack] = (acc[log.attack] || 0) + log.stars;
+            return acc;
+         }, {} as Record<string, number>);
+
+         const formattedData = Object.entries(attackStats).map(([attack, stars]) => ({
+            attack,
+            stars: stars as number,
+         }));
+
+         setChartData(formattedData);
+      };
+      fetchAttackLogs();
+   }, []);
+
+   return (
+      <Box css={{overflow: 'hidden', height: '100%'}}>
          <Flex
             css={{
-               'px': '$12',
-               'mt': '$8',
-               '@xsMax': {px: '$10'},
-               'gap': '$12',
+               'gap': '$8',
+               'pt': '$5',
+               'height': 'fit-content',
+               'flexWrap': 'wrap',
+               '@lg': {
+                  flexWrap: 'nowrap',
+               },
+               '@sm': {
+                  pt: '$10',
+               },
             }}
-            direction={'column'}
+            justify={'center'}
          >
-            {/* Card Section Top */}
-            <Box>
-               <Text
+            <Flex
+               css={{
+                  'px': '$12',
+                  'mt': '$8',
+                  '@xsMax': {px: '$10'},
+                  'gap': '$12',
+               }}
+               direction={'column'}
+            >
+               {/* Card Section Top */}
+               <Box>
+                  <Text
+                     h3
+                     css={{
+                        'textAlign': 'center',
+                        '@sm': {
+                           textAlign: 'inherit',
+                        },
+                     }}
+                  >
+                     Top Jugadores de Guerra 
+                  </Text>
+                  <Flex
+                     css={{
+                        'gap': '$10',
+                        'flexWrap': 'wrap',
+                        'justifyContent': 'center',
+                        '@sm': {
+                           flexWrap: 'nowrap',
+                        },
+                     }}
+                     direction={'row'}
+                  >
+                     {topPlayers.map((player, index) => (
+                        <CardBalance1 key={index} player={player} position={index + 1} />
+                     ))}
+                  </Flex>
+               </Box>
+
+               {/* Chart */}
+               <Box>
+              
+               </Box>
+
+               <Box>
+                  <Text
+                     h3
+                     css={{
+                        'textAlign': 'center',
+                        '@lg': {
+                           textAlign: 'inherit',
+                        },
+                     }}
+                  >
+                     Rendimiento en Estrellas por Tipo de Ataque
+                  </Text>
+                  <Box
+                     css={{
+                        width: '100%',
+                        backgroundColor: '$accents0',
+                        boxShadow: '$lg',
+                        borderRadius: '$2xl',
+                        px: '$10',
+                        py: '$10',
+                     }}
+                  >
+                     <Chart chartData={chartData} />
+                  </Box>
+               </Box>
+            </Flex>
+
+            {/* Left Section */}
+            <Box
+               css={{
+                  'px': '$12',
+                  'mt': '$8',
+                  'height': 'fit-content',
+                  '@xsMax': {px: '$10'},
+                  'gap': '$6',
+                  'overflow': 'hidden',
+               }}
+            >
+               {/* <Text
                   h3
                   css={{
                      'textAlign': 'center',
-                     '@sm': {
+                     '@lg': {
                         textAlign: 'inherit',
                      },
                   }}
                >
-                  Available Balance
-               </Text>
+                  Top Jugadores Liga 
+               </Text> */}
                <Flex
+                  direction={'column'}
+                  justify={'center'}
                   css={{
-                     'gap': '$10',
+                     'gap': '$8',
+                     'flexDirection': 'row',
                      'flexWrap': 'wrap',
-                     'justifyContent': 'center',
                      '@sm': {
                         flexWrap: 'nowrap',
                      },
+                     '@lg': {
+                        flexWrap: 'nowrap',
+                        flexDirection: 'column',
+                     },
                   }}
-                  direction={'row'}
                >
-                  <CardBalance1 />
-                  <CardBalance2 />
-                  <CardBalance3 />
+                  {/* <CardAgents /> */}
+                  <CardTransactions />
                </Flex>
             </Box>
-
-            {/* Chart */}
-            <Box>
-               <Text
-                  h3
-                  css={{
-                     'textAlign': 'center',
-                     '@lg': {
-                        textAlign: 'inherit',
-                     },
-                  }}
-               >
-                  Statistics
-               </Text>
-               <Box
-                  css={{
-                     width: '100%',
-                     backgroundColor: '$accents0',
-                     boxShadow: '$lg',
-                     borderRadius: '$2xl',
-                     px: '$10',
-                     py: '$10',
-                  }}
-               >
-                  <Chart />
-               </Box>
-            </Box>
          </Flex>
 
-         {/* Left Section */}
-         <Box
+         {/* Table Latest Users */}
+         <Flex
+            direction={'column'}
+            justify={'center'}
             css={{
-               'px': '$12',
+               'width': '100%',
+               'py': '$10',
+               'px': '$10',
                'mt': '$8',
-               'height': 'fit-content',
-               '@xsMax': {px: '$10'},
-               'gap': '$6',
-               'overflow': 'hidden',
+               '@sm': {px: '$20'},
             }}
          >
-            <Text
-               h3
-               css={{
-                  'textAlign': 'center',
-                  '@lg': {
-                     textAlign: 'inherit',
-                  },
-               }}
-            >
-               Section
-            </Text>
-            <Flex
-               direction={'column'}
-               justify={'center'}
-               css={{
-                  'gap': '$8',
-                  'flexDirection': 'row',
-                  'flexWrap': 'wrap',
-                  '@sm': {
-                     flexWrap: 'nowrap',
-                  },
-                  '@lg': {
-                     flexWrap: 'nowrap',
-                     flexDirection: 'column',
-                  },
-               }}
-            >
-               <CardAgents />
-               <CardTransactions />
-            </Flex>
-         </Box>
-      </Flex>
-
-      {/* Table Latest Users */}
-      <Flex
-         direction={'column'}
-         justify={'center'}
-         css={{
-            'width': '100%',
-            'py': '$10',
-            'px': '$10',
-            'mt': '$8',
-            '@sm': {px: '$20'},
-         }}
-      >
-         <Flex justify={'between'} wrap={'wrap'}>
-            <Text
-               h3
-               css={{
-                  'textAlign': 'center',
-                  '@lg': {
-                     textAlign: 'inherit',
-                  },
-               }}
-            >
-               Latest Users
-            </Text>
-            <NextLink href="/accounts">
-               <Link
-                  block
-                  color="primary"
-                  css={{
-                     'textAlign': 'center',
-                     '@lg': {
-                        textAlign: 'inherit',
-                     },
-                  }}
-               >
-                  View All
-               </Link>
-            </NextLink>
+           
          </Flex>
-         <TableWrapper />
-      </Flex>
-   </Box>
-);
+
+   
+      </Box>
+   );
+};

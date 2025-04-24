@@ -49,6 +49,12 @@ export const SidebarWrapper = () => {
                <Sidebar.Body className="body sidebar">
 
                   <SidebarMenu title="Main Menu">
+                  <SidebarItem
+                        isActive={router.pathname === '/'}
+                        title="Inicio"
+                        icon={<AccountsIcon />}
+                        href="/"
+                     />
                      <SidebarItem
                         isActive={router.pathname === '/accounts'}
                         title="Requisitos minimos"
