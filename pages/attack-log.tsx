@@ -343,6 +343,8 @@ const AttackLog: React.FC = () => {
                                         width: '300px',
                                     }}
                                 >
+
+                                    
                                     <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{attackName}</h3>
                                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                         <li style={{ marginBottom: '5px' }}>
