@@ -119,10 +119,17 @@ const AttackLog: React.FC = () => {
         return 'red';
     };
 
-    const getAttackCardBorderColor = (rank: number, total: number): string => {
-        if (rank <= 3) return 'green'; // Top 3 attacks
-        if (rank === 4) return 'yellow'; // 4th best attack
-        if (rank > total - 3) return 'red'; // Bottom 3 attacks
+    const getAttackCardBorderColor = (points: number[], index: number): string => {
+        const sortedPoints = [...points].sort((a, b) => b - a); // Sort points in descending order
+        const topThree = sortedPoints.slice(0, 3); // Top 3 points
+        const bottomThree = sortedPoints.slice(-3); // Bottom 3 points
+        const fourthWorst = sortedPoints[sortedPoints.length - 4]; // 4th worst point
+
+        const currentPoint = points[index];
+
+        if (topThree.includes(currentPoint)) return 'green'; // Top 3 attacks
+        if (currentPoint === fourthWorst) return 'yellow'; // 4th worst attack
+        if (bottomThree.includes(currentPoint)) return 'red'; // Bottom 3 attacks
         return '#ccc'; // Default border color
     };
 
@@ -317,12 +324,17 @@ const AttackLog: React.FC = () => {
                 ) : savedAttacks.length > 0 ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                         {Object.entries(getAttackSummary())
-                            .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Sort by total points descending
-                            .map(([attackName, summary], index, sortedArray) => (
+                            .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Sort attacks by total points descending
+                            .map(([attackName, summary], index) => (
                                 <div
                                     key={index}
                                     style={{
-                                        border: `2px solid ${getAttackCardBorderColor(index + 1, sortedArray.length)}`,
+                                        border: `2px solid ${getAttackCardBorderColor(
+                                            Object.entries(getAttackSummary())
+                                                .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Ensure consistent sorting
+                                                .map(([, s]) => s.totalPoints),
+                                            index
+                                        )}`,
                                         borderRadius: '10px',
                                         padding: '15px',
                                         backgroundColor: '#333', // Dark background for better contrast
