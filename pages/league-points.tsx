@@ -67,7 +67,7 @@ const LeaguePointsPage = () => {
       totalDestruction: number;
       minDestruction: number;
       score: number;
-      avgDestruction?: number;
+      avgDestruction: number; // Changed from optional to required
    }
 
    const processResults = async (
@@ -91,6 +91,7 @@ const LeaguePointsPage = () => {
                   totalDestruction: 0,
                   minDestruction: 100,
                   score: 0,
+                  avgDestruction: 0, // Initialize avgDestruction with 0
                };
             }
 
@@ -118,7 +119,7 @@ const LeaguePointsPage = () => {
             ...player,
             avgDestruction: player.totalAttacks
                ? player.totalDestruction / player.totalAttacks
-               : 0 as number,
+               : 0, // Ensure avgDestruction is always a number
          }))
          .sort((a, b) => b.score - a.score);
    };
