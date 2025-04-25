@@ -25,13 +25,28 @@ type Player = {
    member: string;
    stars: number;
    percentage: number;
-   army: string; // Add army property
+   army: string;
+   points: number; // Add points property
 };
 
 export const Content = () => {
    const [attackLogs, setAttackLogs] = React.useState<any[] | null>(null);
    const [topPlayers, setTopPlayers] = React.useState<Player[]>([]);
    const [chartData, setChartData] = React.useState<{attack: string; stars: number}[]>([]);
+
+   const calculatePoints = (stars: number, memberThLevel: string, thRival: string): number => {
+      const memberLevel = parseInt(memberThLevel.replace('TH', ''), 10);
+      const rivalLevel = parseInt(thRival.replace('TH', ''), 10);
+      let points = stars;
+
+      if (memberLevel > rivalLevel) {
+         points -= 0.5; // Subtract 0.5 points if attacking a lower TH
+      } else if (memberLevel < rivalLevel) {
+         points += stars === 3 ? 0.5 : 0.25; // Add 0.5 for 3 stars, 0.25 otherwise
+      }
+
+      return points;
+   };
 
    React.useEffect(() => {
       const fetchAttackLogs = async () => {
@@ -46,6 +61,8 @@ export const Content = () => {
             stars: number;
             percentage: number;
             attack: string;
+            memberThLevel: string;
+            thRival: string;
           }
 
           interface PlayerStats {
@@ -53,27 +70,30 @@ export const Content = () => {
             percentage: number;
             attacks: number;
             army: string;
+            points: number; // Add points field
           }
 
           const playerStats: Record<string, PlayerStats> = data.reduce((acc: Record<string, PlayerStats>, attack: Attack) => {
             if (!acc[attack.member]) {
-               acc[attack.member] = { stars: 0, percentage: 0, attacks: 0, army: attack.attack };
+               acc[attack.member] = { stars: 0, percentage: 0, attacks: 0, army: attack.attack, points: 0 };
             }
             acc[attack.member].stars += attack.stars;
             acc[attack.member].percentage += attack.percentage;
             acc[attack.member].attacks += 1;
+            acc[attack.member].points += calculatePoints(attack.stars, attack.memberThLevel, attack.thRival); // Calculate points
             return acc;
           }, {} as Record<string, PlayerStats>);
 
-         // Calculate average percentage and sort players by total stars and average percentage
+         // Calculate average percentage and sort players by total points, stars, and average percentage
          const sortedPlayers = Object.entries(playerStats)
             .map(([member, stats]: [string, PlayerStats]) => ({
                member,
                stars: stats.stars,
                percentage: stats.percentage / stats.attacks,
-               army: stats.army, // Include army
+               army: stats.army,
+               points: stats.points, // Include points
             }))
-            .sort((a, b) => b.stars - a.stars || b.percentage - a.percentage)
+            .sort((a, b) => b.points - a.points || b.stars - a.stars || b.percentage - a.percentage)
             .slice(0, 3); // Get top 3 players
 
          setTopPlayers(sortedPlayers);

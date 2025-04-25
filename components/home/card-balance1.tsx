@@ -7,6 +7,7 @@ type Player = {
    stars: number;
    percentage: number;
    army: string; // Add army property
+   points: number; // Add points property
 };
 
 type CardBalance1Props = {
@@ -33,13 +34,16 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                   #{position} - {player.member}
                </Text>
                <Text span css={{color: 'black'}} size={'$md'}>
-                  Stars: {player.stars}
+                  Estrellas: {player.stars}
                </Text>
                <Text span css={{color: 'black'}} size={'$md'}>
-                  Percentage: {player.percentage}%
+                  Destruccion %: {player.percentage}%
                </Text>
                <Text span css={{color: 'black'}} size={'$md'}>
-                  Army: {player.army}
+                  Ejercito: {player.army}
+               </Text>
+               <Text span css={{color: 'black'}} size={'$md'}>
+                  Puntos: {player.points.toFixed(2)}
                </Text>
             </Flex>
          </Card.Body>

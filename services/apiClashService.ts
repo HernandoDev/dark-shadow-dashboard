@@ -84,7 +84,7 @@ export const APIClashService = {
     return APIClashService.saveClanMembersWithDetails(clanTag);
   },
 
-  saveAttackLog: async (attackData: { member: string; attack: string; percentage: number; stars: number }) => {
+  saveAttackLog: async (attackData: { member: string; attack: string; percentage: number; stars: number; thRival: string; description: string; memberThLevel: string }) => {
     const res = await fetch(`${baseUrl}/attack-log/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
