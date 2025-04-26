@@ -31,6 +31,8 @@ const Login = () => {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 height: '100vh',
+                backgroundPositionY: '-300px',
+
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center'
@@ -38,7 +40,6 @@ const Login = () => {
                 backgroundImage: "url('/login_image.png')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundPositionY: '-300px',
                 backgroundRepeat: 'no-repeat',
                 backgroundAttachment: 'fixed',
                 height: '100vh',
