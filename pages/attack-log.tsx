@@ -158,7 +158,7 @@ const AttackLog: React.FC = () => {
         return '#ccc'; // Default border color
     };
 
-    const calculatePoints = (stars: number, memberThLevel: string, thRival: string): number => {
+    const calculatePoints = (stars: number, memberThLevel: string, thRival: string, totalUses: number): number => {
         const memberLevel = parseInt(memberThLevel.replace('TH', ''), 10);
         const rivalLevel = parseInt(thRival.replace('TH', ''), 10);
         let points = stars;
@@ -169,6 +169,9 @@ const AttackLog: React.FC = () => {
             points += stars === 3 ? 0.5 : 0.25; // Add 0.5 for 3 stars, 0.25 otherwise
         }
 
+        // Adjust points based on the total number of uses
+        points = points / totalUses;
+
         return points;
     };
 
@@ -177,32 +180,45 @@ const AttackLog: React.FC = () => {
             console.log('Por favor, complete todos los campos antes de guardar.');
             return;
         }
-        debugger
-        const memberThLevel = getMemberThLevel(selectedMember);
+
+        let memberThLevel = getMemberThLevel(selectedMember);
         if (!memberThLevel) {
             console.log('No se pudo determinar el TH del miembro seleccionado.');
             return;
         }
 
+        // Ensure memberThLevel is always a string prefixed with "TH"
+        if (typeof memberThLevel === 'number') {
+            memberThLevel = `TH${memberThLevel}`;
+        } else if (!memberThLevel.startsWith('TH')) {
+            memberThLevel = `TH${memberThLevel}`;
+        }
+        memberThLevel = `TH${memberThLevel}`;
+
         setIsSaving(true); // Disable the button during save
+
         const attackData = {
             member: selectedMember,
             attack: selectedAttack,
             percentage: parseInt(percentage, 10),
             stars: parseInt(stars, 10),
+            timestamp: new Date().toISOString(),
+            description: description || "",
             thRival,
-            description,
-            memberThLevel, // Include the member's TH level
+            memberThLevel, // Use the properly formatted memberThLevel
         };
 
         try {
             await APIClashService.saveAttackLog(attackData);
             console.log('Ataque guardado exitosamente.');
             closeModal();
-            fetchSavedAttacks().then(setSavedAttacks).catch((error) => {
-                console.error('Error al obtener los ataques guardados:', error);
-                console.log('Hubo un error al obtener los ataques guardados.');
-            }).finally(() => setLoadingSavedAttacks(false));
+            fetchSavedAttacks()
+                .then(setSavedAttacks)
+                .catch((error) => {
+                    console.error('Error al obtener los ataques guardados:', error);
+                    console.log('Hubo un error al obtener los ataques guardados.');
+                })
+                .finally(() => setLoadingSavedAttacks(false));
         } catch (error) {
             console.error('Error al guardar el ataque:', error);
             console.log('Hubo un error al guardar el ataque.');
@@ -230,6 +246,10 @@ const AttackLog: React.FC = () => {
                 averagePercentage: number;
                 players: Set<string>;
                 totalPoints: number;
+                usageCount: number;
+                usedAgainstHigherTH: number; // Count of uses against higher TH
+                usedAgainstLowerTH: number; // Count of uses against lower TH
+                usedAgainstEqualTH: number; // Count of uses against equal TH
             };
         } = {};
 
@@ -242,18 +262,30 @@ const AttackLog: React.FC = () => {
                     averagePercentage: 0,
                     players: new Set(),
                     totalPoints: 0,
+                    usageCount: 0,
+                    usedAgainstHigherTH: 0,
+                    usedAgainstLowerTH: 0,
+                    usedAgainstEqualTH: 0,
                 };
             }
 
             const summary = attackSummary[attack.attack];
             summary.players.add(attack.member);
+            summary.usageCount++;
+            debugger
+            const memberTH = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+            const rivalTH = parseInt(attack.thRival.replace('TH', ''), 10);
+
+            if (memberTH > rivalTH) summary.usedAgainstLowerTH++;
+            else if (memberTH < rivalTH) summary.usedAgainstHigherTH++;
+            else summary.usedAgainstEqualTH++;
 
             if (attack.stars === 1) summary.oneStar++;
             if (attack.stars === 2) summary.twoStars++;
             if (attack.stars === 3) summary.threeStars++;
 
             summary.averagePercentage += attack.percentage;
-            summary.totalPoints += calculatePoints(attack.stars, attack.memberThLevel, attack.thRival);
+            summary.totalPoints += calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, filteredAttacks.length);
         });
 
         Object.keys(attackSummary).forEach((attack) => {
@@ -406,7 +438,7 @@ const AttackLog: React.FC = () => {
                                                     <Star size={16} style={{ marginRight: '5px' }} />
                                                     Puntaje:
                                                 </strong>{' '}
-                                                {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival).toFixed(2)}
+                                                {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, filteredPlayerAttacks.length).toFixed(2)}
                                             </li>
                                             {attack.description && (
                                                 <li style={{ marginBottom: '5px' }}>
@@ -552,6 +584,30 @@ const AttackLog: React.FC = () => {
                                                 <Shield size={16} style={{ marginRight: '5px' }} />
                                                 Puntos Totales:
                                             </strong> {summary.totalPoints.toFixed(2)}
+                                        </li>
+                                        <li style={{ marginBottom: '5px' }}>
+                                            <strong>
+                                                <Target size={16} style={{ marginRight: '5px' }} />
+                                                Veces Usado:
+                                            </strong> {summary.usageCount}
+                                        </li>
+                                        <li style={{ marginBottom: '5px' }}>
+                                            <strong>
+                                                <Shield size={16} style={{ marginRight: '5px' }} />
+                                                Usado contra TH Superior:
+                                            </strong> {summary.usedAgainstHigherTH}
+                                        </li>
+                                        <li style={{ marginBottom: '5px' }}>
+                                            <strong>
+                                                <Shield size={16} style={{ marginRight: '5px' }} />
+                                                Usado contra TH Inferior:
+                                            </strong> {summary.usedAgainstLowerTH}
+                                        </li>
+                                        <li style={{ marginBottom: '5px' }}>
+                                            <strong>
+                                                <Shield size={16} style={{ marginRight: '5px' }} />
+                                                Usado contra TH Igual:
+                                            </strong> {summary.usedAgainstEqualTH}
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
                                             <strong>
