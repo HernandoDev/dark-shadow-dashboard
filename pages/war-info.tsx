@@ -254,7 +254,7 @@ const WarInfoPage = () => {
               <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>
                 {clan.name}
               </h2>
-              {clan.warLog && (
+              {clan.warLog && clan.warLog.totalWars > 0 && (
                 <div
                   style={{
                     marginBottom: '10px',
@@ -281,25 +281,16 @@ const WarInfoPage = () => {
                   >
                     Resumen del registro de Guerra (Últimos 60 Días)
                   </h5>
-                  {clan.warLog.totalWars === 0 &&
-                    clan.warLog.wins === 0 &&
-                    clan.warLog.losses === 0 &&
-                    clan.warLog.ties === 0 ? (
-                    <p style={{ color: 'red' }}>
-                      No se pudo obtener el registro de guerras del clan enemigo.
-                    </p>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                      <p>Total Guerras: {clan.warLog.totalWars}</p>
-                      <p>Victorias: {clan.warLog.wins}</p>
-                      <p>Derrotas: {clan.warLog.losses}</p>
-                      <p>Empates: {clan.warLog.ties}</p>
-                      <p>Racha Máxima de Victorias: {clan.warLog.maxWinStreak}</p>
-                      <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
-                      <p>Victorias Significativas: {clan.warLog.significantWins}</p>
-                      <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <p>Total Guerras: {clan.warLog.totalWars}</p>
+                    <p>Victorias: {clan.warLog.wins}</p>
+                    <p>Derrotas: {clan.warLog.losses}</p>
+                    <p>Empates: {clan.warLog.ties}</p>
+                    <p>Racha Máxima de Victorias: {clan.warLog.maxWinStreak}</p>
+                    <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
+                    <p>Victorias Significativas: {clan.warLog.significantWins}</p>
+                    <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
+                  </div>
                 </div>
               )}
               {clan.tag !== '#2QL0GCQGQ' && clan.tag !== '#2RG9R9JVP' && (
