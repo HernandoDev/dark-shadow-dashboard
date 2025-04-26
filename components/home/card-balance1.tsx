@@ -22,29 +22,50 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
    return (
       <Card
          css={{
-            mw: '375px',
+            mw: '300px', // Reduced width from 375px to 300px
             bg: bgColor,
             borderRadius: '$xl',
             px: '$6',
+            py: '$4',
          }}
       >
-         <Card.Body >
-            <Flex direction={'column'} align={'center'} css={{gap: '$5'}}>
-               <Text span css={{color: 'black'}} weight={'bold'} size={'$lg'}>
+         <Card.Body>
+            <Flex direction={'column'} align={'center'} css={{gap: '$4'}}>
+               <Text span css={{color: 'black', textAlign: 'center'}} weight={'bold'} size={'$lg'}>
                   #{position} - {player.member}
                </Text>
-               <Text span css={{color: 'black'}} size={'$md'}>
-                  Estrellas: {player.stars}
-               </Text>
-               <Text span css={{color: 'black'}} size={'$md'}>
-                  Destruccion %: {player.percentage}%
-               </Text>
-               <Text span css={{color: 'black'}} size={'$md'}>
-                  Ejercito: {player.army}
-               </Text>
-               <Text span css={{color: 'black'}} size={'$md'}>
-                  Puntos: {player.points.toFixed(2)}
-               </Text>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'black'}} size={'$md'}>
+                     Estrellas:
+                  </Text>
+                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                     {player.stars}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'black'}} size={'$md'}>
+                     Destrucción %:
+                  </Text>
+                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                     {player.percentage}%
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'black'}} size={'$md'}>
+                     Ejército:
+                  </Text>
+                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                     {player.army}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'black'}} size={'$md'}>
+                     Puntos:
+                  </Text>
+                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                     {player.points.toFixed(2)}
+                  </Text>
+               </Flex>
             </Flex>
          </Card.Body>
       </Card>

@@ -87,12 +87,17 @@ export const NavbarWrapper = ({children}: Props) => {
                         window.location.href = '/login';
                      }}
                      style={{
-                        padding: '10px',
-                        backgroundColor: 'red',
+                        padding: '10px 20px',
+                        backgroundColor: '#dc2626',
                         color: 'white',
                         border: 'none',
+                        borderRadius: '8px',
                         cursor: 'pointer',
+                        fontWeight: 'bold',
+                        transition: 'background-color 0.3s ease',
                      }}
+                     onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#b91c1c')}
+                     onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#dc2626')}
                   >
                      Cerrar Sesión
                   </button>
