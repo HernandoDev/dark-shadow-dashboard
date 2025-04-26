@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Text, Loading, Input, FormElement } from '@nextui-org/react';
-import { Plus } from 'react-feather';
+import { Plus, Star, Percent, User, Calendar, Target, Info, Shield } from 'react-feather'; // Import icons
 import { APIClashService } from '../services/apiClashService';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks'; // Adjust the path as needed
 
@@ -275,11 +275,19 @@ const AttackLog: React.FC = () => {
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Registro de Ataques</h1>
-            <p>Esta ventana muestra los ataques más usados en el clan y su rendimiento. Verás una lista con los ataques, sus resultados y los jugadores que los usan. Usa la barra de búsqueda para ver los ataques de un jugador específico y el botón "Agregar" para guardar nuevos ataques.</p>
-<br />
-            <p>El sistema de puntos asigna 1 punto por cada estrella obtenida en un ataque, y ajusta el puntaje según la diferencia de niveles de Ayuntamiento (TH): se resta 0.5 puntos si el atacante tiene un TH superior al del rival, y se suman 0.5 o 0.25 puntos extra si el atacante tiene un TH inferior, según logre 3 estrellas o menos. Así, se premian los ataques más desafiantes y se penalizan los más fáciles.            </p>
-
+            <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <Target size={24} style={{ marginRight: '10px' }} />
+                Registro de Ataques
+            </h1>
+            <p>
+                <Info size={16} style={{ marginRight: '5px' }} />
+                Esta ventana muestra los ataques más usados en el clan y su rendimiento. Verás una lista con los ataques, sus resultados y los jugadores que los usan. Usa la barra de búsqueda para ver los ataques de un jugador específico y el botón "Agregar" para guardar nuevos ataques.
+            </p>
+            <br />
+            <p>
+                <Shield size={16} style={{ marginRight: '5px' }} />
+                El sistema de puntos asigna 1 punto por cada estrella obtenida en un ataque, y ajusta el puntaje según la diferencia de niveles de Ayuntamiento (TH): se resta 0.5 puntos si el atacante tiene un TH superior al del rival, y se suman 0.5 o 0.25 puntos extra si el atacante tiene un TH inferior, según logre 3 estrellas o menos. Así, se premian los ataques más desafiantes y se penalizan los más fáciles.
+            </p>
             <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
                 <Button auto color="success" icon={<Plus />} onClick={openModal}>
                     Agregar Ataque
@@ -293,10 +301,14 @@ const AttackLog: React.FC = () => {
                     value={playerSearchTerm}
                     onChange={handlePlayerSearch}
                     css={{ marginBottom: '10px', width: '100%' }}
+                    labelLeft={<User size={16} />}
                 />
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                     <div style={{ width: '50%' }}>
-                        <label htmlFor="start-date" style={{ display: 'block', marginBottom: '5px' }}>Fecha de inicio</label>
+                        <label htmlFor="start-date" style={{ display: 'block', marginBottom: '5px' }}>
+                            <Calendar size={16} style={{ marginRight: '5px' }} />
+                            Fecha de inicio
+                        </label>
                         <Input
                             id="start-date"
                             bordered
@@ -307,7 +319,10 @@ const AttackLog: React.FC = () => {
                         />
                     </div>
                     <div style={{ width: '50%' }}>
-                        <label htmlFor="end-date" style={{ display: 'block', marginBottom: '5px' }}>Fecha de fin</label>
+                        <label htmlFor="end-date" style={{ display: 'block', marginBottom: '5px' }}>
+                            <Calendar size={16} style={{ marginRight: '5px' }} />
+                            Fecha de fin
+                        </label>
                         <Input
                             id="end-date"
                             bordered
@@ -320,7 +335,10 @@ const AttackLog: React.FC = () => {
                 </div>
                 {(playerSearchTerm || startDate || endDate) && playerSearchTerm ? (
                     <div style={{ marginTop: '20px' }}>
-                        <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Ataques Filtrados</h2>
+                        <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>
+                            <User size={20} style={{ marginRight: '10px' }} />
+                            Ataques Filtrados
+                        </h2>
                         {filteredPlayerAttacks.length > 0 ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                                 {filteredPlayerAttacks.map((attack, index) => (
@@ -336,32 +354,67 @@ const AttackLog: React.FC = () => {
                                             width: '300px',
                                         }}
                                     >
-                                        <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{attack.member}</h3>
+                                        <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
+                                            <User size={16} style={{ marginRight: '5px' }} />
+                                            {attack.member}
+                                        </h3>
                                         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                             <li style={{ marginBottom: '5px' }}>
-                                                <strong>Ataque:</strong> {attack.attack}
+                                                <strong>
+                                                    <Target size={16} style={{ marginRight: '5px' }} />
+                                                    Ataque:
+                                                </strong>{' '}
+                                                {attack.attack}
                                             </li>
                                             <li style={{ marginBottom: '5px' }}>
-                                                <strong>Porcentaje:</strong> {attack.percentage}%
+                                                <strong>
+                                                    <Percent size={16} style={{ marginRight: '5px' }} />
+                                                    Porcentaje:
+                                                </strong>{' '}
+                                                {attack.percentage}%
                                             </li>
                                             <li style={{ marginBottom: '5px' }}>
-                                                <strong>Estrellas:</strong> {attack.stars}
+                                                <strong>
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                                    Estrellas:
+                                                </strong>{' '}
+                                                {attack.stars}
                                             </li>
                                             <li style={{ marginBottom: '5px' }}>
-                                                <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                                <strong>
+                                                    <Calendar size={16} style={{ marginRight: '5px' }} />
+                                                    Fecha:
+                                                </strong>{' '}
+                                                {new Date(attack.timestamp).toLocaleString()}
                                             </li>
                                             <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                                <strong>TH Rival:</strong> {attack.thRival}
+                                                <strong>
+                                                    <Shield size={16} style={{ marginRight: '5px' }} />
+                                                    TH Rival:
+                                                </strong>{' '}
+                                                {attack.thRival}
                                             </li>
                                             <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                                <strong>TH Miembro:</strong> {attack.memberThLevel}
+                                                <strong>
+                                                    <Shield size={16} style={{ marginRight: '5px' }} />
+                                                    TH Miembro:
+                                                </strong>{' '}
+                                                {attack.memberThLevel}
                                             </li>
                                             <li style={{ marginBottom: '5px' }}>
-                                                <strong>Puntaje:</strong> {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival).toFixed(2)}
+                                                <strong>
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                                    Puntaje:
+                                                </strong>{' '}
+                                                {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival).toFixed(2)}
                                             </li>
                                             {attack.description && (
                                                 <li style={{ marginBottom: '5px' }}>
-                                                    <strong>Descripción:</strong> {attack.description}
+                                                    <strong>
+                                                        <Info size={16} style={{ marginRight: '5px' }} />
+                                                        Descripción:
+                                                    </strong>{' '}
+                                                    {attack.description}
                                                 </li>
                                             )}
                                         </ul>
@@ -369,7 +422,10 @@ const AttackLog: React.FC = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p style={{ textAlign: 'center', color: '#666' }}>No se encontraron ataques para este rango de fechas.</p>
+                            <p style={{ textAlign: 'center', color: '#666' }}>
+                                <Info size={16} style={{ marginRight: '5px' }} />
+                                No se encontraron ataques para este rango de fechas.
+                            </p>
                         )}
                         {filteredPlayerAttacks.length > 0 &&
                             new Set(filteredPlayerAttacks.map((attack) => attack.member)).size === 1 && (() => {
@@ -468,22 +524,48 @@ const AttackLog: React.FC = () => {
                                     <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{attackName}</h3>
                                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                         <li style={{ marginBottom: '5px' }}>
-                                            <strong>1 Estrella:</strong> {summary.oneStar}
+                                            <strong>
+                                                <Star size={16} style={{ marginRight: '5px' }} />
+                                                1 Estrella:
+                                            </strong> {summary.oneStar}
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
-                                            <strong>2 Estrellas:</strong> {summary.twoStars}
+                                            <strong>
+                                                <Star size={16} style={{ marginRight: '5px' }} />
+                                                2 Estrellas:
+                                            </strong> {summary.twoStars}
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
-                                            <strong>3 Estrellas:</strong> {summary.threeStars}
+                                            <strong>
+                                                <Star size={16} style={{ marginRight: '5px' }} />
+                                                3 Estrellas:
+                                            </strong> {summary.threeStars}
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
-                                            <strong>Media de %:</strong> {summary.averagePercentage}%
+                                            <strong>
+                                                <Percent size={16} style={{ marginRight: '5px' }} />
+                                                Media de %:
+                                            </strong> {summary.averagePercentage}%
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
-                                            <strong>Puntos Totales:</strong> {summary.totalPoints.toFixed(2)}
+                                            <strong>
+                                                <Shield size={16} style={{ marginRight: '5px' }} />
+                                                Puntos Totales:
+                                            </strong> {summary.totalPoints.toFixed(2)}
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
-                                            <strong>Jugadores:</strong> {Array.from(summary.players).join(', ')}
+                                            <strong>
+                                                <User size={16} style={{ marginRight: '5px' }} />
+                                                Jugadores:
+                                            </strong>
+                                            <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
+                                                {Array.from(summary.players).map((player, index) => (
+                                                    <li key={index} style={{ marginBottom: '5px' }}>
+                                                <User size={12} style={{ marginRight: '5px' }} />
+                                                        
+                                                        {player}</li>
+                                                ))}
+                                            </ul>
                                         </li>
                                     </ul>
                                 </div>
