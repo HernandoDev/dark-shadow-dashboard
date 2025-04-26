@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { APIClashService } from '../services/apiClashService';
 import { Button } from '@nextui-org/react';
-import { FaCrown, FaStar, FaTrophy, FaTimesCircle } from 'react-icons/fa';
+import {  FaStar, FaTrophy, FaTimesCircle } from 'react-icons/fa';
 
 const heroTranslations = {
   "Barbarian King": "Rey Bárbaro",
@@ -208,7 +208,6 @@ const WarInfoPage = () => {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
       <h1 style={{ marginBottom: '20px', color: '#ffcc00' }}>
-        <FaCrown style={{ marginRight: '10px' }} />
         Información de Guerra
       </h1>
       <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
@@ -253,7 +252,6 @@ const WarInfoPage = () => {
               }}
             >
               <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>
-                <FaTrophy style={{ marginRight: '10px' }} />
                 {clan.name}
               </h2>
               {clan.warLog && (
@@ -281,7 +279,6 @@ const WarInfoPage = () => {
                           : 'violet',
                     }}
                   >
-                    <FaStar style={{ marginRight: '5px' }} />
                     Resumen del registro de Guerra (Últimos 60 Días)
                   </h5>
                   {clan.warLog.totalWars === 0 &&
@@ -289,7 +286,6 @@ const WarInfoPage = () => {
                     clan.warLog.losses === 0 &&
                     clan.warLog.ties === 0 ? (
                     <p style={{ color: 'red' }}>
-                      <FaTimesCircle style={{ marginRight: '5px' }} />
                       No se pudo obtener el registro de guerras del clan enemigo.
                     </p>
                   ) : (
@@ -383,7 +379,6 @@ const WarInfoPage = () => {
                           : 'violet',
                     }}
                   >
-                    <FaStar style={{ marginRight: '5px' }} />
                     Resumen de diferencias de nivel de héroes y ayuntamiento
                   </h5>
                   {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
