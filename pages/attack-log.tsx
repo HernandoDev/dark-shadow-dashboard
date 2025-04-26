@@ -318,7 +318,7 @@ const AttackLog: React.FC = () => {
             <br />
             <p>
                 <Shield size={16} style={{ marginRight: '5px' }} />
-                El sistema de puntos asigna 1 punto por cada estrella obtenida en un ataque, y ajusta el puntaje según la diferencia de niveles de Ayuntamiento (TH): se resta 0.5 puntos si el atacante tiene un TH superior al del rival, y se suman 0.5 o 0.25 puntos extra si el atacante tiene un TH inferior, según logre 3 estrellas o menos. Así, se premian los ataques más desafiantes y se penalizan los más fáciles.
+                El sistema de puntos asigna 1 punto por cada estrella obtenida en un ataque. Si el atacante tiene un TH superior al del rival, se resta 0.5 puntos. Si el atacante tiene un TH inferior, se suman puntos adicionales: 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. Además, el puntaje final se ajusta dividiéndolo por el número total de veces que el ataque ha sido usado, promoviendo la diversidad y premiando los ataques más efectivos.
             </p>
             <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
                 <Button auto color="success" icon={<Plus />} onClick={openModal}>
@@ -371,8 +371,69 @@ const AttackLog: React.FC = () => {
                             <User size={20} style={{ marginRight: '10px' }} />
                             Ataques Filtrados
                         </h2>
+                        {filteredPlayerAttacks.length > 0 &&
+                            new Set(filteredPlayerAttacks.map((attack) => attack.member)).size === 1 && (() => {
+                                const playerName = filteredPlayerAttacks[0].member;
+                                const totalAttacks = filteredPlayerAttacks.length;
+                                const totalPercentage = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.percentage, 0);
+                                const totalStars = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0);
+
+                                const averagePercentage = totalPercentage / totalAttacks;
+                                const percentageColor =
+                                    averagePercentage > 65 ? 'green' : averagePercentage >= 50 ? 'yellow' : 'red';
+
+                                const averageStars = totalStars / totalAttacks;
+                                const starsColor =
+                                    averageStars > 2.2 ? 'green' : averageStars >= 2 ? 'yellow' : 'red';
+
+                                const attackCounts: { [key: string]: number } = {};
+                                filteredPlayerAttacks.forEach((attack) => {
+                                    attackCounts[attack.attack] = (attackCounts[attack.attack] || 0) + 1;
+                                });
+
+                                const favoriteAttacks = Object.entries(attackCounts)
+                                    .sort(([, a], [, b]) => b - a)
+                                    .slice(0, 2)
+                                    .map(([attack]) => attack);
+
+                                let thComparison = { lower: 0, equal: 0, higher: 0 };
+                                filteredPlayerAttacks.forEach((attack) => {
+                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                    if (memberTh > rivalTh) thComparison.lower++;
+                                    else if (memberTh < rivalTh) thComparison.higher++;
+                                    else thComparison.equal++;
+                                });
+
+                                return (
+                                    <div style={{ textAlign: 'center', marginTop: '20px',paddingBottom: '20px' }}>
+                                        <h3>Resumen de {playerName}</h3>
+                                        <p><span style={{ color: percentageColor }}>
+                                            <strong>Media de porcentaje: </strong> 
+                                             {(averagePercentage).toFixed(2)}%</span>
+                                        </p>
+                                        <p><span style={{ color: starsColor }}>
+                                            <strong>Media de estrellas: </strong> 
+                                             {(averageStars).toFixed(2)}</span>
+                                        </p>
+                                        <p><strong>Ataques favoritos: </strong> {favoriteAttacks.join(', ')}</p>
+                                        <p>
+                                            <strong>Comparación de TH: </strong>
+                                            <span style={{
+                                                color: thComparison.lower > thComparison.equal && thComparison.lower > thComparison.higher
+                                                    ? 'red'
+                                                    : thComparison.equal > thComparison.lower && thComparison.equal > thComparison.higher
+                                                    ? 'green'
+                                                    : 'violet'
+                                            }}>
+                                                {` ${thComparison.lower} ataques a TH inferior, ${thComparison.equal} ataques a TH igual, ${thComparison.higher} ataques a TH superior`}
+                                            </span>
+                                        </p>
+                                    </div>
+                                );
+                            })()}
                         {filteredPlayerAttacks.length > 0 ? (
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center',paddingBottom: '20px' }}>
                                 {filteredPlayerAttacks.map((attack, index) => (
                                     <div
                                         key={index}
@@ -384,6 +445,7 @@ const AttackLog: React.FC = () => {
                                             color: '#fff',
                                             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                                             width: '300px',
+                                            
                                         }}
                                     >
                                         <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
@@ -438,7 +500,7 @@ const AttackLog: React.FC = () => {
                                                     <Star size={16} style={{ marginRight: '5px' }} />
                                                     Puntaje:
                                                 </strong>{' '}
-                                                {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, filteredPlayerAttacks.length).toFixed(2)}
+                                                {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, 1).toFixed(2)}
                                             </li>
                                             {attack.description && (
                                                 <li style={{ marginBottom: '5px' }}>
@@ -459,73 +521,50 @@ const AttackLog: React.FC = () => {
                                 No se encontraron ataques para este rango de fechas.
                             </p>
                         )}
-                        {filteredPlayerAttacks.length > 0 &&
-                            new Set(filteredPlayerAttacks.map((attack) => attack.member)).size === 1 && (() => {
-                                const playerName = filteredPlayerAttacks[0].member;
-                                const totalAttacks = filteredPlayerAttacks.length;
-                                const totalPercentage = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.percentage, 0);
-                                const totalStars = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0);
-
-                                const averagePercentage = totalPercentage / totalAttacks;
-                                const percentageColor =
-                                    averagePercentage > 65 ? 'green' : averagePercentage >= 50 ? 'yellow' : 'red';
-
-                                const averageStars = totalStars / totalAttacks;
-                                const starsColor =
-                                    averageStars > 2.2 ? 'green' : averageStars >= 2 ? 'yellow' : 'red';
-
-                                const attackCounts: { [key: string]: number } = {};
-                                filteredPlayerAttacks.forEach((attack) => {
-                                    attackCounts[attack.attack] = (attackCounts[attack.attack] || 0) + 1;
-                                });
-
-                                const favoriteAttacks = Object.entries(attackCounts)
-                                    .sort(([, a], [, b]) => b - a)
-                                    .slice(0, 2)
-                                    .map(([attack]) => attack);
-
-                                let thComparison = { lower: 0, equal: 0, higher: 0 };
-                                filteredPlayerAttacks.forEach((attack) => {
-                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
-                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
-                                    if (memberTh > rivalTh) thComparison.lower++;
-                                    else if (memberTh < rivalTh) thComparison.higher++;
-                                    else thComparison.equal++;
-                                });
-
-                                return (
-                                    <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                                        <h3>Resumen de {playerName}</h3>
-                                        <p><span style={{ color: percentageColor }}>
-                                            <strong>Media de porcentaje:</strong> 
-                                             {(averagePercentage).toFixed(2)}%</span>
-                                        </p>
-                                        <p><span style={{ color: starsColor }}>
-                                            <strong>Media de estrellas:</strong> 
-                                             {(averageStars).toFixed(2)}</span>
-                                        </p>
-                                        <p><strong>Ataques favoritos:</strong> {favoriteAttacks.join(', ')}</p>
-                                        <p>
-                                            <strong>Comparación de TH:</strong>
-                                            <span style={{
-                                                color: thComparison.lower > thComparison.equal && thComparison.lower > thComparison.higher
-                                                    ? 'red'
-                                                    : thComparison.equal > thComparison.lower && thComparison.equal > thComparison.higher
-                                                    ? 'green'
-                                                    : 'violet'
-                                            }}>
-                                                {` ${thComparison.lower} ataques a TH inferior, ${thComparison.equal} ataques a TH igual, ${thComparison.higher} ataques a TH superior`}
-                                            </span>
-                                        </p>
-                                    </div>
-                                );
-                            })()}
+                       
                     </div>
                 ) : null}
             </div>
             <div style={{ marginBottom: '20px' }}>
                 <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Resumen del clan</h2>
 
+                {!loadingSavedAttacks && savedAttacks.length > 0 && (
+                    <div style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
+                        {(() => {
+                            const attackSummary = getAttackSummary();
+                            const sortedAttacks = Object.entries(attackSummary).sort(([, a], [, b]) => b.totalPoints - a.totalPoints);
+                            const bestAttack = sortedAttacks[0];
+                            const worstAttack = sortedAttacks[sortedAttacks.length - 1];
+                            const intermediateAttacks = sortedAttacks.slice(1, sortedAttacks.length - 1).slice(0, 2); // Top 1 or 2 intermediate attacks
+
+                            return (
+                                <div>
+                                    <p style={{ color: 'violet' }}>
+                                        <strong>Mejor ataque:</strong> {bestAttack[0]} con un total de {bestAttack[1].totalPoints.toFixed(2)} puntos, 
+                                        usado {bestAttack[1].usageCount} veces y con una media de {bestAttack[1].averagePercentage}% de porcentaje.
+                                    </p>
+                                    <br />
+                                    {intermediateAttacks.length > 0 && (
+                                        <div style={{color:'yellow'}}>
+                                            <strong>Ataques destacados intermedios:</strong>
+                                                {intermediateAttacks.map(([attackName, summary], index) => (
+                                                    <p  key={index}>
+                                                        {attackName} - {summary.totalPoints.toFixed(2)} puntos, usado {summary.usageCount} veces, 
+                                                        media de {summary.averagePercentage}% de porcentaje.
+                                                    </p>
+                                                ))}
+                                        </div>
+                                    )}
+                                    <br />
+                                    <p style={{ color: 'red' }}>
+                                        <strong>Peor ataque:</strong> {worstAttack[0]} con un total de {worstAttack[1].totalPoints.toFixed(2)} puntos, 
+                                        usado {worstAttack[1].usageCount} veces y con una media de {worstAttack[1].averagePercentage}% de porcentaje.
+                                    </p>
+                                </div>
+                            );
+                        })()}
+                    </div>
+                )}
 
                 {loadingSavedAttacks ? (
                     <Loading>Obteniendo ataques guardados...</Loading>
@@ -551,8 +590,6 @@ const AttackLog: React.FC = () => {
                                         width: '300px',
                                     }}
                                 >
-
-                                    
                                     <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{attackName}</h3>
                                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                         <li style={{ marginBottom: '5px' }}>
