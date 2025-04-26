@@ -98,15 +98,19 @@ export const Content = () => {
 
          setTopPlayers(sortedPlayers);
 
-         // Calculate total stars for each type of attack
-         const attackStats = data.reduce((acc: Record<string, number>, log: { attack: string; stars: number }) => {
-            acc[log.attack] = (acc[log.attack] || 0) + log.stars;
+         // Calculate average stars for each type of attack
+         const attackStats = data.reduce((acc: Record<string, { totalStars: number; count: number }>, log: { attack: string; stars: number }) => {
+            if (!acc[log.attack]) {
+               acc[log.attack] = { totalStars: 0, count: 0 };
+            }
+            acc[log.attack].totalStars += log.stars;
+            acc[log.attack].count += 1;
             return acc;
-         }, {} as Record<string, number>);
+         }, {} as Record<string, { totalStars: number; count: number }>);
 
-         const formattedData = Object.entries(attackStats).map(([attack, stars]) => ({
+         const formattedData = Object.entries(attackStats).map(([attack, stats]) => ({
             attack,
-            stars: stars as number,
+            stars: parseFloat((stats.totalStars / stats.count).toFixed(2)), // Calculate average and format to 2 decimals
          }));
 
          setChartData(formattedData);
