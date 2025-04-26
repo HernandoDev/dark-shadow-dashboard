@@ -382,20 +382,20 @@ const WarInfoPage = () => {
                     Resumen de diferencias de nivel de héroes y ayuntamiento
                   </h5>
                   {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
-                    const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0).toFixed(2));
+                    const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.find(c => c.name === 'Dark Shadonws')?.members || []).heroAverages[hero] || 0).toFixed(2));
                     const roundedAvgLevel = parseFloat(avgLevel.toFixed(2));
-                    const levelDifference = parseFloat(Math.abs(mainClanHeroLevel - roundedAvgLevel).toFixed(2));
+                    const levelDifference = parseFloat((mainClanHeroLevel - roundedAvgLevel).toFixed(2));
                     let comparisonText = '';
                     let comparisonColor = '';
 
-                    if (mainClanHeroLevel > roundedAvgLevel) {
-                      comparisonText = `Nuestro clan es mejor en nivel de ${translateHero(hero as keyof typeof heroTranslations)} por ${levelDifference}`;
+                    if (levelDifference > 0) {
+                      comparisonText = `Nuestro clan tiene un nivel superior en ${translateHero(hero as keyof typeof heroTranslations)} por ${Math.abs(levelDifference)}`;
                       comparisonColor = 'green';
-                    } else if (mainClanHeroLevel < roundedAvgLevel) {
-                      comparisonText = `Nuestro clan es peor en nivel de ${translateHero(hero as keyof typeof heroTranslations)} por ${levelDifference}`;
+                    } else if (levelDifference < 0) {
+                      comparisonText = `Nuestro clan tiene un nivel inferior en ${translateHero(hero as keyof typeof heroTranslations)} por ${Math.abs(levelDifference)}`;
                       comparisonColor = 'red';
                     } else {
-                      comparisonText = `Nuestro clan tiene el mismo nivel de ${translateHero(hero as keyof typeof heroTranslations)}`;
+                      comparisonText = `Nuestro clan tiene el mismo nivel en ${translateHero(hero as keyof typeof heroTranslations)}`;
                       comparisonColor = 'gray';
                     }
 
@@ -406,20 +406,20 @@ const WarInfoPage = () => {
                     );
                   })}
                   {(() => {
-                    const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel.toFixed(2));
+                    const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.find(c => c.name === 'Dark Shadonws')?.members || []).averageTownHallLevel.toFixed(2));
                     const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
-                    const levelDifference = parseFloat(Math.abs(mainClanTHLevel - opponentTHLevel).toFixed(2));
+                    const levelDifference = parseFloat((mainClanTHLevel - opponentTHLevel).toFixed(2));
                     let comparisonText = '';
                     let comparisonColor = '';
 
-                    if (mainClanTHLevel > opponentTHLevel) {
-                      comparisonText = `Nuestro clan es mejor en nivel de ayuntamiento por ${levelDifference}`;
+                    if (levelDifference > 0) {
+                      comparisonText = `Nuestro clan tiene un nivel superior en ayuntamiento por ${Math.abs(levelDifference)}`;
                       comparisonColor = 'green';
-                    } else if (mainClanTHLevel < opponentTHLevel) {
-                      comparisonText = `Nuestro clan es peor en nivel de ayuntamiento por ${levelDifference}`;
+                    } else if (levelDifference < 0) {
+                      comparisonText = `Nuestro clan tiene un nivel inferior en ayuntamiento por ${Math.abs(levelDifference)}`;
                       comparisonColor = 'red';
                     } else {
-                      comparisonText = 'Nuestro clan tiene el mismo nivel de ayuntamiento';
+                      comparisonText = 'Nuestro clan tiene el mismo nivel en ayuntamiento';
                       comparisonColor = 'gray';
                     }
 
