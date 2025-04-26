@@ -94,7 +94,6 @@ export const Content = () => {
                points: stats.points, // Include points
             }))
             .sort((a, b) => b.points - a.points || b.stars - a.stars || b.percentage - a.percentage)
-            .slice(0, 3); // Get top 3 players
 
          setTopPlayers(sortedPlayers);
 
@@ -170,8 +169,42 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {topPlayers.map((player, index) => (
+                     {topPlayers.slice(0, 3).map((player, index) => (
                         <CardBalance1 key={index} player={player} position={index + 1} />
+                     ))}
+                  </Flex>
+               </Box>
+
+               <Box>
+                  <Text
+                     h3
+                     css={{
+                        'textAlign': 'center',
+                        'color': 'red', // Red color for the title
+                        '@sm': {
+                           textAlign: 'inherit',
+                        },
+                     }}
+                  >
+                     Peores Jugadores de Guerra
+                  </Text>
+                  <Flex
+                     css={{
+                        'gap': '$10',
+                        'flexWrap': 'wrap',
+                        'justifyContent': 'center',
+                        '@sm': {
+                           flexWrap: 'nowrap',
+                        },
+                     }}
+                     direction={'row'}
+                  >
+                     {topPlayers.slice(-3).map((player, index) => (
+                        <CardBalance1 
+                           key={index} 
+                           player={player} 
+                           position={topPlayers.length - index} 
+                        />
                      ))}
                   </Flex>
                </Box>

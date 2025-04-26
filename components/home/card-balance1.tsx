@@ -17,7 +17,7 @@ type CardBalance1Props = {
 
 export const CardBalance1 = ({player, position}: CardBalance1Props) => {
    const backgroundColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
-   const bgColor = backgroundColors[position - 1] || '#FFFFFF';
+   const bgColor = backgroundColors[position - 1] || '#fc4503';
 
    return (
       <Card

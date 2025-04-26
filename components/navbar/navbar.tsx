@@ -1,5 +1,5 @@
 import {Input, Link, Navbar, Text} from '@nextui-org/react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {FeedbackIcon} from '../icons/navbar/feedback-icon';
 import {GithubIcon} from '../icons/navbar/github-icon';
 import {SupportIcon} from '../icons/navbar/support-icon';
@@ -15,6 +15,14 @@ interface Props {
 }
 
 export const NavbarWrapper = ({children}: Props) => {
+   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+   useEffect(() => {
+      if (typeof window !== 'undefined') {
+         setIsAuthenticated(!!localStorage.getItem('isAuthenticated'));
+      }
+   }, []);
+
    const collapseItems = [
       'Profile',
       'Dashboard',
@@ -67,10 +75,29 @@ export const NavbarWrapper = ({children}: Props) => {
                css={{
                   width: '100%',
                }}
+               className="animate__animated animate__fadeInDown"
             >
               Dark Shadows Dashboard
             </Navbar.Content>
-          
+            <Navbar.Content>
+               {isAuthenticated && (
+                  <button
+                     onClick={() => {
+                        localStorage.removeItem('isAuthenticated');
+                        window.location.href = '/login';
+                     }}
+                     style={{
+                        padding: '10px',
+                        backgroundColor: 'red',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                     }}
+                  >
+                     Cerrar Sesión
+                  </button>
+               )}
+            </Navbar.Content>
             <Navbar.Collapse>
                {collapseItems.map((item, index) => (
                   <Navbar.CollapseItem

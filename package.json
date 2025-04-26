@@ -10,6 +10,7 @@
    },
    "dependencies": {
       "@nextui-org/react": "^1.0.0-beta.10",
+      "animate.css": "^4.1.1",
       "apexcharts": "^3.35.5",
       "next": "12.3.0",
       "next-themes": "^0.2.1",
