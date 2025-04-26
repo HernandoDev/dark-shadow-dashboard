@@ -44,6 +44,9 @@ const AttackLog: React.FC = () => {
     const [playerSearchTerm, setPlayerSearchTerm] = useState('');
     const [filteredPlayerAttacks, setFilteredPlayerAttacks] = useState<any[]>([]);
 
+    const [startDate, setStartDate] = useState<string>(''); // Start date for filtering
+    const [endDate, setEndDate] = useState<string>(''); // End date for filtering
+
     const [isSaving, setIsSaving] = useState(false); // New state to track saving status
 
     const openModal = async () => {
@@ -92,11 +95,33 @@ const AttackLog: React.FC = () => {
     const handlePlayerSearch = (event: React.ChangeEvent<FormElement>) => {
         const value = (event.target as HTMLInputElement).value.toLowerCase();
         setPlayerSearchTerm(value);
-        const filteredAttacks = savedAttacks.filter((attack) =>
-            attack.member.toLowerCase().includes(value)
-        );
+    };
+
+    const handleDateRangeFilter = () => {
+        if (!startDate || !endDate) {
+            setFilteredPlayerAttacks(savedAttacks.filter((attack) =>
+                attack.member.toLowerCase().includes(playerSearchTerm.toLowerCase())
+            ));
+            return;
+        }
+
+        const start = new Date(startDate).getTime();
+        const end = new Date(endDate).getTime();
+
+        const filteredAttacks = savedAttacks.filter((attack) => {
+            const attackTime = new Date(attack.timestamp).getTime();
+            return (
+                attack.member.toLowerCase().includes(playerSearchTerm.toLowerCase()) &&
+                attackTime >= start && attackTime <= end
+            );
+        });
+
         setFilteredPlayerAttacks(filteredAttacks);
     };
+
+    useEffect(() => {
+        handleDateRangeFilter();
+    }, [playerSearchTerm, startDate, endDate, savedAttacks]);
 
     const handleStarsChange = (value: string) => {
         setStars(value);
@@ -187,6 +212,16 @@ const AttackLog: React.FC = () => {
     };
 
     const getAttackSummary = () => {
+        const filteredAttacks = savedAttacks.filter((attack) => {
+            if (!startDate || !endDate) return true;
+
+            const attackTime = new Date(attack.timestamp).getTime();
+            const start = new Date(startDate).getTime();
+            const end = new Date(endDate).getTime();
+
+            return attackTime >= start && attackTime <= end;
+        });
+
         const attackSummary: {
             [key: string]: {
                 oneStar: number;
@@ -194,11 +229,11 @@ const AttackLog: React.FC = () => {
                 threeStars: number;
                 averagePercentage: number;
                 players: Set<string>;
-                totalPoints: number; // New field for total points
+                totalPoints: number;
             };
         } = {};
 
-        savedAttacks.forEach((attack) => {
+        filteredAttacks.forEach((attack) => {
             if (!attackSummary[attack.attack]) {
                 attackSummary[attack.attack] = {
                     oneStar: 0,
@@ -206,7 +241,7 @@ const AttackLog: React.FC = () => {
                     threeStars: 0,
                     averagePercentage: 0,
                     players: new Set(),
-                    totalPoints: 0, // Initialize total points
+                    totalPoints: 0,
                 };
             }
 
@@ -218,7 +253,7 @@ const AttackLog: React.FC = () => {
             if (attack.stars === 3) summary.threeStars++;
 
             summary.averagePercentage += attack.percentage;
-            summary.totalPoints += calculatePoints(attack.stars, attack.memberThLevel, attack.thRival); // Add points
+            summary.totalPoints += calculatePoints(attack.stars, attack.memberThLevel, attack.thRival);
         });
 
         Object.keys(attackSummary).forEach((attack) => {
@@ -259,9 +294,33 @@ const AttackLog: React.FC = () => {
                     onChange={handlePlayerSearch}
                     css={{ marginBottom: '10px', width: '100%' }}
                 />
-                {playerSearchTerm && (
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{ width: '50%' }}>
+                        <label htmlFor="start-date" style={{ display: 'block', marginBottom: '5px' }}>Fecha de inicio</label>
+                        <Input
+                            id="start-date"
+                            bordered
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            css={{ width: '100%' }}
+                        />
+                    </div>
+                    <div style={{ width: '50%' }}>
+                        <label htmlFor="end-date" style={{ display: 'block', marginBottom: '5px' }}>Fecha de fin</label>
+                        <Input
+                            id="end-date"
+                            bordered
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            css={{ width: '100%' }}
+                        />
+                    </div>
+                </div>
+                {(playerSearchTerm || startDate || endDate) && playerSearchTerm ? (
                     <div style={{ marginTop: '20px' }}>
-                        <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Ataques de {playerSearchTerm}</h2>
+                        <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Ataques Filtrados</h2>
                         {filteredPlayerAttacks.length > 0 ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                                 {filteredPlayerAttacks.map((attack, index) => (
@@ -271,8 +330,8 @@ const AttackLog: React.FC = () => {
                                             border: '1px solid #ccc',
                                             borderRadius: '10px',
                                             padding: '15px',
-                                            backgroundColor: '#333', // Dark background for better contrast
-                                            color: '#fff', // White text for readability
+                                            backgroundColor: '#333',
+                                            color: '#fff',
                                             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                                             width: '300px',
                                         }}
@@ -310,10 +369,71 @@ const AttackLog: React.FC = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p style={{ textAlign: 'center', color: '#666' }}>No se encontraron ataques para este jugador.</p>
+                            <p style={{ textAlign: 'center', color: '#666' }}>No se encontraron ataques para este rango de fechas.</p>
                         )}
+                        {filteredPlayerAttacks.length > 0 &&
+                            new Set(filteredPlayerAttacks.map((attack) => attack.member)).size === 1 && (() => {
+                                const playerName = filteredPlayerAttacks[0].member;
+                                const totalAttacks = filteredPlayerAttacks.length;
+                                const totalPercentage = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.percentage, 0);
+                                const totalStars = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0);
+
+                                const averagePercentage = totalPercentage / totalAttacks;
+                                const percentageColor =
+                                    averagePercentage > 65 ? 'green' : averagePercentage >= 50 ? 'yellow' : 'red';
+
+                                const averageStars = totalStars / totalAttacks;
+                                const starsColor =
+                                    averageStars > 2.2 ? 'green' : averageStars >= 2 ? 'yellow' : 'red';
+
+                                const attackCounts: { [key: string]: number } = {};
+                                filteredPlayerAttacks.forEach((attack) => {
+                                    attackCounts[attack.attack] = (attackCounts[attack.attack] || 0) + 1;
+                                });
+
+                                const favoriteAttacks = Object.entries(attackCounts)
+                                    .sort(([, a], [, b]) => b - a)
+                                    .slice(0, 2)
+                                    .map(([attack]) => attack);
+
+                                let thComparison = { lower: 0, equal: 0, higher: 0 };
+                                filteredPlayerAttacks.forEach((attack) => {
+                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                    if (memberTh > rivalTh) thComparison.lower++;
+                                    else if (memberTh < rivalTh) thComparison.higher++;
+                                    else thComparison.equal++;
+                                });
+
+                                return (
+                                    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                                        <h3>Resumen de {playerName}</h3>
+                                        <p><span style={{ color: percentageColor }}>
+                                            <strong>Media de porcentaje:</strong> 
+                                             {(averagePercentage).toFixed(2)}%</span>
+                                        </p>
+                                        <p><span style={{ color: starsColor }}>
+                                            <strong>Media de estrellas:</strong> 
+                                             {(averageStars).toFixed(2)}</span>
+                                        </p>
+                                        <p><strong>Ataques favoritos:</strong> {favoriteAttacks.join(', ')}</p>
+                                        <p>
+                                            <strong>Comparación de TH:</strong>
+                                            <span style={{
+                                                color: thComparison.lower > thComparison.equal && thComparison.lower > thComparison.higher
+                                                    ? 'red'
+                                                    : thComparison.equal > thComparison.lower && thComparison.equal > thComparison.higher
+                                                    ? 'green'
+                                                    : 'violet'
+                                            }}>
+                                                {` ${thComparison.lower} ataques a TH inferior, ${thComparison.equal} ataques a TH igual, ${thComparison.higher} ataques a TH superior`}
+                                            </span>
+                                        </p>
+                                    </div>
+                                );
+                            })()}
                     </div>
-                )}
+                ) : null}
             </div>
             <div style={{ marginBottom: '20px' }}>
                 <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Resumen del clan</h2>
