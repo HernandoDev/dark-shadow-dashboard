@@ -86,7 +86,7 @@ export const Content = () => {
 
          // Calculate average percentage and sort players by total points, stars, and average percentage
          const sortedPlayers = Object.entries(playerStats)
-            .map(([member, stats]: [string, PlayerStats]) => ({
+            .map(([member, stats]: [string, PlayerStats]) => ({ // Explicitly type stats as PlayerStats
                member,
                stars: stats.stars,
                percentage: stats.percentage / stats.attacks,
@@ -108,10 +108,12 @@ export const Content = () => {
             return acc;
          }, {} as Record<string, { totalStars: number; count: number }>);
 
-         const formattedData = Object.entries(attackStats).map(([attack, stats]) => ({
-            attack,
-            stars: parseFloat((stats.totalStars / stats.count).toFixed(2)), // Calculate average and format to 2 decimals
-         }));
+         const formattedData = Object.entries(attackStats as Record<string, { totalStars: number; count: number }>).map(
+            ([attack, stats]: [string, { totalStars: number; count: number }]) => ({
+               attack,
+               stars: parseFloat((stats.totalStars / stats.count).toFixed(2)), // Calculate average and format to 2 decimals
+            })
+         );
 
          setChartData(formattedData);
       };
