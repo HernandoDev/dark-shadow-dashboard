@@ -37,10 +37,12 @@ const Login = () => {
             } : {
                 backgroundImage: "url('/login_image.png')",
                 backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 backgroundPositionY: '-300px',
                 backgroundRepeat: 'no-repeat',
                 backgroundAttachment: 'fixed',
                 height: '100vh',
+                width: '100vw',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center'
