@@ -510,26 +510,31 @@ export const TableWrapper = () => {
                      <Table.Column>Centinela</Table.Column>
                      <Table.Column>Luchadora</Table.Column>
                      <Table.Column>Principe</Table.Column>
+                     <Table.Column>Ejércitos más usados</Table.Column> 
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
-                     {sortedMeetingRequirements.map((member, index) => (
-                        <Table.Row key={member.tag}>
-                           <Table.Cell>{index + 1}</Table.Cell>
-                           <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>{`TH ${member.townHallLevel || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>{`Rey ${member.heroes?.[0]?.level || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>{`Reina ${member.heroes?.[1]?.level || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>{`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>{`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
-                           <Table.Cell>
-                              <Button auto flat onClick={() => openModal(member)}>
-                                 👁️
-                              </Button>
-                           </Table.Cell>
-                        </Table.Row>
-                     ))}
+                     {sortedMeetingRequirements.map((member, index) => {
+                        const topArmies = getTopUsedArmies(member.name); // Get top armies
+                        return (
+                           <Table.Row key={member.tag}>
+                              <Table.Cell>{index + 1}</Table.Cell>
+                              <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{`TH ${member.townHallLevel || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{`Rey ${member.heroes?.[0]?.level || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{`Reina ${member.heroes?.[1]?.level || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell> 
+                              <Table.Cell>
+                                 <Button auto flat onClick={() => openModal(member)}>
+                                    👁️
+                                 </Button>
+                              </Table.Cell>
+                           </Table.Row>
+                        );
+                     })}
                   </Table.Body>
                </Table>
 
@@ -547,38 +552,43 @@ export const TableWrapper = () => {
                      <Table.Column>Centinela</Table.Column>
                      <Table.Column>Luchadora</Table.Column>
                      <Table.Column>Principe</Table.Column>
+                     <Table.Column>Ejércitos más usados</Table.Column>
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
-                     {sortedNotMeetingRequirements.map((member, index) => (
-                        <Table.Row key={member.tag}>
-                           <Table.Cell>{index + 1}</Table.Cell>
-                           <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
-                           <Table.Cell css={{ color: member.townHallLevel < parseInt(minLevels.th) ? 'red' : 'inherit' }}>
-                              {`TH ${member.townHallLevel || 'N/A'}`}
-                           </Table.Cell>
-                           <Table.Cell css={{ color: (member.heroes?.[0]?.level ?? 0) < parseInt(minLevels.rey) ? 'red' : 'inherit' }}>
-                              {`Rey ${member.heroes?.[0]?.level || 'N/A'}`}
-                           </Table.Cell>
-                           <Table.Cell css={{ color: (member.heroes?.[1]?.level ?? 0) < parseInt(minLevels.reina) ? 'red' : 'inherit' }}>
-                              {`Reina ${member.heroes?.[1]?.level || 'N/A'}`}
-                           </Table.Cell>
-                           <Table.Cell css={{ color: (member.heroes?.[2]?.level ?? 0) < parseInt(minLevels.centinela) ? 'red' : 'inherit' }}>
-                              {`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}
-                           </Table.Cell>
-                           <Table.Cell css={{ color: (member.heroes?.[4]?.level ?? 0) < parseInt(minLevels.luchadora) ? 'red' : 'inherit' }}>
-                              {`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}
-                           </Table.Cell>
-                           <Table.Cell css={{ color: (member.heroes?.[6]?.level ?? 0) < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
-                              {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
-                           </Table.Cell>
-                           <Table.Cell>
-                              <Button auto flat onClick={() => openModal(member)}>
-                                 👁️
-                              </Button>
-                           </Table.Cell>
-                        </Table.Row>
-                     ))}
+                     {sortedNotMeetingRequirements.map((member, index) => {
+                        const topArmies = getTopUsedArmies(member.name); // Get top armies
+                        return (
+                           <Table.Row key={member.tag}>
+                              <Table.Cell>{index + 1}</Table.Cell>
+                              <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
+                              <Table.Cell css={{ color: member.townHallLevel < parseInt(minLevels.th) ? 'red' : 'inherit' }}>
+                                 {`TH ${member.townHallLevel || 'N/A'}`}
+                              </Table.Cell>
+                              <Table.Cell css={{ color: (member.heroes?.[0]?.level ?? 0) < parseInt(minLevels.rey) ? 'red' : 'inherit' }}>
+                                 {`Rey ${member.heroes?.[0]?.level || 'N/A'}`}
+                              </Table.Cell>
+                              <Table.Cell css={{ color: (member.heroes?.[1]?.level ?? 0) < parseInt(minLevels.reina) ? 'red' : 'inherit' }}>
+                                 {`Reina ${member.heroes?.[1]?.level || 'N/A'}`}
+                              </Table.Cell>
+                              <Table.Cell css={{ color: (member.heroes?.[2]?.level ?? 0) < parseInt(minLevels.centinela) ? 'red' : 'inherit' }}>
+                                 {`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}
+                              </Table.Cell>
+                              <Table.Cell css={{ color: (member.heroes?.[4]?.level ?? 0) < parseInt(minLevels.luchadora) ? 'red' : 'inherit' }}>
+                                 {`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}
+                              </Table.Cell>
+                              <Table.Cell css={{ color: (member.heroes?.[6]?.level ?? 0) < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
+                                 {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
+                              </Table.Cell>
+                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell> 
+                              <Table.Cell>
+                                 <Button auto flat onClick={() => openModal(member)}>
+                                    👁️
+                                 </Button>
+                              </Table.Cell>
+                           </Table.Row>
+                        );
+                     })}
                   </Table.Body>
                </Table>
             </>
