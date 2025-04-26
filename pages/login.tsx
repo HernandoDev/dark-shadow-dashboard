@@ -7,6 +7,8 @@ const Login = () => {
     const [error, setError] = useState('');
     const router = useRouter();
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
     const handleLogin = () => {
         const validUsers: Record<string, string> = {
             gaboadmin: 'gaboadmin',
@@ -24,10 +26,20 @@ const Login = () => {
 
     return (
         <div
-            style={{
+            style={isMobile ? {
                 backgroundImage: "url('/login_image.png')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            } : {
+                backgroundImage: "url('/login_image.png')",
+                backgroundSize: 'cover',
+                backgroundPositionY: '-300px',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
                 height: '100vh',
                 display: 'flex',
                 justifyContent: 'center',
