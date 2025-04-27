@@ -67,7 +67,7 @@ const Login = () => {
                                     className="input-is"
                                     type="text"
                                     required
-                                    placeholder="User"
+                                    placeholder="Usuario"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                 />
@@ -75,7 +75,7 @@ const Login = () => {
                                     className="input-is"
                                     type="password"
                                     required
-                                    placeholder="Password"
+                                    placeholder="Contraseña"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
