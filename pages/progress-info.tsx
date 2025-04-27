@@ -4,11 +4,27 @@ import { Button } from '@nextui-org/react';
 
 const ProgressInfo: React.FC = () => {
     const [saves, setSaves] = useState<any[]>([]);
+    const [members, setMembers] = useState<any[]>([]); // New state for current members
     const [timeline, setTimeline] = useState<any[]>([]);
     const [comparisonDates, setComparisonDates] = useState<{ oldDate: string; newDate: string } | null>(null);
     const [clanTag, setClanTag] = useState('%232QL0GCQGQ'); // Clan Principal
+    const [selectedOldDate, setSelectedOldDate] = useState<string | null>(null);
+    const [selectedNewDate, setSelectedNewDate] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true); // Loading state for fetching members
 
     useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const data = await APIClashService.getClanMembersWithDetails(clanTag);
+                setMembers(data.detailedMembers || []); // Store current members
+            } catch (error) {
+                console.error('Error fetching members:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMembers();
         getSaves();
     }, [clanTag]);
 
@@ -17,9 +33,13 @@ const ProgressInfo: React.FC = () => {
 
     const getSaves = async () => {
         const data = await APIClashService.getSaves(clanTag);
-        setSaves(data);
-        setComparisonDates(calculateComparisonDates(data));
-        setTimeline(generateTimeline(data));
+        const currentSave = {
+            fileName: 'current_state',
+            content: { detailedMembers: members }, // Add current members as the latest save
+        };
+        setSaves([...data, currentSave]); // Append current state to saves
+        setComparisonDates(calculateComparisonDates([...data, currentSave]));
+        setTimeline(generateTimeline([...data, currentSave]));
     };
 
     const saveProgress = async () => {
@@ -165,14 +185,20 @@ const ProgressInfo: React.FC = () => {
         }));
     };
 
+    const handleDateChange = (oldDate: string | null, newDate: string | null) => {
+        if (oldDate && newDate) {
+            const filteredSaves = saves.filter(save =>
+                [oldDate, newDate].includes(save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName))
+            );
+            setComparisonDates(calculateComparisonDates(filteredSaves));
+            setTimeline(generateTimeline(filteredSaves));
+        }
+    };
+
     return (
-        <div style={{padding:'20px'}}>
-                
+        <div style={{ padding: '20px' }}>
             <h1>Informacion de progreso de los jugadores</h1>
-            <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. Si deseas iniciar un nuevo punto de guardado, pulsa el botón "Crear guardado".
-
-
-</p>
+            <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. Si deseas iniciar un nuevo punto de guardado, pulsa el botón "Crear guardado".</p>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <Button bordered color="success" onClick={saveProgress}>
                     Guardar Progreso
@@ -200,7 +226,44 @@ const ProgressInfo: React.FC = () => {
                     Clan Cantera
                 </Button>
             </div>
-       
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+                <select
+                    value={selectedOldDate || ''}
+                    onChange={(e) => {
+                        const newOldDate = e.target.value;
+                        setSelectedOldDate(newOldDate);
+                        handleDateChange(newOldDate, selectedNewDate);
+                    }}
+                    style={{ padding: '5px', borderRadius: '5px' }}
+                >
+                    <option value="" disabled>Selecciona la fecha antigua</option>
+                    {saves.map((save, index) => (
+                        <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)}>
+                            {save.fileName === 'current_state' ? 'Estado Actual' : extractDateFromFileName(save.fileName)}
+                        </option>
+                    ))}
+                </select>
+                <select
+                    value={selectedNewDate || ''}
+                    onChange={(e) => {
+                        const newNewDate = e.target.value;
+                        setSelectedNewDate(newNewDate);
+                        handleDateChange(selectedOldDate, newNewDate);
+                    }}
+                    style={{ padding: '5px', borderRadius: '5px' }}
+                >
+                    <option value="" disabled>Selecciona la fecha nueva</option>
+                    {saves.map((save, index) => {
+                        const saveDate = save.fileName === 'current_state' ? 'Estado Actual' : extractDateFromFileName(save.fileName);
+                        const isDisabled = selectedOldDate && saveDate <= selectedOldDate;
+                        return (
+                            <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)} disabled={!!isDisabled}>
+                                {saveDate}
+                            </option>
+                        );
+                    })}
+                </select>
+            </div>
             <div>
                 {comparisonDates && (
                     <p>
@@ -216,8 +279,8 @@ const ProgressInfo: React.FC = () => {
                             border: '1px solid #ccc',
                             borderRadius: '10px',
                             padding: '15px',
-                            backgroundColor: '#333', // Dark background for better contrast
-                            color: '#fff', // White text for readability
+                            backgroundColor: '#333',
+                            color: '#fff',
                             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                             width: '300px',
                         }}
