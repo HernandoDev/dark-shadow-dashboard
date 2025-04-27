@@ -51,22 +51,24 @@ function MyApp({ Component, pageProps }: AppProps) {
          }}
       >
          <NextUIProvider>
-            <div
-               style={{
-                  backgroundImage: "url('/logo-fondo-removebg-preview.png')",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundPositionX: isMobile ? 'center' : '7vw', // Aplica 7vw solo si no es móvil
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  opacity: 0.15,
-                  zIndex: 0,
-               }}
-            />
+            {router.pathname !== '/login' && ( // Renderiza el fondo solo si no es la página de login
+               <div
+                  style={{
+                     backgroundImage: "url('/logo-fondo-removebg-preview.png')",
+                     backgroundRepeat: 'no-repeat',
+                     backgroundSize: 'cover',
+                     backgroundPosition: 'center',
+                     backgroundPositionX: isMobile ? 'center' : '7vw',
+                     position: 'fixed',
+                     top: 0,
+                     left: 0,
+                     width: '100%',
+                     height: '100%',
+                     opacity: 0.15,
+                     zIndex: 0,
+                  }}
+               />
+            )}
             <Layout>
                <Component {...pageProps} />
             </Layout>
