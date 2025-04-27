@@ -1,20 +1,20 @@
-import {Input, Link, Navbar, Text} from '@nextui-org/react';
+import { Input, Link, Navbar, Text } from '@nextui-org/react';
 import React, { useEffect, useState } from 'react';
-import {FeedbackIcon} from '../icons/navbar/feedback-icon';
-import {GithubIcon} from '../icons/navbar/github-icon';
-import {SupportIcon} from '../icons/navbar/support-icon';
-import {SearchIcon} from '../icons/searchicon';
-import {Box} from '../styles/box';
-import {Flex} from '../styles/flex';
-import {BurguerButton} from './burguer-button';
-import {NotificationsDropdown} from './notifications-dropdown';
-import {UserDropdown} from './user-dropdown';
+import { FeedbackIcon } from '../icons/navbar/feedback-icon';
+import { GithubIcon } from '../icons/navbar/github-icon';
+import { SupportIcon } from '../icons/navbar/support-icon';
+import { SearchIcon } from '../icons/searchicon';
+import { Box } from '../styles/box';
+import { Flex } from '../styles/flex';
+import { BurguerButton } from './burguer-button';
+import { NotificationsDropdown } from './notifications-dropdown';
+import { UserDropdown } from './user-dropdown';
 
 interface Props {
    children: React.ReactNode;
 }
 
-export const NavbarWrapper = ({children}: Props) => {
+export const NavbarWrapper = ({ children }: Props) => {
    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
    useEffect(() => {
@@ -68,7 +68,17 @@ export const NavbarWrapper = ({children}: Props) => {
             }}
          >
             <Navbar.Content showIn="md">
-               <BurguerButton />
+               <div style={{ display: 'flex', alignItems: 'center', gap: '50px', justifyContent: 'space-between' }}>
+
+                  <div>
+                     <BurguerButton />
+                  </div>
+                  <img
+                     src="/logo-fondo-removebg-preview.png"
+                     alt="Logo"
+                     style={{ width: '100px', height: '100px' }}
+                  />
+               </div>
             </Navbar.Content>
             <Navbar.Content
                hideIn={'md'}
@@ -77,7 +87,14 @@ export const NavbarWrapper = ({children}: Props) => {
                }}
                className="animate__animated animate__fadeInDown"
             >
-              Dark Shadows Dashboard
+               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <img
+                     src="/logo-fondo-removebg-preview.png"
+                     alt="Logo"
+                     style={{ width: '100px', height: '100px' }}
+                  />
+                  <span>Dark Shadows Dashboard</span>
+               </div>
             </Navbar.Content>
             <Navbar.Content>
                {isAuthenticated && (

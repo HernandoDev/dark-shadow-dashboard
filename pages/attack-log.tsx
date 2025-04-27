@@ -272,7 +272,6 @@ const AttackLog: React.FC = () => {
             const summary = attackSummary[attack.attack];
             summary.players.add(attack.member);
             summary.usageCount++;
-            debugger
             const memberTH = parseInt(attack.memberThLevel.replace('TH', ''), 10);
             const rivalTH = parseInt(attack.thRival.replace('TH', ''), 10);
 

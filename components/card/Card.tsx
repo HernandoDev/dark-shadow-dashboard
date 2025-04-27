@@ -18,9 +18,15 @@ interface CardProps {
   position: number; // Add position prop
   topArmies?: string[]; // Add topArmies prop
   borderColor?: string; // Add borderColor prop
+  tag: string; // Add tag prop
 }
 
-const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position, topArmies, borderColor }) => {
+const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position, topArmies, borderColor, tag }) => {
+  const openInGameProfile = () => {
+    const url = `https://link.clashofclans.com/?playerTag=${encodeURIComponent(tag)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <StyledWrapper borderColor={borderColor}>
       <div className="card">
@@ -62,6 +68,9 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails,
           )}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
             <Button onClick={onViewDetails}>👁️ Ver Detalles</Button>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+            <Button onClick={openInGameProfile}>Abrir jugador en el juego</Button>
           </div>
         </div>
       </div>

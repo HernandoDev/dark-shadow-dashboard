@@ -456,13 +456,8 @@ export const TableWrapper = () => {
                               principe: parseInt(minLevels.principe),
                            }}
                            topArmies={topArmies} // Pass topArmies prop
-                           
+                           tag={member.tag} // Pass tag prop
                         />
-                        {/* {topArmies.length > 0 && (
-                           <p style={{ marginTop: '10px', color: '#1e293b' }}>
-                              <strong>Ejércitos más usados:</strong> {topArmies.join(', ')}
-                           </p>
-                        )} */}
                      </div>
                   );
                })}
@@ -487,9 +482,9 @@ export const TableWrapper = () => {
                               principe: parseInt(minLevels.principe),
                            }}
                            topArmies={topArmies} // Pass topArmies prop
+                           tag={member.tag} // Pass tag prop
                            borderColor="#dc2626" // Add red border for non-compliant members
                         />
-                     
                      </div>
                   );
                })}
@@ -594,10 +589,6 @@ export const TableWrapper = () => {
             </>
          )}
 
-         
-
-         {/* ESTE ES EL MODAL  */}
-
          <Modal {...bindings}>
             <Modal.Header css={{ backgroundColor: '#1e293b', color: 'white' }}>
                <Text h4>{selectedMember?.name || 'Información del jugador'}</Text>
@@ -606,11 +597,15 @@ export const TableWrapper = () => {
                {selectedMember && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                      <div style={{ backgroundColor: '#e2e8f0', padding: '10px', borderRadius: '8px' }}>
-                        <p style={{ color: 'black' }}><strong style={{ color: '#1e40af' }}>TH:</strong> {selectedMember.townHallLevel}</p>
-                        <p style={{ color: 'black' }}><strong style={{ color: '#1e40af' }}>Rol:</strong> {selectedMember.role || 'N/A'}</p>
                         <p style={{ color: 'black' }}>
-                           <strong style={{ color: '#1e40af' }}>Donaciones:</strong> 
-                           <span  style={{ color: '#16a34a' }}> {selectedMember.donations || 'N/A'}</span> / 
+                           <strong style={{ color: '#1e40af' }}>TH:</strong> {selectedMember.townHallLevel}
+                        </p>
+                        <p style={{ color: 'black' }}>
+                           <strong style={{ color: '#1e40af' }}>Rol:</strong> {selectedMember.role || 'N/A'}
+                        </p>
+                        <p style={{ color: 'black' }}>
+                           <strong style={{ color: '#1e40af' }}>Donaciones:</strong>
+                           <span style={{ color: '#16a34a' }}> {selectedMember.donations || 'N/A'}</span> /
                            <span style={{ color: '#dc2626' }}> {selectedMember.donationsReceived || 'N/A'}</span>
                         </p>
                      </div>
@@ -659,7 +654,6 @@ export const TableWrapper = () => {
                </Button>
             </Modal.Footer>
          </Modal>
-
       </Box>
    );
 };
