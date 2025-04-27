@@ -261,14 +261,14 @@ const ProgressInfo: React.FC = () => {
                 </Button>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
-                <select
+                <select 
                     value={selectedOldDate || ''}
                     onChange={(e) => {
                         const newOldDate = e.target.value;
                         setSelectedOldDate(newOldDate);
                         handleDateChange(newOldDate, selectedNewDate);
                     }}
-                    style={{ padding: '5px', borderRadius: '5px' }}
+                    style={{ padding: '5px', borderRadius: '5px',width:'50%' }}
                 >
                     <option value="" disabled>Selecciona la fecha antigua</option>
                     {saves.map((save, index) => (
@@ -284,7 +284,7 @@ const ProgressInfo: React.FC = () => {
                         setSelectedNewDate(newNewDate);
                         handleDateChange(selectedOldDate, newNewDate);
                     }}
-                    style={{ padding: '5px', borderRadius: '5px' }}
+                    style={{ padding: '5px', borderRadius: '5px',width:'50%'  }}
                 >
                     <option value="" disabled>Selecciona la fecha nueva</option>
                     {saves.map((save, index) => {
