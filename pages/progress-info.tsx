@@ -15,11 +15,7 @@ const ProgressInfo: React.FC = () => {
     useEffect(() => {
         const fetchMembers = async () => {
             try {
-                // const data = await APIClashService.getClanMembersWithDetails(clanTag);
-                // debugger
-                // setMembers(data.detailedMembers || []); // Store current members
-        getSaves();
-
+                getSaves();
             } catch (error) {
                 console.error('Error fetching members:', error);
             } finally {
@@ -35,18 +31,21 @@ const ProgressInfo: React.FC = () => {
 
     const getSaves = async () => {
         const dataMembers = await APIClashService.getClanMembersWithDetails(clanTag);
-        debugger
-        setMembers(dataMembers.detailedMembers || []); 
+        setMembers(dataMembers.detailedMembers || []);
         const data = await APIClashService.getSaves(clanTag);
-        debugger
         const currentSave = {
             fileName: 'current_state',
             content: { detailedMembers: dataMembers.detailedMembers || [] }, // Add current members as the latest save
         };
-        debugger
-        setSaves([...data, currentSave]); // Append current state to saves
-        setComparisonDates(calculateComparisonDates([...data, currentSave]));
-        setTimeline(generateTimeline([...data, currentSave]));
+        const allSaves = [...data, currentSave];
+        setSaves(allSaves); // Append current state to saves
+
+        // Set the default value for selectedOldDate to the last saved date (excluding "Estado Actual")
+        const lastSavedDate = data.length > 0 ? extractDateFromFileName(data[data.length - 1].fileName) : null;
+        setSelectedOldDate(lastSavedDate);
+
+        setComparisonDates(calculateComparisonDates(allSaves));
+        setTimeline(generateTimeline(allSaves));
     };
 
     const saveProgress = async () => {
@@ -120,6 +119,26 @@ const ProgressInfo: React.FC = () => {
     const extractDateFromFileName = (fileName: string) => {
         const match = fileName.match(/_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})/);
         return match ? match[1].replace(/-/g, ':').replace('T', ' ') : 'Fecha desconocida';
+    };
+
+    const formatDateToHumanReadable = (dateString: string) => {
+        if (!dateString || dateString === 'Fecha desconocida') {
+            return 'Fecha actual';
+        }
+        try {
+            const [datePart] = dateString.split(' ');
+            const [year, month, day] = datePart.split(':').map(Number);
+            if (!year || !month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
+                return 'Fecha desconocida';
+            }
+            const months = [
+                'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+            ];
+            return `${day} de ${months[month - 1]} de ${year}`;
+        } catch {
+            return 'Fecha desconocida';
+        }
     };
 
     const translateChanges = (timeline: any[]) => {
@@ -246,7 +265,7 @@ const ProgressInfo: React.FC = () => {
                     <option value="" disabled>Selecciona la fecha antigua</option>
                     {saves.map((save, index) => (
                         <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)}>
-                            {save.fileName === 'current_state' ? 'Estado Actual' : extractDateFromFileName(save.fileName)}
+                            {save.fileName === 'current_state' ? 'Estado Actual' : formatDateToHumanReadable(extractDateFromFileName(save.fileName))}
                         </option>
                     ))}
                 </select>
@@ -261,8 +280,8 @@ const ProgressInfo: React.FC = () => {
                 >
                     <option value="" disabled>Selecciona la fecha nueva</option>
                     {saves.map((save, index) => {
-                        const saveDate = save.fileName === 'current_state' ? 'Estado Actual' : extractDateFromFileName(save.fileName);
-                        const isDisabled = selectedOldDate && saveDate <= selectedOldDate;
+                        const saveDate = save.fileName === 'current_state' ? 'Estado Actual' : formatDateToHumanReadable(extractDateFromFileName(save.fileName));
+                        const isDisabled = selectedOldDate && saveDate <= formatDateToHumanReadable(selectedOldDate);
                         return (
                             <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)} disabled={!!isDisabled}>
                                 {saveDate}
@@ -274,7 +293,7 @@ const ProgressInfo: React.FC = () => {
             <div>
                 {comparisonDates && (
                     <p>
-                        Comparación entre: {comparisonDates.oldDate} y {comparisonDates.newDate}
+                        Comparación entre: {formatDateToHumanReadable(comparisonDates.oldDate)} y {formatDateToHumanReadable(comparisonDates.newDate)}
                     </p>
                 )}
             </div>
