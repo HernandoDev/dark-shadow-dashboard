@@ -370,6 +370,8 @@ export const TableWrapper = () => {
       <Box css={{ padding: '20px' }}>
          <div style={{ display: 'flex', gap: '10px', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
             <Button
+               style={{ width: '50%', minWidth: '0px' }}
+
                bordered
                css={{
                   backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
@@ -381,6 +383,8 @@ export const TableWrapper = () => {
                Clan Principal
             </Button>
             <Button
+               style={{ width: '50%', minWidth: '0px' }}
+
                bordered
                css={{
                   backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
@@ -505,7 +509,7 @@ export const TableWrapper = () => {
                      <Table.Column>Centinela</Table.Column>
                      <Table.Column>Luchadora</Table.Column>
                      <Table.Column>Principe</Table.Column>
-                     <Table.Column>Ejércitos más usados</Table.Column> 
+                     <Table.Column>Ejércitos más usados</Table.Column>
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
@@ -521,7 +525,7 @@ export const TableWrapper = () => {
                               <Table.Cell>{`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
-                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell> 
+                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell>
                               <Table.Cell>
                                  <Button auto flat onClick={() => openModal(member)}>
                                     👁️
@@ -575,7 +579,7 @@ export const TableWrapper = () => {
                               <Table.Cell css={{ color: (member.heroes?.[6]?.level ?? 0) < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
                                  {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
                               </Table.Cell>
-                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell> 
+                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell>
                               <Table.Cell>
                                  <Button auto flat onClick={() => openModal(member)}>
                                     👁️

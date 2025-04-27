@@ -216,6 +216,7 @@ const WarInfoPage = () => {
       <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
         <Button
           bordered
+          style={{width:'50%',minWidth:'0px' }}
           css={{
             backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
             color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
@@ -225,6 +226,8 @@ const WarInfoPage = () => {
           Clan Principal
         </Button>
         <Button
+          style={{width:'50%' ,minWidth:'0px'}}
+
           bordered
           css={{
             backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
