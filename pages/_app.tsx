@@ -71,7 +71,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                />
             )}
             <Layout>
-               <div style={{marginTop: '18%'}}>
+               <div style={{marginTop: '20%'}}>
                < Component {...pageProps} />
                </div>
             </Layout>
