@@ -52,7 +52,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                   left: 0,
                   width: '100%',
                   height: '100%',
-                  opacity: 0.2, // Incrementa la opacidad para mayor visibilidad
+                  opacity: 0.15, // Incrementa la opacidad para mayor visibilidad
 
                   zIndex: 0, // Asegúrate de que el fondo esté detrás del contenido
                }}
