@@ -31,6 +31,7 @@ export const CardTransactions = () => {
 
    return (
       <Card
+      className="animate__animated animate__backInRight"
          css={{
             mw: '375px',
             height: 'auto',

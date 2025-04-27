@@ -20,7 +20,8 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
    const bgColor = backgroundColors[position - 1] || '#fc4503';
 
    return (
-      <Card
+      <Card 
+      className="animate__animated animate__backInLeft"
          css={{
             mw: '300px', // Reduced width from 375px to 300px
             bg: bgColor,
