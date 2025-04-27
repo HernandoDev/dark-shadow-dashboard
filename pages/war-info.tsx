@@ -253,6 +253,7 @@ const WarInfoPage = () => {
             >
               <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>
                 {clan.name}
+                {clan.tag !== clanTag.replace('%23', '#') && ' (Clan Enemigo)'}
               </h2>
               {clan.warLog && clan.warLog.totalWars > 0 && (
                 <div
@@ -373,7 +374,7 @@ const WarInfoPage = () => {
                     Resumen de diferencias de nivel de héroes y ayuntamiento
                   </h5>
                   {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
-                    const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.find(c => c.name === 'Dark Shadonws')?.members || []).heroAverages[hero] || 0).toFixed(2));
+                    const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.find(c => c.tag ===  clanTag.replace('%23', '#'))?.members || []).heroAverages[hero] || 0).toFixed(2));
                     const roundedAvgLevel = parseFloat(avgLevel.toFixed(2));
                     const levelDifference = parseFloat((mainClanHeroLevel - roundedAvgLevel).toFixed(2));
                     let comparisonText = '';
@@ -397,7 +398,7 @@ const WarInfoPage = () => {
                     );
                   })}
                   {(() => {
-                    const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.find(c => c.name === 'Dark Shadonws')?.members || []).averageTownHallLevel.toFixed(2));
+                    const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.find(c => c.name === clanTag.replace('%23', '#'))?.members || []).averageTownHallLevel.toFixed(2));
                     const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
                     const levelDifference = parseFloat((mainClanTHLevel - opponentTHLevel).toFixed(2));
                     let comparisonText = '';
