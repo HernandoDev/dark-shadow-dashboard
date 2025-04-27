@@ -49,10 +49,10 @@ export const SidebarWrapper = () => {
                <Sidebar.Body className="body sidebar">
 
                   <SidebarMenu title="Main Menu">
-                  <SidebarItem
+                     <SidebarItem
                         isActive={router.pathname === '/'}
                         title="Inicio"
-                        icon={<AccountsIcon />}
+                        icon={<HomeIcon />}
                         href="/"
                      />
                      <SidebarItem
@@ -64,26 +64,25 @@ export const SidebarWrapper = () => {
                      <SidebarItem
                         isActive={router.pathname === '/league-points'}
                         title="Clasificación Liga"
-                        icon={<PaymentsIcon />}
+                        icon={<BalanceIcon />}
                         href="league-points"
                      />
-
                      <SidebarItem
                         isActive={router.pathname === '/war-info'}
                         title="Info de Guerra/Liga"
                         icon={<ViewIcon />}
                         href="war-info"
                      />
-                       <SidebarItem
+                     <SidebarItem
                         isActive={router.pathname === '/progress-info'}
                         title="Progreso de Jugadores"
                         icon={<ReportsIcon />}
                         href="progress-info"
                      />
-                               <SidebarItem
+                     <SidebarItem
                         isActive={router.pathname === '/attack-log'}
                         title="Registro de ataques"
-                        icon={<ReportsIcon />}
+                        icon={<DevIcon />}
                         href="attack-log"
                      />
                   </SidebarMenu>
