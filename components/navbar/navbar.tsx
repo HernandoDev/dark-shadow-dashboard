@@ -49,6 +49,9 @@ export const NavbarWrapper = ({ children }: Props) => {
          <Navbar
             isBordered
             css={{
+               'position': 'fixed', // Make the navbar fixed
+               'top': 0, // Position it at the top
+               'zIndex': 1000, // Ensure it stays above other elements
                'borderBottom': '1px solid $border',
                'justifyContent': 'space-between',
                'width': '100%',
