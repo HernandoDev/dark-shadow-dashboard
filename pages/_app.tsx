@@ -25,6 +25,7 @@ const darkTheme = createTheme({
 function MyApp({ Component, pageProps }: AppProps) {
    const router = useRouter();
    const [isMobile, setIsMobile] = useState(false);
+   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
    useEffect(() => {
       const handleResize = () => {
@@ -36,8 +37,9 @@ function MyApp({ Component, pageProps }: AppProps) {
    }, []);
 
    useEffect(() => {
-      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-      if (!isAuthenticated && router.pathname !== '/login') {
+      const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+      setIsAuthenticated(authStatus);
+      if (!authStatus && router.pathname !== '/login') {
          router.push('/login');
       }
    }, [router]);
@@ -52,7 +54,7 @@ function MyApp({ Component, pageProps }: AppProps) {
          }}
       >
          <NextUIProvider>
-            {router.pathname !== '/login' && ( // Renderiza el fondo solo si no es la página de login
+            {router.pathname !== '/login' && (
                <div
                   style={{
                      backgroundImage: "url('/logo-fondo-removebg-preview.png')",
@@ -70,11 +72,15 @@ function MyApp({ Component, pageProps }: AppProps) {
                   }}
                />
             )}
-            <Layout>
-               <div style={{marginTop: '20%'}}>
-               < Component {...pageProps} />
-               </div>
-            </Layout>
+            {isAuthenticated ? (
+               <Layout>
+                  <div style={{ marginTop: isMobile ? '20%' : '6%' }}>
+                     <Component {...pageProps} />
+                  </div>
+               </Layout>
+            ) : (
+               <Component {...pageProps} />
+            )}
          </NextUIProvider>
       </NextThemesProvider>
    );

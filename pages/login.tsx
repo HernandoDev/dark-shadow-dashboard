@@ -38,7 +38,7 @@ const Login = () => {
                 alignItems: 'center'
             } : {
                 backgroundImage: "url('/login_image.png')",
-                backgroundSize: 'contain', // Changed from 'cover' to 'contain' to show the entire image
+                backgroundSize: 'contain', 
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
                 height: '100vh',

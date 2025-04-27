@@ -3,18 +3,25 @@
 const baseUrl = 'https://dark-shadows.ddns.net';
 // const baseUrl = 'http://localhost:3100';
 
+const isAuthenticated = () => {
+   return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
+};
+
 export const APIClashService = {
   getClanInfo: async (clanTag: string) => {
+    if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/clans/${clanTag}`);
     return res.json();
   },
 
   getClanMembersWithDetails: async (clanTag: string) => {
+    if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/members/details`);
     return res.json();
   },
 
   saveClanMembersWithDetails: async (clanTag: string) => {
+    if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/members/details/save`);
     return res.json();
   },
@@ -97,6 +104,7 @@ export const APIClashService = {
   },
 
   getAttackLogs: async () => {
+    if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/attack-log`);
     if (!res.ok) {
         throw new Error('Error al obtener los ataques guardados');
