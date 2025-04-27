@@ -70,7 +70,9 @@ function MyApp({ Component, pageProps }: AppProps) {
                />
             )}
             <Layout>
-               <Component {...pageProps} />
+               <div style={{marginTop: '18%'}}>
+               < Component {...pageProps} />
+               </div>
             </Layout>
          </NextUIProvider>
       </NextThemesProvider>
