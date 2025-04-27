@@ -11,6 +11,7 @@ const ProgressInfo: React.FC = () => {
     const [selectedOldDate, setSelectedOldDate] = useState<string | null>(null);
     const [selectedNewDate, setSelectedNewDate] = useState<string | null>('current_state'); // Default to current state
     const [loading, setLoading] = useState<boolean>(true); // Loading state
+    const [playerFilter, setPlayerFilter] = useState<string>('');
 
     useEffect(() => {
         const fetchMembers = async () => {
@@ -211,6 +212,13 @@ const ProgressInfo: React.FC = () => {
         }));
     };
 
+    const getTopAndBottomPlayers = (timeline: any[]) => {
+        const sortedTimeline = [...timeline].sort((a, b) => b.changes.length - a.changes.length);
+        const topPlayers = sortedTimeline.slice(0, 3).map(player => player.name);
+        const bottomPlayers = sortedTimeline.slice(-3).map(player => player.name);
+        return { topPlayers, bottomPlayers };
+    };
+
     const handleDateChange = (oldDate: string | null, newDate: string | null) => {
         if (oldDate && newDate) {
             const filteredSaves = saves.filter(save =>
@@ -290,37 +298,64 @@ const ProgressInfo: React.FC = () => {
                     })}
                 </select>
             </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <input
+                    type="text"
+                    placeholder="Filtrar por nombre de jugador"
+                    value={playerFilter}
+                    onChange={(e) => setPlayerFilter(e.target.value)}
+                    style={{
+                        padding: '5px',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        width: '300px',
+                    }}
+                />
+            </div>
             <div>
                 {comparisonDates && (
-                    <p>
-                        Comparación entre: {formatDateToHumanReadable(comparisonDates.oldDate)} y {formatDateToHumanReadable(comparisonDates.newDate)}
-                    </p>
+                    <>
+                        <p>
+                            Comparación entre: {formatDateToHumanReadable(comparisonDates.oldDate)} y {formatDateToHumanReadable(comparisonDates.newDate)}
+                        </p>
+                        {timeline.length > 0 && (() => {
+                            const { topPlayers, bottomPlayers } = getTopAndBottomPlayers(timeline);
+                            return (
+                                <div>
+                                    <p>Jugadores con más progreso: {topPlayers.join(', ') || 'Ninguno'}</p>
+                                    <p>Jugadores con menos progreso: {bottomPlayers.join(', ') || 'Ninguno'}</p>
+                                </div>
+                            );
+                        })()}
+                    </>
                 )}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
-                {translateChanges(timeline).map((entry, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            border: '1px solid #ccc',
-                            borderRadius: '10px',
-                            padding: '15px',
-                            backgroundColor: '#333',
-                            color: '#fff',
-                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                            width: '300px',
-                        }}
-                    >
-                        <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                            {entry.changes.map((change: any, idx: number) => (
-                                <li key={idx} style={{ marginBottom: '5px' }}>
-                                    {change.type}: {change.name} (De nivel {change.oldLevel} a nivel {change.newLevel})
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
+                {translateChanges(timeline)
+                    .filter((entry) => entry.name.toLowerCase().includes(playerFilter.toLowerCase()))
+                    .map((entry, index) => (
+                        <div
+                            key={index}
+                            style={{
+                                border: '1px solid #ccc',
+                                borderRadius: '10px',
+                                padding: '15px',
+                                backgroundColor: '#333',
+                                color: '#fff',
+                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                width: '300px',
+                            }}
+                        >
+                            <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                {entry.changes.map((change: any, idx: number) => (
+                                    <li key={idx} style={{ marginBottom: '5px' }}>
+                                        {change.type}: {change.name} (De nivel {change.oldLevel} a nivel {change.newLevel})
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
             </div>
         </div>
     );
