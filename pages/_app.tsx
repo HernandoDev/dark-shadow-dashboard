@@ -4,7 +4,7 @@ import type { AppProps } from 'next/app';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { Layout } from '../components/layout/layout';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 const lightTheme = createTheme({
@@ -23,6 +23,16 @@ const darkTheme = createTheme({
 
 function MyApp({ Component, pageProps }: AppProps) {
    const router = useRouter();
+   const [isMobile, setIsMobile] = useState(false);
+
+   useEffect(() => {
+      const handleResize = () => {
+         setIsMobile(window.innerWidth <= 768); // Define móvil como ancho <= 768px
+      };
+      handleResize(); // Ejecuta al cargar
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+   }, []);
 
    useEffect(() => {
       const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
@@ -47,14 +57,14 @@ function MyApp({ Component, pageProps }: AppProps) {
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
+                  backgroundPositionX: isMobile ? 'center' : '7vw', // Aplica 7vw solo si no es móvil
                   position: 'fixed',
                   top: 0,
                   left: 0,
                   width: '100%',
                   height: '100%',
-                  opacity: 0.15, // Incrementa la opacidad para mayor visibilidad
-
-                  zIndex: 0, // Asegúrate de que el fondo esté detrás del contenido
+                  opacity: 0.15,
+                  zIndex: 0,
                }}
             />
             <Layout>
