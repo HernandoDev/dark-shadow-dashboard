@@ -444,7 +444,7 @@ export const TableWrapper = () => {
                {sortedMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
                   return (
-                     <div style={{ padding: '15px' }} key={member.tag}>
+                     <div className="animate__animated animate__backInLeft" style={{ padding: '15px' }} key={member.tag}>
                         <Card
                            position={index + 1}
                            name={member.name}

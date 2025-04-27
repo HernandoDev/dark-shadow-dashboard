@@ -339,6 +339,7 @@ const ProgressInfo: React.FC = () => {
                     .filter((entry) => entry.name.toLowerCase().includes(playerFilter.toLowerCase()))
                     .map((entry, index) => (
                         <div
+                        className="animate__animated animate__backInLeft"
                             key={index}
                             style={{
                                 border: '1px solid #ccc',
@@ -349,11 +350,12 @@ const ProgressInfo: React.FC = () => {
                                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                                 width: '300px',
                             }}
+                            
                         >
                             <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                            <ul  style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 {entry.changes.map((change: any, idx: number) => (
-                                    <li key={idx} style={{ marginBottom: '5px' }}>
+                                    <li   key={idx} style={{ marginBottom: '5px' }}>
                                         {change.type}: {change.name} (De nivel {change.oldLevel} a nivel {change.newLevel})
                                     </li>
                                 ))}

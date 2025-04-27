@@ -207,7 +207,7 @@ const WarInfoPage = () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
-      <h1 style={{ marginBottom: '20px', color: '#ffcc00' }}>
+      <h1 className="animate__animated animate__backInDown" style={{ marginBottom: '20px', color: '#ffcc00' }}>
         Información de Guerra
       </h1>
       <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
@@ -239,7 +239,7 @@ const WarInfoPage = () => {
         </Button>
       </div>
 
-      <div id="war-info-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="animate__animated animate__backInLeft" id="war-info-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {fullWarDetails ? (
           getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string; members: any; warLog?: any; }) => (
             <div

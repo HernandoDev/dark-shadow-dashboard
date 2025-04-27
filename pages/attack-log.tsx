@@ -305,17 +305,17 @@ const AttackLog: React.FC = () => {
     }, []);
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <div  style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+            <h1 className="animate__animated animate__backInDown" style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <Target size={24} style={{ marginRight: '10px' }} />
                 Registro de Ataques
             </h1>
-            <p>
+            <p className="animate__animated animate__backInLeft">
                 <Info size={16} style={{ marginRight: '5px' }} />
                 Esta ventana muestra los ataques más usados en el clan y su rendimiento. Verás una lista con los ataques, sus resultados y los jugadores que los usan. Usa la barra de búsqueda para ver los ataques de un jugador específico y el botón "Agregar" para guardar nuevos ataques.
             </p>
             <br />
-            <p>
+            <p className="animate__animated animate__backInRight">
                 <Shield size={16} style={{ marginRight: '5px' }} />
                 El sistema de puntos <span style={{color:'violet'}}>asigna 1 punto por cada estrella</span> obtenida en un ataque. Si el atacante tiene un TH superior al del rival, <span style={{color:'red'}}>se resta 0.5 puntos</span> . Si el atacante tiene un TH inferior, se suman puntos adicionales: <span style={{color:'yellow'}}> 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. </span>Además, el puntaje final se ajusta <span style={{color:'yellow'}}>dividiéndolo por el número total de veces que el ataque ha sido usado</span>, promoviendo la diversidad y premiando los ataques más efectivos.
             </p>
@@ -365,7 +365,7 @@ const AttackLog: React.FC = () => {
                     </div>
                 </div>
                 {(playerSearchTerm || startDate || endDate) && playerSearchTerm ? (
-                    <div style={{ marginTop: '20px' }}>
+                    <div className="animate__animated animate__backInLeft" style={{ marginTop: '20px' }}>
                         <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>
                             <User size={20} style={{ marginRight: '10px' }} />
                             Ataques Filtrados
@@ -405,7 +405,8 @@ const AttackLog: React.FC = () => {
                                 });
 
                                 return (
-                                    <div style={{ textAlign: 'center', marginTop: '20px',paddingBottom: '20px' }}>
+                                    <div   style={{ textAlign: 'center', marginTop: '20px',paddingBottom: '20px' }}
+                                    >
                                         <h3>Resumen de {playerName}</h3>
                                         <p><span style={{ color: percentageColor }}>
                                             <strong>Media de porcentaje: </strong> 
@@ -524,11 +525,11 @@ const AttackLog: React.FC = () => {
                     </div>
                 ) : null}
             </div>
-            <div style={{ marginBottom: '20px' }}>
+            <div  style={{ marginBottom: '20px' }}>
                 <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Resumen del clan</h2>
 
                 {!loadingSavedAttacks && savedAttacks.length > 0 && (
-                    <div style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
+                    <div  className="animate__animated animate__backInLeft" style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
                         {(() => {
                             const attackSummary = getAttackSummary();
                             const sortedAttacks = Object.entries(attackSummary).sort(([, a], [, b]) => b.totalPoints - a.totalPoints);
@@ -568,7 +569,7 @@ const AttackLog: React.FC = () => {
                 {loadingSavedAttacks ? (
                     <Loading>Obteniendo ataques guardados...</Loading>
                 ) : savedAttacks.length > 0 ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
+                    <div className="animate__animated animate__backInRight" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                         {Object.entries(getAttackSummary())
                             .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Sort attacks by total points descending
                             .map(([attackName, summary], index) => (
