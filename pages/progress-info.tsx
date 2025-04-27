@@ -4,24 +4,49 @@ import { Button } from '@nextui-org/react';
 
 const ProgressInfo: React.FC = () => {
     const [saves, setSaves] = useState<any[]>([]);
+    const [members, setMembers] = useState<any[]>([]); // State for current members
     const [timeline, setTimeline] = useState<any[]>([]);
     const [comparisonDates, setComparisonDates] = useState<{ oldDate: string; newDate: string } | null>(null);
     const [clanTag, setClanTag] = useState('%232QL0GCQGQ'); // Clan Principal
     const [selectedOldDate, setSelectedOldDate] = useState<string | null>(null);
-    const [selectedNewDate, setSelectedNewDate] = useState<string | null>(null);
+    const [selectedNewDate, setSelectedNewDate] = useState<string | null>('current_state'); // Default to current state
+    const [loading, setLoading] = useState<boolean>(true); // Loading state
 
     useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                // const data = await APIClashService.getClanMembersWithDetails(clanTag);
+                // debugger
+                // setMembers(data.detailedMembers || []); // Store current members
         getSaves();
+
+            } catch (error) {
+                console.error('Error fetching members:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMembers();
     }, [clanTag]);
 
     const switchToMainClan = () => setClanTag('%232QL0GCQGQ'); // Clan Principal
     const switchToSecondaryClan = () => setClanTag('%232RG9R9JVP'); // Clan Cantera
 
     const getSaves = async () => {
+        const dataMembers = await APIClashService.getClanMembersWithDetails(clanTag);
+        debugger
+        setMembers(dataMembers.detailedMembers || []); 
         const data = await APIClashService.getSaves(clanTag);
-        setSaves(data);
-        setComparisonDates(calculateComparisonDates(data));
-        setTimeline(generateTimeline(data));
+        debugger
+        const currentSave = {
+            fileName: 'current_state',
+            content: { detailedMembers: dataMembers.detailedMembers || [] }, // Add current members as the latest save
+        };
+        debugger
+        setSaves([...data, currentSave]); // Append current state to saves
+        setComparisonDates(calculateComparisonDates([...data, currentSave]));
+        setTimeline(generateTimeline([...data, currentSave]));
     };
 
     const saveProgress = async () => {
@@ -170,7 +195,7 @@ const ProgressInfo: React.FC = () => {
     const handleDateChange = (oldDate: string | null, newDate: string | null) => {
         if (oldDate && newDate) {
             const filteredSaves = saves.filter(save =>
-                [oldDate, newDate].includes(extractDateFromFileName(save.fileName))
+                [oldDate, newDate].includes(save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName))
             );
             setComparisonDates(calculateComparisonDates(filteredSaves));
             setTimeline(generateTimeline(filteredSaves));
@@ -220,8 +245,8 @@ const ProgressInfo: React.FC = () => {
                 >
                     <option value="" disabled>Selecciona la fecha antigua</option>
                     {saves.map((save, index) => (
-                        <option key={index} value={extractDateFromFileName(save.fileName)}>
-                            {extractDateFromFileName(save.fileName)}
+                        <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)}>
+                            {save.fileName === 'current_state' ? 'Estado Actual' : extractDateFromFileName(save.fileName)}
                         </option>
                     ))}
                 </select>
@@ -236,10 +261,10 @@ const ProgressInfo: React.FC = () => {
                 >
                     <option value="" disabled>Selecciona la fecha nueva</option>
                     {saves.map((save, index) => {
-                        const saveDate = extractDateFromFileName(save.fileName);
+                        const saveDate = save.fileName === 'current_state' ? 'Estado Actual' : extractDateFromFileName(save.fileName);
                         const isDisabled = selectedOldDate && saveDate <= selectedOldDate;
                         return (
-                            <option key={index} value={saveDate} disabled={!!isDisabled}>
+                            <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)} disabled={!!isDisabled}>
                                 {saveDate}
                             </option>
                         );
