@@ -23,7 +23,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position, topArmies, borderColor, tag }) => {
   const openInGameProfile = () => {
-    const url = `https://link.clashofclans.com/?playerTag=${encodeURIComponent(tag)}`;
+    const url = `https://link.clashofclans.com/es?action=OpenPlayerProfile&tag=${encodeURIComponent(tag)}`;
     window.open(url, '_blank');
   };
 
