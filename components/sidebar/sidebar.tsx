@@ -100,10 +100,10 @@ export const SidebarWrapper = () => {
                         href="attack-log"
                      />
                        <SidebarItem
-                        isActive={router.pathname === '/donaciones-capital'}
-                        title="Registro de donaciones/capital"
+                        isActive={router.pathname === '/donaciones'}
+                        title="Registro de donaciones"
                         icon={<AccountsIcon />}
-                        href="donaciones-capital"
+                        href="donaciones"
                      />
                   </SidebarMenu>
                   <select
