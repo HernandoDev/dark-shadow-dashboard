@@ -244,7 +244,7 @@ const ProgressInfo: React.FC = () => {
 
                     bordered
                     css={{
-                        backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
+                        backgroundColor: clanTag === '%232QL0GCQGQ' ? 'purple' : 'inherit',
                         color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
                     }}
                     onClick={() => switchToMainClan()}
@@ -256,7 +256,7 @@ const ProgressInfo: React.FC = () => {
 
                     bordered
                     css={{
-                        backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
+                        backgroundColor: clanTag === '%232RG9R9JVP' ? 'purple' : 'inherit',
                         color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
                     }}
                     onClick={() => switchToSecondaryClan()}
@@ -352,7 +352,7 @@ const ProgressInfo: React.FC = () => {
                             }}
                             
                         >
-                            <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
+                            <h2 style={{ textAlign: 'center', color: 'purple', marginBottom: '10px' }}>{entry.name}</h2>
                             <ul  style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 {entry.changes.map((change: any, idx: number) => (
                                     <li   key={idx} style={{ marginBottom: '5px' }}>

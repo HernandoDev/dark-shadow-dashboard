@@ -218,7 +218,7 @@ const WarInfoPage = () => {
           bordered
           style={{width:'50%',minWidth:'0px' }}
           css={{
-            backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
+            backgroundColor: clanTag === '%232QL0GCQGQ' ? 'purple' : 'inherit',
             color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
           }}
           onClick={() => switchToMainClan()}
@@ -230,7 +230,7 @@ const WarInfoPage = () => {
 
           bordered
           css={{
-            backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
+            backgroundColor: clanTag === '%232RG9R9JVP' ? 'purple' : 'inherit',
             color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
           }}
           onClick={() => switchToSecondaryClan()}
@@ -267,7 +267,7 @@ const WarInfoPage = () => {
                         ? 'green'
                         : clan.warLog.wins > clan.warLog.losses
                         ? 'red'
-                        : 'violet'
+                        : 'purple'
                     }`,
                     borderRadius: '8px',
                     padding: '10px',
@@ -280,7 +280,7 @@ const WarInfoPage = () => {
                           ? 'green'
                           : clan.warLog.wins > clan.warLog.losses
                           ? 'red'
-                          : 'violet',
+                          : 'purple',
                     }}
                   >
                     Resumen del registro de Guerra (Últimos 60 Días)
@@ -332,7 +332,7 @@ const WarInfoPage = () => {
                               parseFloat(avgLevel.toFixed(2))
                           ).length
                         ? 'red'
-                        : 'violet'
+                        : 'purple'
                     }`,
                     borderRadius: '8px',
                     padding: '10px',
@@ -371,7 +371,7 @@ const WarInfoPage = () => {
                                 parseFloat(avgLevel.toFixed(2))
                             ).length
                           ? 'red'
-                          : 'violet',
+                          : 'purple',
                     }}
                   >
                     Resumen de diferencias de nivel de héroes y ayuntamiento
@@ -435,7 +435,7 @@ const WarInfoPage = () => {
                       : getClanSummary(clan.members).averageTownHallLevel <
                         getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
                       ? 'red'
-                      : 'violet'
+                      : 'purple'
                   }`,
                   borderRadius: '8px',
                   padding: '10px',
@@ -450,7 +450,7 @@ const WarInfoPage = () => {
                         : getClanSummary(clan.members).averageTownHallLevel <
                           getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
                         ? 'red'
-                        : 'violet',
+                        : 'purple',
                     marginBottom: '10px',
                   }}
                 >

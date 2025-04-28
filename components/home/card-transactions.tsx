@@ -94,7 +94,7 @@ export const CardTransactions: React.FC<CardTransactionsProps> = ({filterType}) 
                               {member.donations} 
                            </Text>
                            /
-                           <Text span css={{color: 'violet'}} size={'$xs'}>
+                           <Text span css={{color: 'purple'}} size={'$xs'}>
                               {member.donationsReceived} 
                            </Text>
                            <Text

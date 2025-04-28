@@ -374,7 +374,7 @@ export const TableWrapper = () => {
 
                bordered
                css={{
-                  backgroundColor: clanTag === '%232QL0GCQGQ' ? 'violet' : 'inherit',
+                  backgroundColor: clanTag === '%232QL0GCQGQ' ? 'purple' : 'inherit',
                   color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
                   width: isMobile ? '100%' : 'auto',
                }}
@@ -387,7 +387,7 @@ export const TableWrapper = () => {
 
                bordered
                css={{
-                  backgroundColor: clanTag === '%232RG9R9JVP' ? 'violet' : 'inherit',
+                  backgroundColor: clanTag === '%232RG9R9JVP' ? 'purple' : 'inherit',
                   color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
                   width: isMobile ? '100%' : 'auto',
                }}
