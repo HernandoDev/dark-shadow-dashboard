@@ -5,6 +5,8 @@ import { APIClashService } from '../services/apiClashService'; // Import API ser
 const DonacionesCapital = () => {
     const [saves, setSaves] = useState<any[]>([]); // State to store saves
     const [aggregatedDonations, setAggregatedDonations] = useState<any[]>([]); // Aggregated donations per player
+    const [activeTab, setActiveTab] = useState<'transactions' | 'totals'>('transactions'); // State for active tab
+    const [nameFilter, setNameFilter] = useState(''); // State for name filter
 
     useEffect(() => {
         const fetchSaves = async () => {
@@ -67,32 +69,113 @@ const DonacionesCapital = () => {
             <h1>Donaciones</h1>
             <p>Un buen donador es un miembro que ha realizado al menos 1000 donaciones y cuya diferencia entre donaciones realizadas y recibidas es mayor o igual a 0.
             Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
-            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                <CardTransactions filterType="bad" />
-                <CardTransactions filterType="good" />
+            
+            {/* Tabs */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <button
+                    onClick={() => setActiveTab('transactions')}
+                    style={{
+                        padding: '10px 20px',
+                        border: 'none',
+                        borderBottom: activeTab === 'transactions' ? '2px solid blue' : 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                        fontWeight: activeTab === 'transactions' ? 'bold' : 'normal',
+                    }}
+                >
+                    Malos y Buenos Donadores
+                </button>
+                <button
+                    onClick={() => setActiveTab('totals')}
+                    style={{
+                        padding: '10px 20px',
+                        border: 'none',
+                        borderBottom: activeTab === 'totals' ? '2px solid blue' : 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                        fontWeight: activeTab === 'totals' ? 'bold' : 'normal',
+                    }}
+                >
+                    Donaciones Totales por Jugador
+                </button>
             </div>
-          
-            <div style={{ marginTop: '20px' }}>
-                <h2>Donaciones Totales por Jugador</h2>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr>
-                            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Jugador</th>
-                            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Donaciones Totales</th>
-                            <th style={{ border: '1px solid #ccc', padding: '8px' }}>Donaciones Recibidas Totales</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {aggregatedDonations.map((player, index) => (
-                            <tr key={index}>
-                                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{player.name}</td>
-                                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{player.totalDonations}</td>
-                                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{player.totalDonationsReceived}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'transactions' && (
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                    <CardTransactions filterType="bad" />
+                    <CardTransactions filterType="good" />
+                </div>
+            )}
+
+            {activeTab === 'totals' && (
+                <div style={{ marginTop: '20px' }}>
+                    <h2>Donaciones Totales por Jugador</h2>
+                    <input
+                        type="text"
+                        placeholder="Filtrar por nombre"
+                        value={nameFilter}
+                        onChange={(e) => setNameFilter(e.target.value)}
+                        style={{
+                            marginBottom: '10px',
+                            padding: '8px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            width: '100%',
+                        }}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {aggregatedDonations
+                            .filter((player) =>
+                                player.name.toLowerCase().includes(nameFilter.toLowerCase())
+                            )
+                            .sort((a, b) => b.totalDonations - a.totalDonations) // Sort by highest total donations
+                            .map((player, index) => {
+                                const donationDifference = player.totalDonations - player.totalDonationsReceived;
+                                return (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            padding: '10px',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                        }}
+                                    >
+                                        <strong
+                                            style={{
+                                                fontSize: '16px',
+                                                marginBottom: '5px',
+                                                color: 'violet',
+                                            }}
+                                        >
+                                            {index + 1}. {player.name}
+                                        </strong>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                                            <span>Donaciones Totales:</span>
+                                            <span style={{ color: '#4caf50' }}>{player.totalDonations}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                                            <span>Donaciones Recibidas Totales:</span>
+                                            <span style={{ color: '#673ab7' }}>{player.totalDonationsReceived}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 'bold' }}>
+                                            <span>Diferencia:</span>
+                                            <span
+                                                style={{
+                                                    color: donationDifference < 0 ? 'red' : 'green',
+                                                }}
+                                            >
+                                                {donationDifference}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
