@@ -99,6 +99,12 @@ export const SidebarWrapper = () => {
                         icon={<DevIcon />}
                         href="attack-log"
                      />
+                       <SidebarItem
+                        isActive={router.pathname === '/donaciones-capital'}
+                        title="Registro de donaciones/capital"
+                        icon={<AccountsIcon />}
+                        href="donaciones-capital"
+                     />
                   </SidebarMenu>
                   <select
                      value={clanTag}

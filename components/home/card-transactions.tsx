@@ -12,7 +12,14 @@ type Member = {
 import {Flex} from '../styles/flex';
 import {APIClashService} from '../../services/apiClashService';
 
-export const CardTransactions = () => {
+// Define the filter type
+type FilterType = 'good' | 'bad';
+
+interface CardTransactionsProps {
+   filterType: FilterType;
+}
+
+export const CardTransactions: React.FC<CardTransactionsProps> = ({filterType}) => {
    const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
    const [members, setMembers] = useState<Member[]>([]);
 
@@ -29,9 +36,17 @@ export const CardTransactions = () => {
       fetchClanMembers();
    }, [clanTag]);
 
+   const filteredMembers = members.filter((member) => {
+      if (filterType === 'bad') {
+         return member.donations < 1000 || member.donations - member.donationsReceived < 0;
+      } else {
+         return member.donations >= 1000 && member.donations - member.donationsReceived >= 0;
+      }
+   });
+
    return (
       <Card
-      className="animate__animated animate__backInRight"
+         className="animate__animated animate__backInRight"
          css={{
             mw: '375px',
             height: 'auto',
@@ -44,16 +59,16 @@ export const CardTransactions = () => {
          <Card.Body>
             <Flex css={{gap: '$5'}} justify={'center'}>
                <Text h3 css={{textAlign: 'center'}}>
-                  Malos donadores
+                  {filterType === 'bad' ? 'Malos donadores' : 'Buenos donadores'}
                </Text>
             </Flex>
             <Flex css={{gap: '$6', py: '$4'}} direction={'column'}>
-               {members
-                  .filter(
-                     (member) =>
-                        member.donations < 1000 || member.donations - member.donationsReceived < 0
-                  )
-                  .map((member, index) => {
+               {filteredMembers.length === 0 ? (
+                  <Text h4 css={{textAlign: 'center', color: '$gray600'}}>
+                     No hay miembros.
+                  </Text>
+               ) : (
+                  filteredMembers.map((member, index) => {
                      const difference = member.donations - member.donationsReceived;
                      return (
                         <Flex key={index} css={{gap: '$6'}} align={'center'} justify="between">
@@ -70,10 +85,10 @@ export const CardTransactions = () => {
                               size={'$base'}
                               weight={'semibold'}
                               css={{
-                                 color: member.donations < 1000 ? 'orange' : 'inherit',
+                                 color: filterType === 'bad' && member.donations < 1000 ? 'orange' : 'inherit',
                               }}
                            >
-                              {member.name}
+                              {index + 1}. {member.name}
                            </Text>
                            <Text span css={{color: '$green600'}} size={'$xs'}>
                               {member.donations} 
@@ -93,7 +108,8 @@ export const CardTransactions = () => {
                            </Text>
                         </Flex>
                      );
-                  })}
+                  })
+               )}
             </Flex>
          </Card.Body>
       </Card>

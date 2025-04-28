@@ -280,7 +280,7 @@ export const Content = () => {
                   }}
                >
                   {/* <CardAgents /> */}
-                  <CardTransactions />
+                <CardTransactions filterType="bad" />
                </Flex>
             </Box>
          </Flex>
