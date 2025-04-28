@@ -27,8 +27,6 @@ const ProgressInfo: React.FC = () => {
         fetchMembers();
     }, [clanTag]);
 
-    const switchToMainClan = () => setClanTag('%232QL0GCQGQ'); // Clan Principal
-    const switchToSecondaryClan = () => setClanTag('%232RG9R9JVP'); // Clan Cantera
 
     const getSaves = async () => {
         const dataMembers = await APIClashService.getClanMembersWithDetails();
@@ -238,32 +236,7 @@ const ProgressInfo: React.FC = () => {
                     Guardar Progreso
                 </Button>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
-                <Button
-                    style={{ width: '50%', minWidth: '0px' }}
-
-                    bordered
-                    css={{
-                        backgroundColor: clanTag === '%232QL0GCQGQ' ? 'purple' : 'inherit',
-                        color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
-                    }}
-                    onClick={() => switchToMainClan()}
-                >
-                    Clan Principal
-                </Button>
-                <Button
-                    style={{ width: '50%', minWidth: '0px' }}
-
-                    bordered
-                    css={{
-                        backgroundColor: clanTag === '%232RG9R9JVP' ? 'purple' : 'inherit',
-                        color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
-                    }}
-                    onClick={() => switchToSecondaryClan()}
-                >
-                    Clan Cantera
-                </Button>
-            </div>
+          
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
                 <select
                     value={selectedOldDate || ''}

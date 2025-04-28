@@ -213,31 +213,7 @@ const WarInfoPage = () => {
       <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
         En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador. Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
       </p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
-        <Button
-          bordered
-          style={{width:'50%',minWidth:'0px' }}
-          css={{
-            backgroundColor: clanTag === '%232QL0GCQGQ' ? 'purple' : 'inherit',
-            color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
-          }}
-          onClick={() => switchToMainClan()}
-        >
-          Clan Principal
-        </Button>
-        <Button
-          style={{width:'50%' ,minWidth:'0px'}}
-
-          bordered
-          css={{
-            backgroundColor: clanTag === '%232RG9R9JVP' ? 'purple' : 'inherit',
-            color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
-          }}
-          onClick={() => switchToSecondaryClan()}
-        >
-          Clan Cantera
-        </Button>
-      </div>
+      
 
       <div className="animate__animated animate__backInLeft" id="war-info-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {fullWarDetails ? (

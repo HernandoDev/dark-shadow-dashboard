@@ -368,34 +368,7 @@ export const TableWrapper = () => {
 
    return (
       <Box css={{ padding: '20px' }}>
-         <div style={{ display: 'flex', gap: '10px', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
-            <Button
-               style={{ width: '50%', minWidth: '0px' }}
-
-               bordered
-               css={{
-                  backgroundColor: clanTag === '%232QL0GCQGQ' ? 'purple' : 'inherit',
-                  color: clanTag === '%232QL0GCQGQ' ? 'black' : 'inherit',
-                  width: isMobile ? '100%' : 'auto',
-               }}
-               onClick={() => setClanTag('%232QL0GCQGQ')}
-            >
-               Clan Principal
-            </Button>
-            <Button
-               style={{ width: '50%', minWidth: '0px' }}
-
-               bordered
-               css={{
-                  backgroundColor: clanTag === '%232RG9R9JVP' ? 'purple' : 'inherit',
-                  color: clanTag === '%232RG9R9JVP' ? 'black' : 'inherit',
-                  width: isMobile ? '100%' : 'auto',
-               }}
-               onClick={() => setClanTag('%232RG9R9JVP')}
-            >
-               Clan Cantera
-            </Button>
-         </div>
+  
 
          <div
             style={{
