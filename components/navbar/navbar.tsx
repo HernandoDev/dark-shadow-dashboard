@@ -35,6 +35,13 @@ export const NavbarWrapper = ({ children }: Props) => {
       window.location.reload(); // Reload the page to apply the new clan tag
    };
 
+   const getClanTag = () => {
+      if (typeof window === 'undefined') return '';
+      return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
+   };
+
+   const clanName = getClanTag() === '%232QL0GCQGQ' ? 'Dark Shadows' : getClanTag() === '%232RG9R9JVP' ? 'Dark Shadows II' : 'Unknown Clan';
+
    const collapseItems = [
       'Profile',
       'Dashboard',
@@ -103,7 +110,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                      alt="Logo"
                      style={{ width: '100px', height: '100px' }}
                   />
-                  <span>Dark Shadows Dashboard</span>
+                  <span>{clanName}</span>
                </div>
             </Navbar.Content>
           
