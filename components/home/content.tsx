@@ -50,7 +50,7 @@ export const Content = () => {
 
    React.useEffect(() => {
       const fetchAttackLogs = async () => {
-         const data = await APIClashService.getAttackLogs();
+         const data = await APIClashService.getAttackLogs(clanTag);
          setAttackLogs(data);
 
          // Define the type for playerStats

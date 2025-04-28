@@ -1,7 +1,7 @@
 // services/apiClashService.ts
 
-const baseUrl = 'https://dark-shadows.ddns.net';
-// const baseUrl = 'http://localhost:3100';
+// const baseUrl = 'https://dark-shadows.ddns.net';
+const baseUrl = 'http://localhost:3100';
 
 const isAuthenticated = () => {
    return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
@@ -91,7 +91,7 @@ export const APIClashService = {
     return APIClashService.saveClanMembersWithDetails(clanTag);
   },
 
-  saveAttackLog: async (attackData: { member: string; attack: string; percentage: number; stars: number; thRival: string; description: string; memberThLevel: string }) => {
+  saveAttackLog: async (attackData: { member: string; attack: string; percentage: number; stars: number; thRival: string; description: string; memberThLevel: string, clanTag: string }) => {
     const res = await fetch(`${baseUrl}/attack-log/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,9 +103,9 @@ export const APIClashService = {
     return res.json();
   },
 
-  getAttackLogs: async () => {
+  getAttackLogs: async (clanTag: string) => {
     if (!isAuthenticated()) throw new Error('User not authenticated');
-    const res = await fetch(`${baseUrl}/attack-log`);
+    const res = await fetch(`${baseUrl}/attack-log?clanTag=${encodeURIComponent(clanTag)}`);
     if (!res.ok) {
         throw new Error('Error al obtener los ataques guardados');
     }

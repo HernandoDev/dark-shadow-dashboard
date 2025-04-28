@@ -191,9 +191,8 @@ const AttackLog: React.FC = () => {
         if (typeof memberThLevel === 'number') {
             memberThLevel = `TH${memberThLevel}`;
         } else if (!memberThLevel.startsWith('TH')) {
-            memberThLevel = `TH${memberThLevel}`;
+            memberThLevel = memberThLevel; // Avoid adding "TH" again if it already starts with "TH"
         }
-        memberThLevel = `TH${memberThLevel}`;
 
         setIsSaving(true); // Disable the button during save
 
@@ -202,10 +201,11 @@ const AttackLog: React.FC = () => {
             attack: selectedAttack,
             percentage: parseInt(percentage, 10),
             stars: parseInt(stars, 10),
-            timestamp: new Date().toISOString(),
             description: description || "",
             thRival,
             memberThLevel, // Use the properly formatted memberThLevel
+            clanTag: '%232QL0GCQGQ' // Clan Principal
+
         };
 
         try {
@@ -272,6 +272,7 @@ const AttackLog: React.FC = () => {
             const summary = attackSummary[attack.attack];
             summary.players.add(attack.member);
             summary.usageCount++;
+            debugger
             const memberTH = parseInt(attack.memberThLevel.replace('TH', ''), 10);
             const rivalTH = parseInt(attack.thRival.replace('TH', ''), 10);
 
@@ -298,10 +299,13 @@ const AttackLog: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchSavedAttacks().then(setSavedAttacks).catch((error) => {
-            console.error('Error al obtener los ataques guardados:', error);
-            console.log('Hubo un error al obtener los ataques guardados.');
-        }).finally(() => setLoadingSavedAttacks(false));
+        fetchSavedAttacks()
+            .then((data) => setSavedAttacks(Array.isArray(data) ? data : [])) // Ensure savedAttacks is always an array
+            .catch((error) => {
+                console.error('Error al obtener los ataques guardados:', error);
+                console.log('Hubo un error al obtener los ataques guardados.');
+            })
+            .finally(() => setLoadingSavedAttacks(false));
     }, []);
 
     return (
@@ -397,6 +401,7 @@ const AttackLog: React.FC = () => {
 
                                 let thComparison = { lower: 0, equal: 0, higher: 0 };
                                 filteredPlayerAttacks.forEach((attack) => {
+                                        
                                     const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
                                     const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
                                     if (memberTh > rivalTh) thComparison.lower++;
@@ -528,7 +533,7 @@ const AttackLog: React.FC = () => {
             <div  style={{ marginBottom: '20px' }}>
                 <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Resumen del clan</h2>
 
-                {!loadingSavedAttacks && savedAttacks.length > 0 && (
+                {!loadingSavedAttacks && savedAttacks && savedAttacks.length > 0 && (
                     <div  className="animate__animated animate__backInLeft" style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
                         {(() => {
                             const attackSummary = getAttackSummary();
