@@ -19,7 +19,7 @@ export const CardTransactions = () => {
    useEffect(() => {
       const fetchClanMembers = async () => {
          try {
-            const data = await APIClashService.getClanMembersWithDetails(clanTag);
+            const data = await APIClashService.getClanMembersWithDetails();
             setMembers(data.detailedMembers as Member[] || []);
          } catch (error) {
             console.error('Error fetching clan members:', error);
