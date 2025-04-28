@@ -31,9 +31,9 @@ const ProgressInfo: React.FC = () => {
     const switchToSecondaryClan = () => setClanTag('%232RG9R9JVP'); // Clan Cantera
 
     const getSaves = async () => {
-        const dataMembers = await APIClashService.getClanMembersWithDetails(clanTag);
+        const dataMembers = await APIClashService.getClanMembersWithDetails();
         setMembers(dataMembers.detailedMembers || []);
-        const data = await APIClashService.getSaves(clanTag);
+        const data = await APIClashService.getSaves();
         const currentSave = {
             fileName: 'current_state',
             content: { detailedMembers: dataMembers.detailedMembers || [] }, // Add current members as the latest save
@@ -50,7 +50,7 @@ const ProgressInfo: React.FC = () => {
     };
 
     const saveProgress = async () => {
-        await APIClashService.saveClanMembersWithDetails(clanTag);
+        await APIClashService.saveClanMembersWithDetails();
         getSaves();
     };
 

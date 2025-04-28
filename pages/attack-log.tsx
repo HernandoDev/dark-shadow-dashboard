@@ -4,6 +4,11 @@ import { Plus, Star, Percent, User, Calendar, Target, Info, Shield } from 'react
 import { APIClashService } from '../services/apiClashService';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks'; // Adjust the path as needed
 
+const getClanTag = () => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
+};
+
 const AttackLog: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clanMembers, setClanMembers] = useState<string[]>([]);
@@ -53,7 +58,7 @@ const AttackLog: React.FC = () => {
         setIsModalOpen(true);
         setLoading(true);
         try {
-            const response = await APIClashService.getClanMembers('%232QL0GCQGQ'); // Clan Principal
+            const response = await APIClashService.getClanMembers(); // Clan Principal
             const memberNames = response.items.map((member: { name: string }) => member.name);
             setMembers(response.items); // Save the full members list
             setClanMembers(memberNames);
@@ -204,8 +209,7 @@ const AttackLog: React.FC = () => {
             description: description || "",
             thRival,
             memberThLevel, // Use the properly formatted memberThLevel
-            clanTag: '%232QL0GCQGQ' // Clan Principal
-
+            clanTag: getClanTag(), // Retrieve clanTag dynamically
         };
 
         try {
@@ -272,7 +276,6 @@ const AttackLog: React.FC = () => {
             const summary = attackSummary[attack.attack];
             summary.players.add(attack.member);
             summary.usageCount++;
-            debugger
             const memberTH = parseInt(attack.memberThLevel.replace('TH', ''), 10);
             const rivalTH = parseInt(attack.thRival.replace('TH', ''), 10);
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box } from '../styles/box';
 import { Sidebar } from './sidebar.styles';
 import { Avatar, Tooltip } from '@nextui-org/react';
@@ -25,6 +25,21 @@ import { useRouter } from 'next/router';
 export const SidebarWrapper = () => {
    const router = useRouter();
    const { collapsed, setCollapsed } = useSidebarContext();
+   const [clanTag, setClanTag] = useState('');
+
+   useEffect(() => {
+      const storedClanTag = localStorage.getItem('clanTag');
+      if (storedClanTag) {
+         setClanTag(storedClanTag);
+      }
+   }, []);
+
+   const handleClanChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const selectedClanTag = event.target.value;
+      setClanTag(selectedClanTag);
+      localStorage.setItem('clanTag', selectedClanTag);
+      window.location.reload(); // Reload the page to apply the new clan tag
+   };
 
    return (
       <Box
@@ -38,9 +53,8 @@ export const SidebarWrapper = () => {
       >
          {collapsed ? <Sidebar.Overlay onClick={setCollapsed} /> : null}
 
-         <Sidebar collapsed={collapsed}>
-            <Sidebar.Header>
-            </Sidebar.Header>
+         <Sidebar style={{marginTop:'40px'}} collapsed={collapsed}>
+        
             <Flex
                direction={'column'}
                justify={'between'}
@@ -86,7 +100,29 @@ export const SidebarWrapper = () => {
                         href="attack-log"
                      />
                   </SidebarMenu>
-
+                  <select
+                     value={clanTag}
+                     onChange={handleClanChange}
+                     style={{
+                        width: '100%',
+                        padding: '8px',
+                        marginBottom: '10px',
+                        backgroundColor: '#1e293b', // Dark background
+                        color: '#ffffff', // White text
+                        border: '1px solid #4b5563', // Gray border
+                        borderRadius: '8px', // Rounded corners
+                        fontSize: '14px', // Adjust font size
+                        outline: 'none', // Remove outline
+                        appearance: 'none', // Remove default dropdown arrow
+                        cursor: 'pointer', // Pointer cursor
+                     }}
+                  >
+                     <option value="" disabled>
+                        Select Clan
+                     </option>
+                     <option value="%232QL0GCQGQ">Principal</option>
+                     <option value="%232RG9R9JVP">Cantera</option>
+                  </select>
                </Sidebar.Body>
 
             </Flex>

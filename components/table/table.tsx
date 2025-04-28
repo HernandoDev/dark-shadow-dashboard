@@ -303,7 +303,7 @@ export const TableWrapper = () => {
    useEffect(() => {
       const fetchMembers = async () => {
          try {
-            const data = await APIClashService.getClanMembersWithDetails(clanTag);
+            const data = await APIClashService.getClanMembersWithDetails();
             setMembers(data.detailedMembers as Member[] || []);
          } catch (error) {
             console.error('Error fetching members:', error);

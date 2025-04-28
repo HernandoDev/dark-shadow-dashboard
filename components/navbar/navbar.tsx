@@ -16,12 +16,24 @@ interface Props {
 
 export const NavbarWrapper = ({ children }: Props) => {
    const [isAuthenticated, setIsAuthenticated] = useState(false);
+   const [clanTag, setClanTag] = useState('');
 
    useEffect(() => {
       if (typeof window !== 'undefined') {
          setIsAuthenticated(!!localStorage.getItem('isAuthenticated'));
+         const storedClanTag = localStorage.getItem('clanTag');
+         if (storedClanTag) {
+            setClanTag(storedClanTag);
+         }
       }
    }, []);
+
+   const handleClanChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const selectedClanTag = event.target.value;
+      setClanTag(selectedClanTag);
+      localStorage.setItem('clanTag', selectedClanTag);
+      window.location.reload(); // Reload the page to apply the new clan tag
+   };
 
    const collapseItems = [
       'Profile',
@@ -84,13 +96,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                   />
                </div>
             </Navbar.Content>
-            <Navbar.Content
-               hideIn={'md'}
-               css={{
-                  width: '100%',
-               }}
-               className="animate__animated animate__fadeInDown"
-            >
+            <Navbar.Content hideIn={'md'}>
                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <img
                      src="/logo-fondo-removebg-preview.png"
@@ -100,6 +106,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                   <span>Dark Shadows Dashboard</span>
                </div>
             </Navbar.Content>
+          
             <Navbar.Content>
                {isAuthenticated && (
                   <button
@@ -125,6 +132,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                )}
             </Navbar.Content>
             <Navbar.Collapse>
+        
                {collapseItems.map((item, index) => (
                   <Navbar.CollapseItem
                      key={item}
@@ -147,6 +155,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                   </Navbar.CollapseItem>
                ))}
             </Navbar.Collapse>
+
          </Navbar>
          {children}
       </Box>

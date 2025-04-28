@@ -20,7 +20,7 @@ const LeaguePointsPage = () => {
    useEffect(() => {
       const loadData = async () => {
          try {
-            const data = await APIClashService.getClanWarLeagueGroupDetails(clanTag);
+            const data = await APIClashService.getClanWarLeagueGroupDetails();
             if (data) {
                const results = await processResults(data, clanTag);
                setProcessedResults(results);

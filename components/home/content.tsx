@@ -12,7 +12,6 @@ import {CardAgents} from './card-agents';
 import { APIClashService } from '../../services/apiClashService';
 
 import {CardTransactions} from './card-transactions';
-const clanTag = '%232QL0GCQGQ';
 
 const Chart = dynamic(
    () => import('../charts/steam').then((mod) => mod.Steam),
@@ -50,7 +49,8 @@ export const Content = () => {
 
    React.useEffect(() => {
       const fetchAttackLogs = async () => {
-         const data = await APIClashService.getAttackLogs(clanTag);
+         let data = await APIClashService.getAttackLogs();
+         data = data[0].content
          setAttackLogs(data);
 
          // Define the type for playerStats
@@ -70,7 +70,7 @@ export const Content = () => {
             percentage: number;
             attacks: number;
             army: string;
-            points: number; // Add points field
+            points: number;
           }
 
           const playerStats: Record<string, PlayerStats> = data.reduce((acc: Record<string, PlayerStats>, attack: Attack) => {

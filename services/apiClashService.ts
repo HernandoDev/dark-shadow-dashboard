@@ -7,36 +7,53 @@ const isAuthenticated = () => {
    return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
 };
 
+const getClanTag = () => {
+   if (typeof window === 'undefined') return '';
+   return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
+};
+
 export const APIClashService = {
-  getClanInfo: async (clanTag: string) => {
+  getClanInfo: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/clans/${clanTag}`);
     return res.json();
   },
 
-  getClanMembersWithDetails: async (clanTag: string) => {
+  getClanMembersWithDetails: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/members/details`);
     return res.json();
   },
 
-  saveClanMembersWithDetails: async (clanTag: string) => {
+  saveClanMembersWithDetails: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/members/details/save`);
     return res.json();
   },
 
-  getClanWarLeagueGroup: async (clanTag: string) => {
+  getClanWarLeagueGroup: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/currentwar/leaguegroup`);
     return res.json();
   },
 
-  getClanWarLeagueGroupDetails: async (clanTag: string) => {
+  getClanWarLeagueGroupDetails: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/currentwar/leaguegroup/details`);
     return res.json();
   },
 
-  getClanCurrentWar: async (clanTag: string) => {
+  getClanCurrentWar: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/currentwar`);
     return res.json();
   },
@@ -66,12 +83,16 @@ export const APIClashService = {
     return res.json();
   },
 
-  getCapitalRaidSeasons: async (clanTag: string) => {
+  getCapitalRaidSeasons: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/capitalraidseasons`);
     return res.json();
   },
 
-  getClanMembers: async (clanTag: string) => {
+  getClanMembers: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     const res = await fetch(`${baseUrl}/clans/${clanTag}/members`);
     return res.json();
   },
@@ -81,14 +102,16 @@ export const APIClashService = {
     return res.json();
   },
 
-  getSaves: async (clanTag?: string) => {
-    const url = clanTag ? `${baseUrl}/saves/${clanTag}` : `${baseUrl}/saves`;
+  getSaves: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
+    const url = `${baseUrl}/saves/${clanTag}`;
     const res = await fetch(url);
     return res.json();
   },
 
-  saveProgress: async (clanTag: string) => {
-    return APIClashService.saveClanMembersWithDetails(clanTag);
+  saveProgress: async () => {
+    return APIClashService.saveClanMembersWithDetails();
   },
 
   saveAttackLog: async (attackData: { member: string; attack: string; percentage: number; stars: number; thRival: string; description: string; memberThLevel: string, clanTag: string }) => {
@@ -103,7 +126,9 @@ export const APIClashService = {
     return res.json();
   },
 
-  getAttackLogs: async (clanTag: string) => {
+  getAttackLogs: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
     const res = await fetch(`${baseUrl}/attack-log?clanTag=${encodeURIComponent(clanTag)}`);
     if (!res.ok) {

@@ -21,7 +21,7 @@ const WarInfoPage = () => {
     const loadData = async () => {
       try {
         console.log('Fetching clan war league group details for tag:', clanTag);
-        const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup(clanTag);
+        const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
         console.log('Fetched data:', clanWarLeagueGroupDetails);
 
         if (clanWarLeagueGroupDetails?.clans) {
@@ -39,7 +39,7 @@ const WarInfoPage = () => {
           );
           setFullWarDetails(fullDetails);
         } else {
-          const currentWarDetails = await APIClashService.getClanCurrentWar(clanTag);
+          const currentWarDetails = await APIClashService.getClanCurrentWar();
           const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
           const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
 
