@@ -2,8 +2,6 @@ import { APIClashService } from '../services/apiClashService';
 
 export const fetchSavedAttacks = async () => {
     try {
-        debugger
-
         let attacks = await APIClashService.getAttackLogs();
         attacks = attacks[0].content;
         return attacks
