@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import '../styles/login.css'; // Mueve la importación aquí
 import '../styles/checkbox.css';
+import '../styles/war-info.css';
 import 'animate.css';
 import type { AppProps } from 'next/app';
 import { createTheme, NextUIProvider } from '@nextui-org/react';

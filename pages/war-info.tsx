@@ -590,109 +590,58 @@ const WarInfoPage = () => {
           {fullWarDetails ? (
             getSortedClans(fullWarDetails).map((clan: { tag: React.Key | null | undefined; name: string; members: any; warLog?: any; }) => (
               <div
-                key={clan.tag}
+                className="bgblue"
                 style={{
-                  border: '1px solid #ccc',
-                  borderRadius: '10px',
-                  padding: '15px',
-                  backgroundColor: '#333',
-                  color: '#fff',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  textAlign: 'center',
+                  marginBottom: '10px',
                 }}
               >
-                <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>
-                  {clan.name}
-                  {clan.tag !== clanTag.replace('%23', '#') && ' (Clan Enemigo)'}
-                </h2>
-                {clan.warLog && clan.warLog.totalWars > 0 && (
-                  <div
-                    style={{
-                      marginBottom: '10px',
-                      border: `2px solid ${clan.warLog.wins < clan.warLog.losses
-                          ? 'green'
-                          : clan.warLog.wins > clan.warLog.losses
-                            ? 'red'
-                            : 'violet'
-                        }`,
-                      borderRadius: '8px',
-                      padding: '10px',
-                    }}
-                  >
-                    <h5
-                      style={{
-                        color:
-                          clan.warLog.wins < clan.warLog.losses
-                            ? 'green'
-                            : clan.warLog.wins > clan.warLog.losses
+                <div
+                  className="card"
+                  style={{
+                    textAlign: 'center',
+                  }}
+                >
+                  <h2 style={{ color: '#ffcc00', marginBottom: '10px' }}>
+                    {clan.name}
+                    {clan.tag !== clanTag.replace('%23', '#') && ' (Clan Enemigo)'}
+                  </h2>
+                  {clan.warLog && clan.warLog.totalWars > 0 && (
+                    <div>
+                      <h5
+                        style={{
+                          color:
+                            clan.warLog.wins < clan.warLog.losses
+                              ? 'green'
+                              : clan.warLog.wins > clan.warLog.losses
                               ? 'red'
                               : 'violet',
-                      }}
-                    >
-                      Resumen del registro de Guerra (Últimos 60 Días)
-                    </h5>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                      <p>Total Guerras: {clan.warLog.totalWars}</p>
-                      <p>Victorias: {clan.warLog.wins}</p>
-                      <p>Derrotas: {clan.warLog.losses}</p>
-                      <p>Empates: {clan.warLog.ties}</p>
-                      <p>Racha Máxima de Victorias: {clan.warLog.maxWinStreak}</p>
-                      <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
-                      <p>Victorias Significativas: {clan.warLog.significantWins}</p>
-                      <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
+                        }}
+                      >
+                        Resumen del registro de Guerra (Últimos 60 Días)
+                      </h5>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        <p>Total Guerras: {clan.warLog.totalWars}</p>
+                        <p>Victorias: {clan.warLog.wins}</p>
+                        <p>Derrotas: {clan.warLog.losses}</p>
+                        <p>Empates: {clan.warLog.ties}</p>
+                        <p>Racha Máxima de Victorias: {clan.warLog.maxWinStreak}</p>
+                        <p>Racha Máxima de Derrotas: {clan.warLog.maxLossStreak}</p>
+                        <p>Victorias Significativas: {clan.warLog.significantWins}</p>
+                        <p>Derrotas Significativas: {clan.warLog.significantLosses}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
-                {clan.tag !== '#2QL0GCQGQ' && clan.tag !== '#2RG9R9JVP' && (
-                  <div
-                    style={{
-                      marginBottom: '10px',
-                      border: `2px solid ${Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                        ([hero, avgLevel]) =>
-                          parseFloat(
-                            (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                            ).toFixed(2)) >
-                          parseFloat(avgLevel.toFixed(2))
-                      ).length >
-                          Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                            ([hero, avgLevel]) =>
-                              parseFloat(
-                                (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                ).toFixed(2)) <
-                              parseFloat(avgLevel.toFixed(2))
-                          ).length
-                          ? 'green'
-                          : Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                            ([hero, avgLevel]) =>
-                              parseFloat(
-                                (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                ).toFixed(2)) <
-                              parseFloat(avgLevel.toFixed(2))
-                          ).length >
-                            Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                              ([hero, avgLevel]) =>
-                                parseFloat(
-                                  (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                  ).toFixed(2)) >
-                                parseFloat(avgLevel.toFixed(2))
-                            ).length
-                            ? 'red'
-                            : 'violet'
-                        }`,
-                      borderRadius: '8px',
-                      padding: '10px',
-                    }}
-                  >
-                    <h5
+                  )}
+                  {clan.tag !== '#2QL0GCQGQ' && clan.tag !== '#2RG9R9JVP' && (
+                    <div
                       style={{
-                        color:
-                          Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                            ([hero, avgLevel]) =>
-                              parseFloat(
-                                (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                ).toFixed(2)) >
-                              parseFloat(avgLevel.toFixed(2))
-                          ).length >
+                        marginBottom: '10px',
+                        border: `2px solid ${Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                          ([hero, avgLevel]) =>
+                            parseFloat(
+                              (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                              ).toFixed(2)) >
+                            parseFloat(avgLevel.toFixed(2))
+                        ).length >
                             Object.entries(getClanSummary(clan.members).heroAverages).filter(
                               ([hero, avgLevel]) =>
                                 parseFloat(
@@ -716,98 +665,138 @@ const WarInfoPage = () => {
                                   parseFloat(avgLevel.toFixed(2))
                               ).length
                               ? 'red'
-                              : 'violet',
+                              : 'violet'
+                          }`,
+                        borderRadius: '8px',
+                        padding: '10px',
                       }}
                     >
-                      Resumen de diferencias de nivel de héroes y ayuntamiento
-                    </h5>
-                    {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
-                      const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.find(c => c.tag === clanTag.replace('%23', '#'))?.members || []).heroAverages[hero] || 0).toFixed(2));
-                      const roundedAvgLevel = parseFloat(avgLevel.toFixed(2));
-                      const levelDifference = parseFloat((mainClanHeroLevel - roundedAvgLevel).toFixed(2));
-                      let comparisonText = '';
-                      let comparisonColor = '';
+                      <h5
+                        style={{
+                          color:
+                            Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                              ([hero, avgLevel]) =>
+                                parseFloat(
+                                  (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                                  ).toFixed(2)) >
+                                parseFloat(avgLevel.toFixed(2))
+                            ).length >
+                              Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                                ([hero, avgLevel]) =>
+                                  parseFloat(
+                                    (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                                    ).toFixed(2)) <
+                                  parseFloat(avgLevel.toFixed(2))
+                              ).length
+                              ? 'green'
+                              : Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                                ([hero, avgLevel]) =>
+                                  parseFloat(
+                                    (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                                    ).toFixed(2)) <
+                                  parseFloat(avgLevel.toFixed(2))
+                              ).length >
+                                Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                                  ([hero, avgLevel]) =>
+                                    parseFloat(
+                                      (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                                      ).toFixed(2)) >
+                                    parseFloat(avgLevel.toFixed(2))
+                                ).length
+                                ? 'red'
+                                : 'violet',
+                        }}
+                      >
+                        Resumen de diferencias de nivel de héroes y ayuntamiento
+                      </h5>
+                      {Object.entries(getClanSummary(clan.members).heroAverages).map(([hero, avgLevel]) => {
+                        const mainClanHeroLevel = parseFloat((getClanSummary(fullWarDetails?.find(c => c.tag === clanTag.replace('%23', '#'))?.members || []).heroAverages[hero] || 0).toFixed(2));
+                        const roundedAvgLevel = parseFloat(avgLevel.toFixed(2));
+                        const levelDifference = parseFloat((mainClanHeroLevel - roundedAvgLevel).toFixed(2));
+                        let comparisonText = '';
+                        let comparisonColor = '';
 
-                      if (levelDifference > 0) {
-                        comparisonText = `Nuestro clan tiene un nivel superior en ${translateHero(hero as keyof typeof heroTranslations)} por ${Math.abs(levelDifference)}`;
-                        comparisonColor = 'green';
-                      } else if (levelDifference < 0) {
-                        comparisonText = `Nuestro clan tiene un nivel inferior en ${translateHero(hero as keyof typeof heroTranslations)} por ${Math.abs(levelDifference)}`;
-                        comparisonColor = 'red';
-                      } else {
-                        comparisonText = `Nuestro clan tiene el mismo nivel en ${translateHero(hero as keyof typeof heroTranslations)}`;
-                        comparisonColor = 'gray';
-                      }
+                        if (levelDifference > 0) {
+                          comparisonText = `Nuestro clan tiene un nivel superior en ${translateHero(hero as keyof typeof heroTranslations)} por ${Math.abs(levelDifference)}`;
+                          comparisonColor = 'green';
+                        } else if (levelDifference < 0) {
+                          comparisonText = `Nuestro clan tiene un nivel inferior en ${translateHero(hero as keyof typeof heroTranslations)} por ${Math.abs(levelDifference)}`;
+                          comparisonColor = 'red';
+                        } else {
+                          comparisonText = `Nuestro clan tiene el mismo nivel en ${translateHero(hero as keyof typeof heroTranslations)}`;
+                          comparisonColor = 'gray';
+                        }
 
-                      return (
-                        <p key={hero} style={{ color: comparisonColor, margin: '5px 0' }}>
-                          {comparisonText}
-                        </p>
-                      );
-                    })}
-                    {(() => {
-                      const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.find(c => c.name === clanTag.replace('%23', '#'))?.members || []).averageTownHallLevel.toFixed(2));
-                      const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
-                      const levelDifference = parseFloat((mainClanTHLevel - opponentTHLevel).toFixed(2));
-                      let comparisonText = '';
-                      let comparisonColor = '';
+                        return (
+                          <p key={hero} style={{ color: comparisonColor, margin: '5px 0' }}>
+                            {comparisonText}
+                          </p>
+                        );
+                      })}
+                      {(() => {
+                        const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.find(c => c.name === clanTag.replace('%23', '#'))?.members || []).averageTownHallLevel.toFixed(2));
+                        const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
+                        const levelDifference = parseFloat((mainClanTHLevel - opponentTHLevel).toFixed(2));
+                        let comparisonText = '';
+                        let comparisonColor = '';
 
-                      if (levelDifference > 0) {
-                        comparisonText = `Nuestro clan tiene un nivel superior en ayuntamiento por ${Math.abs(levelDifference)}`;
-                        comparisonColor = 'green';
-                      } else if (levelDifference < 0) {
-                        comparisonText = `Nuestro clan tiene un nivel inferior en ayuntamiento por ${Math.abs(levelDifference)}`;
-                        comparisonColor = 'red';
-                      } else {
-                        comparisonText = 'Nuestro clan tiene el mismo nivel en ayuntamiento';
-                        comparisonColor = 'gray';
-                      }
+                        if (levelDifference > 0) {
+                          comparisonText = `Nuestro clan tiene un nivel superior en ayuntamiento por ${Math.abs(levelDifference)}`;
+                          comparisonColor = 'green';
+                        } else if (levelDifference < 0) {
+                          comparisonText = `Nuestro clan tiene un nivel inferior en ayuntamiento por ${Math.abs(levelDifference)}`;
+                          comparisonColor = 'red';
+                        } else {
+                          comparisonText = 'Nuestro clan tiene el mismo nivel en ayuntamiento';
+                          comparisonColor = 'gray';
+                        }
 
-                      return (
-                        <p style={{ color: comparisonColor, margin: '5px 0' }}>
-                          {comparisonText}
-                        </p>
-                      );
-                    })()}
-                  </div>
-                )}
-                <div
-                  style={{
-                    border: `3px solid ${getClanSummary(clan.members).averageTownHallLevel >
-                        getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
-                        ? 'green'
-                        : getClanSummary(clan.members).averageTownHallLevel <
-                          getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
-                          ? 'red'
-                          : 'violet'
-                      }`,
-                    borderRadius: '8px',
-                    padding: '10px',
-                  }}
-                >
-                  <h5
+                        return (
+                          <p style={{ color: comparisonColor, margin: '5px 0' }}>
+                            {comparisonText}
+                          </p>
+                        );
+                      })()}
+                    </div>
+                  )}
+                  <div
                     style={{
-                      color:
-                        getClanSummary(clan.members).averageTownHallLevel >
+                      border: `3px solid ${getClanSummary(clan.members).averageTownHallLevel >
                           getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
                           ? 'green'
                           : getClanSummary(clan.members).averageTownHallLevel <
                             getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
                             ? 'red'
-                            : 'violet',
-                      marginBottom: '10px',
+                            : 'violet'
+                        }`,
+                      borderRadius: '8px',
+                      padding: '10px',
                     }}
                   >
-                    Media de Nivel de TH y Héroes
-                  </h5>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    <li style={{ marginBottom: '5px' }}>Nivel Ayuntamiento: {getClanSummary(clan.members).averageTownHallLevel}</li>
-                    {getUniqueHeroes(clan.members).map((hero) => (
-                      <li key={hero} style={{ marginBottom: '5px' }}>
-                        {translateHero(hero as keyof typeof heroTranslations)}: {getClanSummary(clan.members).heroAverages[hero] || 'N/A'}
-                      </li>
-                    ))}
-                  </ul>
+                    <h5
+                      style={{
+                        color:
+                          getClanSummary(clan.members).averageTownHallLevel >
+                            getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
+                            ? 'green'
+                            : getClanSummary(clan.members).averageTownHallLevel <
+                              getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
+                              ? 'red'
+                              : 'violet',
+                        marginBottom: '10px',
+                      }}
+                    >
+                      Media de Nivel de TH y Héroes
+                    </h5>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                      <li style={{ marginBottom: '5px' }}>Nivel Ayuntamiento: {getClanSummary(clan.members).averageTownHallLevel}</li>
+                      {getUniqueHeroes(clan.members).map((hero) => (
+                        <li key={hero} style={{ marginBottom: '5px' }}>
+                          {translateHero(hero as keyof typeof heroTranslations)}: {getClanSummary(clan.members).heroAverages[hero] || 'N/A'}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             ))
@@ -818,7 +807,10 @@ const WarInfoPage = () => {
       )}
 
       {activeTab === 'MensajeGuerra' && (
-        <div className="animate__animated animate__fadeIn" style={{ marginTop: '20px', textAlign: 'left' }}>
+        <div
+          className="animate__animated animate__fadeIn bgblue card"
+          style={{ marginTop: '20px', textAlign: 'left' }}
+        >
           <h2>Mensaje de Guerra</h2>
           <div style={{ marginBottom: '10px' }}>
             <label className="checkbox-wrapper">
@@ -957,7 +949,7 @@ const WarInfoPage = () => {
             </select>
           )}
           {selectedWar && (
-            <div style={{ marginTop: '20px', textAlign: 'left', width: '100%' }}>
+            <div style={{ marginTop: '20px', textAlign: 'center', width: '100%' }}>
               <h3>Detalles del Registro Seleccionado</h3>
               <p><strong>Fecha:</strong> {formatDate(selectedWar.content.startTime)}</p>
               <p>
@@ -993,16 +985,9 @@ const WarInfoPage = () => {
                             .map((attack, index) => (
                               <div
                                 key={index}
-                                style={{
-                                  border: '1px solid #ccc',
-                                  borderRadius: '10px',
-                                  padding: '15px',
-                                  backgroundColor: '#333',
-                                  color: '#fff',
-                                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                  width: '300px',
-                                }}
+                                className='bgblue'
                               >
+                                <div className='card'>
                                 <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
                                   <Star size={16} style={{ marginRight: '5px' }} />
                                   {attack.member}
@@ -1040,6 +1025,7 @@ const WarInfoPage = () => {
                                     </li>
                                   )}
                                 </ul>
+                                </div>
                               </div>
                             ))}
                         </div>

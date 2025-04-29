@@ -1,0 +1,14 @@
+.bgblue {
+  background: linear-gradient(135deg, #ffffff00, #593a8a7d, #ffffff00);
+  padding: 1px;
+  border-radius: 1.2rem;
+  box-shadow: 0px 1rem 1.5rem -0.9rem #000000e1;
+}
+
+.card {
+  font-size: 1rem;
+  color: #bec4cf;
+  background: linear-gradient(135deg, #0d112078 0%, rgba(106, 76, 166, 0.383) 43%, #0d1120 100%);
+  padding: 1.5rem;
+  border-radius: 1.2rem;
+}
