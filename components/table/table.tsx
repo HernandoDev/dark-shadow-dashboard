@@ -496,22 +496,25 @@ export const TableWrapper = () => {
                      <Table.Column>Luchadora</Table.Column>
                      <Table.Column>Principe</Table.Column>
                      <Table.Column>Ejércitos más usados</Table.Column>
+                     <Table.Column>Promedio de Estrellas</Table.Column>
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
                      {sortedMeetingRequirements.map((member, index) => {
-                        const topArmies = getTopUsedArmies(member.name); // Get top armies
+                        const topArmies = getTopUsedArmies(member.name) || []; // Ensure topArmies is an array
+                        const averageStars = calculateAverageStars(member.name) || 'N/A'; // Ensure averageStars is not undefined
                         return (
                            <Table.Row key={member.tag}>
                               <Table.Cell>{index + 1}</Table.Cell>
-                              <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{member.name || 'N/A'}</Table.Cell>
                               <Table.Cell>{`TH ${member.townHallLevel || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Rey ${member.heroes?.[0]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Reina ${member.heroes?.[1]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Centinela ${member.heroes?.[2]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Luchadora ${member.heroes?.[4]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
-                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell>
+                              <Table.Cell>{topArmies.join(', ')}</Table.Cell>
+                              <Table.Cell>{averageStars}</Table.Cell>
                               <Table.Cell>
                                  <Button auto flat onClick={() => openModal(member)}>
                                     👁️
@@ -538,15 +541,17 @@ export const TableWrapper = () => {
                      <Table.Column>Luchadora</Table.Column>
                      <Table.Column>Principe</Table.Column>
                      <Table.Column>Ejércitos más usados</Table.Column>
+                     <Table.Column>Promedio de Estrellas</Table.Column>
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
                      {sortedNotMeetingRequirements.map((member, index) => {
-                        const topArmies = getTopUsedArmies(member.name); // Get top armies
+                        const topArmies = getTopUsedArmies(member.name) || []; // Ensure topArmies is an array
+                        const averageStars = calculateAverageStars(member.name) || 'N/A'; // Ensure averageStars is not undefined
                         return (
                            <Table.Row key={member.tag}>
                               <Table.Cell>{index + 1}</Table.Cell>
-                              <Table.Cell>{` ${member.name || 'N/A'}`}</Table.Cell>
+                              <Table.Cell>{member.name || 'N/A'}</Table.Cell>
                               <Table.Cell css={{ color: member.townHallLevel < parseInt(minLevels.th) ? 'red' : 'inherit' }}>
                                  {`TH ${member.townHallLevel || 'N/A'}`}
                               </Table.Cell>
@@ -565,7 +570,8 @@ export const TableWrapper = () => {
                               <Table.Cell css={{ color: (member.heroes?.[6]?.level ?? 0) < parseInt(minLevels.principe) ? 'red' : 'inherit' }}>
                                  {`Principe ${member.heroes?.[6]?.level || 'N/A'}`}
                               </Table.Cell>
-                              <Table.Cell>{topArmies.join(', ') || 'N/A'}</Table.Cell>
+                              <Table.Cell>{topArmies.join(', ')}</Table.Cell>
+                              <Table.Cell>{averageStars}</Table.Cell>
                               <Table.Cell>
                                  <Button auto flat onClick={() => openModal(member)}>
                                     👁️
