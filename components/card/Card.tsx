@@ -6,6 +6,7 @@ interface CardProps {
   name: string;
   townHallLevel: number;
   heroes: { level: number }[];
+  averageStars: string;
   onViewDetails: () => void;
   minLevels: {
     th: number;
@@ -21,7 +22,7 @@ interface CardProps {
   tag: string; // Add tag prop
 }
 
-const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails, minLevels, position, topArmies, borderColor, tag }) => {
+const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, onViewDetails, minLevels, position, topArmies, borderColor, tag }) => {
   const openInGameProfile = () => {
     const url = `https://link.clashofclans.com/es?action=OpenPlayerProfile&tag=${encodeURIComponent(tag)}`;
     window.open(url, '_blank');
@@ -65,6 +66,11 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails,
             <div style={{color:'white', fontSize:'15px'}} className="top-armies">
              Ejércitos más usados: <br />
              {topArmies.join(', ')}
+            </div>
+          )}
+          {averageStars && (
+            <div style={{ textAlign: 'center', marginTop: '10px', color: 'white', fontSize: '15px' }}>
+              Promedio de estrellas: {averageStars}
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>

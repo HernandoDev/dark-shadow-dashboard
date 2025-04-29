@@ -286,6 +286,7 @@ export const TableWrapper = () => {
    };
 
    const getTopUsedArmies = (memberName: string) => {
+      
       const memberAttacks = attackLogs.filter((attack) => attack.member === memberName);
       const armyUsageCount: { [key: string]: number } = {};
 
@@ -298,6 +299,16 @@ export const TableWrapper = () => {
          .map(([army]) => army);
 
       return sortedArmies.slice(0, 2); // Return top 1 or 2 armies
+   };
+
+   const calculateAverageStars = (memberName: string) => {
+      const memberAttacks = attackLogs.filter((attack) => attack.member === memberName);
+      const totalStars = memberAttacks.reduce((sum, attack) => sum + attack.stars, 0);
+      const result =memberAttacks.length > 0 ? (totalStars / memberAttacks.length).toFixed(2) : 'N/A';
+      debugger
+
+      return result
+
    };
 
    useEffect(() => {
@@ -434,6 +445,7 @@ export const TableWrapper = () => {
                            }}
                            topArmies={topArmies} // Pass topArmies prop
                            tag={member.tag} // Pass tag prop
+                           averageStars={calculateAverageStars(member.name)} // Pass average stars prop
                         />
                      </div>
                   );
@@ -461,6 +473,7 @@ export const TableWrapper = () => {
                            topArmies={topArmies} // Pass topArmies prop
                            tag={member.tag} // Pass tag prop
                            borderColor="#dc2626" // Add red border for non-compliant members
+                           averageStars={calculateAverageStars(member.name)} // Pass average stars prop
                         />
                      </div>
                   );
