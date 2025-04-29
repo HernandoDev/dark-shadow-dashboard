@@ -154,13 +154,35 @@ export const TableWrapper = () => {
    const [members, setMembers] = useState<Member[]>([]);
    const [loading, setLoading] = useState(true);
    const [attackLogs, setAttackLogs] = useState<AttackLog[]>([]); // Explicitly type attackLogs
-   const [minLevels, setMinLevels] = useState({
-      th: '15',
-      rey: '85',
-      reina: '85',
-      centinela: '60',
-      luchadora: '35',
-      principe: '55',
+   const [minLevels, setMinLevels] = useState(() => {
+      const clanTag = localStorage.getItem('clanTag');
+      if (clanTag === '%232QL0GCQGQ') {
+         return {
+            th: '15',
+            rey: '85',
+            reina: '85',
+            centinela: '60',
+            luchadora: '35',
+            principe: '55',
+         };
+      } else if (clanTag === '%232RG9R9JVP') {
+         return {
+            th: '12',
+            rey: '55',
+            reina: '55',
+            centinela: '35',
+            luchadora: '0',
+            principe: '35',
+         };
+      }
+      return {
+         th: '15',
+         rey: '85',
+         reina: '85',
+         centinela: '60',
+         luchadora: '35',
+         principe: '55',
+      }; // Default values
    });
 
    const [clanTag, setClanTag] = useState('%232QL0GCQGQ'); // Updated to use state

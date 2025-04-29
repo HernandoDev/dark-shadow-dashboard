@@ -126,10 +126,11 @@ export const SidebarWrapper = () => {
                      <option value="" disabled>
                         Selecciona un Clan
                      </option>
-                     <option value="%232QL0GCQGQ">Dark Shadows
-                     </option>
-                     <option value="%232RG9R9JVP">Dark Shadows II
-                     </option>
+                     <option value="%232QL0GCQGQ">Dark Shadows</option>
+                     <option value="%232RG9R9JVP">Dark Shadows II</option>
+                     {localStorage.getItem('username') === 'nandods' && (
+                        <option value="%23GRVGR2YPG">Pollos Hermanos</option>
+                     )}
                   </select>
                </Sidebar.Body>
 
