@@ -159,11 +159,11 @@ export const TableWrapper = () => {
       if (clanTag === '%232QL0GCQGQ') {
          return {
             th: '15',
-            rey: '85',
-            reina: '85',
-            centinela: '60',
-            luchadora: '35',
-            principe: '55',
+            rey: '90',
+            reina: '90',
+            centinela: '65',
+            luchadora: '40',
+            principe: '70',
          };
       } else if (clanTag === '%232RG9R9JVP') {
          return {
