@@ -261,7 +261,7 @@ const AttackLog: React.FC = () => {
             // Fetch saved attacks after saving
             fetchSavedAttacks()
                 .then((data) => {
-                    console.log('Ataques guardados obtenidos:', data);
+                    // console.log('Ataques guardados obtenidos:', data);
                     setSavedAttacks(data);
                 })
                 .catch((error) => {

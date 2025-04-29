@@ -56,7 +56,7 @@ export const RenderCell = ({user, columnKey}: Props) => {
                <Col css={{d: 'flex'}}>
                   <Tooltip content="Details">
                      <IconButton
-                        onClick={() => console.log('View user', user.id)}
+                        // onClick={() => console.log('View user', user.id)}
                      >
                         <EyeIcon size={20} fill="#979797" />
                      </IconButton>

@@ -305,8 +305,6 @@ export const TableWrapper = () => {
       const memberAttacks = attackLogs.filter((attack) => attack.member === memberName);
       const totalStars = memberAttacks.reduce((sum, attack) => sum + attack.stars, 0);
       const result =memberAttacks.length > 0 ? (totalStars / memberAttacks.length).toFixed(2) : 'N/A';
-      debugger
-
       return result
 
    };

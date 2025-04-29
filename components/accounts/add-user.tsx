@@ -8,7 +8,7 @@ export const AddUser = () => {
 
    const closeHandler = () => {
       setVisible(false);
-      console.log('closed');
+      // console.log('closed');
    };
 
    return (

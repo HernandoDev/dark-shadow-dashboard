@@ -167,9 +167,7 @@ const WarInfoPage = () => {
       })
     const loadData = async () => {
       try {
-        console.log('Fetching clan war league group details for tag:', clanTag);
         const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
-        console.log('Fetched data:', clanWarLeagueGroupDetails);
 
         if (clanWarLeagueGroupDetails?.clans) {
           const fullDetails = await Promise.all(
@@ -201,7 +199,7 @@ const WarInfoPage = () => {
             { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
           ];
 
-          console.log('Full War Details (Normal War):', fullDetails);
+          // console.log('Full War Details (Normal War):', fullDetails);
           setFullWarDetails(fullDetails);
         }
       } catch (error) {
@@ -736,10 +734,8 @@ const WarInfoPage = () => {
                       })}
                       {(() => {
                         const mainClanHeroLevel2 = getClanSummary(fullWarDetails?.find(c => c.tag === clanTag.replace('%23', '#'))?.members || []);
-
                         const mainClanTHLevel = mainClanHeroLevel2.averageTownHallLevel
                         const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
-                        debugger
                         const levelDifference = parseFloat((mainClanTHLevel - opponentTHLevel).toFixed(2));
                         let comparisonText = '';
                         let comparisonColor = '';
