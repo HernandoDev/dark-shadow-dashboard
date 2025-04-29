@@ -21,10 +21,10 @@ const getClanTag = () => {
 
 const evaluateWarResult = (selectedWar: any) => {
   const state = selectedWar.content.state;
-  
+
   if (state === "preparation") {
     return "La guerra está en preparación. No se pueden realizar cálculos.";
-  }  else {
+  } else {
     const clanTag = getClanTag().replace('%23', '#'); // Formatear el clanTag
     const isMainClan = selectedWar.content.clan.tag === clanTag;
 
@@ -45,7 +45,7 @@ const evaluateWarResult = (selectedWar: any) => {
         return "La guerra terminó en empate";
       }
     }
-  } 
+  }
 };
 
 const extractTimestampFromFileName = (fileName: string): string => {
@@ -103,8 +103,8 @@ const generateWarMessage = (warDetails: any) => {
             member.mapPosition < playerEnemy.mapPosition
               ? '⬇️(num. inferior)' // Green arrow for higher-ranked
               : member.mapPosition > playerEnemy.mapPosition
-              ? '⬆️(num. superior)' // Red arrow for lower-ranked
-              : '(espejo)'; // Equals sign for equal rank
+                ? '⬆️(num. superior)' // Red arrow for lower-ranked
+                : '(espejo)'; // Equals sign for equal rank
 
           starsGroup[stars]?.push(
             `* ${member.mapPosition}. ${member.name} TH${member.townhallLevel} ${comparisonEmoji} ${playerEnemy.mapPosition} ${playerEnemy.name}. (TH${playerEnemy.townhallLevel})`
@@ -137,7 +137,7 @@ ${noAttack.join('\n') || 'Todos atacaron'}
 const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text).then(() => {
     console.log('Texto copiado al portapapeles:', text);
-    
+
   });
 };
 
@@ -454,14 +454,14 @@ const WarInfoPage = () => {
 
   const generateFilteredWarMessage = (warDetails: any) => {
     if (!warSaves || warSaves.length === 0) return 'No hay registros de guerra disponibles.';
-    
+
     // Get the latest save
     const latestSave = warSaves[warSaves.length - 1];
     const state = latestSave.content.state;
     const now = new Date();
-  
+
     let additionalInfo = '';
-  
+
     if (state === "preparation") {
       const preparationEndTime = new Date(
         `${latestSave.content.startTime.substring(0, 4)}-${latestSave.content.startTime.substring(4, 6)}-${latestSave.content.startTime.substring(6, 8)}T${latestSave.content.startTime.substring(9, 11)}:${latestSave.content.startTime.substring(11, 13)}:${latestSave.content.startTime.substring(13, 15)}.000Z`
@@ -477,13 +477,13 @@ const WarInfoPage = () => {
       const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
       const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-  
+
       const clanTag = getClanTag().replace('%23', '#');
       const isMainClan = latestSave.content.clan.tag === clanTag;
-  
+
       const mainClan = isMainClan ? latestSave.content.clan : latestSave.content.opponent;
       const opponentClan = isMainClan ? latestSave.content.opponent : latestSave.content.clan;
-  
+
       if (mainClan.stars > opponentClan.stars) {
         additionalInfo = `Vamos ganando la guerra. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else if (mainClan.stars < opponentClan.stars) {
@@ -497,32 +497,32 @@ const WarInfoPage = () => {
           additionalInfo = `La guerra está empatada. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         }
       }
-    } 
-  
+    }
+
     const fullMessage = generateWarMessage(warDetails);
     const sections = fullMessage.split('🌟🌟🌟');
-  
+
     const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
     const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
     const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
     const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
-  
+
     let filteredMissingAttacksSection = missingAttacksSection;
-  
+
     if (includeOneMissingAttack) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
         .filter((line) => line.includes('Faltan 1 ataque'))
         .join('\n');
     }
-  
+
     if (includeTwoMissingAttacks) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
         .filter((line) => line.includes('Faltan 2 ataque'))
         .join('\n');
     }
-  
+
     return `
   ${additionalInfo}
   
@@ -614,8 +614,8 @@ const WarInfoPage = () => {
                             clan.warLog.wins < clan.warLog.losses
                               ? 'green'
                               : clan.warLog.wins > clan.warLog.losses
-                              ? 'red'
-                              : 'violet',
+                                ? 'red'
+                                : 'violet',
                         }}
                       >
                         Resumen del registro de Guerra (Últimos 60 Días)
@@ -643,30 +643,30 @@ const WarInfoPage = () => {
                               ).toFixed(2)) >
                             parseFloat(avgLevel.toFixed(2))
                         ).length >
+                          Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                            ([hero, avgLevel]) =>
+                              parseFloat(
+                                (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                                ).toFixed(2)) <
+                              parseFloat(avgLevel.toFixed(2))
+                          ).length
+                          ? 'green'
+                          : Object.entries(getClanSummary(clan.members).heroAverages).filter(
+                            ([hero, avgLevel]) =>
+                              parseFloat(
+                                (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
+                                ).toFixed(2)) <
+                              parseFloat(avgLevel.toFixed(2))
+                          ).length >
                             Object.entries(getClanSummary(clan.members).heroAverages).filter(
                               ([hero, avgLevel]) =>
                                 parseFloat(
                                   (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                  ).toFixed(2)) <
+                                  ).toFixed(2)) >
                                 parseFloat(avgLevel.toFixed(2))
                             ).length
-                            ? 'green'
-                            : Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                              ([hero, avgLevel]) =>
-                                parseFloat(
-                                  (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                  ).toFixed(2)) <
-                                parseFloat(avgLevel.toFixed(2))
-                            ).length >
-                              Object.entries(getClanSummary(clan.members).heroAverages).filter(
-                                ([hero, avgLevel]) =>
-                                  parseFloat(
-                                    (getClanSummary(fullWarDetails?.[0]?.members || []).heroAverages[hero] || 0
-                                    ).toFixed(2)) >
-                                  parseFloat(avgLevel.toFixed(2))
-                              ).length
-                              ? 'red'
-                              : 'violet'
+                            ? 'red'
+                            : 'violet'
                           }`,
                         borderRadius: '8px',
                         padding: '10px',
@@ -735,8 +735,11 @@ const WarInfoPage = () => {
                         );
                       })}
                       {(() => {
-                        const mainClanTHLevel = parseFloat(getClanSummary(fullWarDetails?.find(c => c.name === clanTag.replace('%23', '#'))?.members || []).averageTownHallLevel.toFixed(2));
+                        const mainClanHeroLevel2 = getClanSummary(fullWarDetails?.find(c => c.tag === clanTag.replace('%23', '#'))?.members || []);
+
+                        const mainClanTHLevel = mainClanHeroLevel2.averageTownHallLevel
                         const opponentTHLevel = parseFloat(getClanSummary(clan.members).averageTownHallLevel.toFixed(2));
+                        debugger
                         const levelDifference = parseFloat((mainClanTHLevel - opponentTHLevel).toFixed(2));
                         let comparisonText = '';
                         let comparisonColor = '';
@@ -763,12 +766,12 @@ const WarInfoPage = () => {
                   <div
                     style={{
                       border: `3px solid ${getClanSummary(clan.members).averageTownHallLevel >
+                        getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
+                        ? 'green'
+                        : getClanSummary(clan.members).averageTownHallLevel <
                           getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
-                          ? 'green'
-                          : getClanSummary(clan.members).averageTownHallLevel <
-                            getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
-                            ? 'red'
-                            : 'violet'
+                          ? 'red'
+                          : 'violet'
                         }`,
                       borderRadius: '8px',
                       padding: '10px',
@@ -1003,43 +1006,43 @@ const WarInfoPage = () => {
                                 className='bgblue'
                               >
                                 <div className='card'>
-                                <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
-                                  <Star size={16} style={{ marginRight: '5px' }} />
-                                  {attack.member}
-                                </h3>
-                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                  <li style={{ marginBottom: '5px' }}>
-                                    <strong>Ataque:</strong> {attack.attack}
-                                  </li>
-                                  <li style={{ marginBottom: '5px' }}>
-                                    <strong>
-                                      <Star size={16} style={{ marginRight: '5px' }} />
-                                      Porcentaje:
-                                    </strong>{' '}
-                                    {attack.percentage}%
-                                  </li>
-                                  <li style={{ marginBottom: '5px' }}>
-                                    <strong>
-                                      <Star size={16} style={{ marginRight: '5px' }} />
-                                      Estrellas:
-                                    </strong>{' '}
-                                    {attack.stars}
-                                  </li>
-                                  <li style={{ marginBottom: '5px' }}>
-                                    <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
-                                  </li>
-                                  <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                    <strong>TH Rival:</strong> {attack.thRival}
-                                  </li>
-                                  <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                    <strong>TH Miembro:</strong> {attack.memberThLevel}
-                                  </li>
-                                  {attack.description && (
+                                  <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
+                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                    {attack.member}
+                                  </h3>
+                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                     <li style={{ marginBottom: '5px' }}>
-                                      <strong>Descripción:</strong> {attack.description}
+                                      <strong>Ataque:</strong> {attack.attack}
                                     </li>
-                                  )}
-                                </ul>
+                                    <li style={{ marginBottom: '5px' }}>
+                                      <strong>
+                                        <Star size={16} style={{ marginRight: '5px' }} />
+                                        Porcentaje:
+                                      </strong>{' '}
+                                      {attack.percentage}%
+                                    </li>
+                                    <li style={{ marginBottom: '5px' }}>
+                                      <strong>
+                                        <Star size={16} style={{ marginRight: '5px' }} />
+                                        Estrellas:
+                                      </strong>{' '}
+                                      {attack.stars}
+                                    </li>
+                                    <li style={{ marginBottom: '5px' }}>
+                                      <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                    </li>
+                                    <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
+                                      <strong>TH Rival:</strong> {attack.thRival}
+                                    </li>
+                                    <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
+                                      <strong>TH Miembro:</strong> {attack.memberThLevel}
+                                    </li>
+                                    {attack.description && (
+                                      <li style={{ marginBottom: '5px' }}>
+                                        <strong>Descripción:</strong> {attack.description}
+                                      </li>
+                                    )}
+                                  </ul>
                                 </div>
                               </div>
                             ))}
