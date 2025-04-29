@@ -821,58 +821,83 @@ const WarInfoPage = () => {
         <div className="animate__animated animate__fadeIn" style={{ marginTop: '20px', textAlign: 'left' }}>
           <h2>Mensaje de Guerra</h2>
           <div style={{ marginBottom: '10px' }}>
-            <label>
+            <label className="checkbox-wrapper">
               <input
                 type="checkbox"
                 checked={includeThreeStars}
                 onChange={(e) => setIncludeThreeStars(e.target.checked)}
               />
-              Incluir ataques de 3 estrellas
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Incluir ataques de 3 estrellas</span>
             </label>
-            <br />
-            <label>
+            <label className="checkbox-wrapper">
               <input
                 type="checkbox"
                 checked={includeTwoStars}
                 onChange={(e) => setIncludeTwoStars(e.target.checked)}
               />
-              Incluir ataques de 2 estrellas
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Incluir ataques de 2 estrellas</span>
             </label>
-            <br />
-            <label>
+            <label className="checkbox-wrapper">
               <input
                 type="checkbox"
                 checked={includeOneStar}
                 onChange={(e) => setIncludeOneStar(e.target.checked)}
               />
-              Incluir ataques de 1 estrella
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Incluir ataques de 1 estrella</span>
             </label>
-            <br />
-            <label>
+            <label className="checkbox-wrapper">
               <input
                 type="checkbox"
                 checked={includeMissingAttacks}
                 onChange={(e) => setIncludeMissingAttacks(e.target.checked)}
               />
-              Incluir ataques faltantes
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Incluir ataques faltantes</span>
             </label>
-            <br />
-            <label>
+            <label className="checkbox-wrapper">
               <input
                 type="checkbox"
                 checked={includeOneMissingAttack}
                 onChange={(e) => setIncludeOneMissingAttack(e.target.checked)}
               />
-              Incluir jugadores con 1 ataque faltante
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Incluir jugadores con 1 ataque faltante</span>
             </label>
-            <br />
-            <label>
+            <label className="checkbox-wrapper">
               <input
                 type="checkbox"
                 checked={includeTwoMissingAttacks}
                 onChange={(e) => setIncludeTwoMissingAttacks(e.target.checked)}
               />
-              Incluir jugadores con 2 ataques faltantes
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Incluir jugadores con 2 ataques faltantes</span>
             </label>
           </div>
           <pre
