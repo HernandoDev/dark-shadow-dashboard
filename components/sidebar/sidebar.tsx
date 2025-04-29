@@ -124,7 +124,7 @@ export const SidebarWrapper = () => {
                      }}
                   >
                      <option value="" disabled>
-                        Select Clan
+                        Selecciona un Clan
                      </option>
                      <option value="%232QL0GCQGQ">Dark Shadows
                      </option>
