@@ -325,7 +325,7 @@ const ProgressInfo: React.FC = () => {
                     .filter((entry) => entry.name.toLowerCase().includes(playerFilter.toLowerCase()))
                     .map((entry, index) => (
                         <div
-                        className="animate__animated animate__backInLeft"
+                        className="animate__animated animate__backInLeft card"
                             key={index}
                             style={{
                                 border: '1px solid #ccc',
