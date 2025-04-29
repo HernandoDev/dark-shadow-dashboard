@@ -235,6 +235,49 @@ const WarInfoPage = () => {
     fetchWarSaves();
   }, [clanTag]);
 
+  useEffect(() => {
+    if (!warSaves || warSaves.length === 0) return;
+
+    // Get the latest save
+    const latestSave = warSaves[warSaves.length - 1];
+    const state = latestSave.content.state;
+    const now = new Date();
+
+    if (state === "preparation") {
+      // Deselect all checkboxes
+      setIncludeThreeStars(false);
+      setIncludeTwoStars(false);
+      setIncludeOneStar(false);
+      setIncludeMissingAttacks(false);
+      setIncludeOneMissingAttack(false);
+      setIncludeTwoMissingAttacks(false);
+    } else if (state === "inWar") {
+      const battleEndTime = new Date(
+        `${latestSave.content.endTime.substring(0, 4)}-${latestSave.content.endTime.substring(4, 6)}-${latestSave.content.endTime.substring(6, 8)}T${latestSave.content.endTime.substring(9, 11)}:${latestSave.content.endTime.substring(11, 13)}:${latestSave.content.endTime.substring(13, 15)}.000Z`
+      );
+      const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
+      const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
+
+      if (hoursRemaining > 12) {
+        // Select all checkboxes
+        setIncludeThreeStars(true);
+        setIncludeTwoStars(true);
+        setIncludeOneStar(true);
+        setIncludeMissingAttacks(true);
+        setIncludeOneMissingAttack(true);
+        setIncludeTwoMissingAttacks(true);
+      } else {
+        // Select all except "Incluir jugadores con 2 ataques faltantes"
+        setIncludeThreeStars(true);
+        setIncludeTwoStars(true);
+        setIncludeOneStar(true);
+        setIncludeMissingAttacks(true);
+        setIncludeOneMissingAttack(true);
+        setIncludeTwoMissingAttacks(false);
+      }
+    }
+  }, [warSaves]);
+
   const translateHero = (heroName: keyof typeof heroTranslations) => {
     return heroTranslations[heroName] || heroName;
   };
