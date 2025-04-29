@@ -71,14 +71,83 @@ const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksP
   }).filter((member: any) => member.attacksMissing > 0);
 };
 
+const generateWarMessage = (warDetails: any) => {
+  if (!warDetails) return '';
+
+  const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
+  const myClan = warDetails.find((clan: any) => clan.tag === clanTag);
+  if (!myClan) return 'No se encontró información de tu clan.';
+
+  const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
+  const noAttack: string[] = [];
+
+  myClan.members.forEach((member: any) => {
+    if (member.attacks && member.attacks.length > 0) {
+      member.attacks.forEach((attack: any) => {
+        const stars = (attack.stars || 0) as 1 | 2 | 3;
+
+        // Find the target clan and member by searching for the defenderTag
+        const targetClan = warDetails.find((clan: any) =>
+          clan.members.some((m: any) => m.tag === attack.defenderTag)
+        );
+        const targetClanName = targetClan ? targetClan.name : 'Desconocido';
+        const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
+
+        if (playerEnemy) {
+          const comparisonEmoji =
+            member.mapPosition < playerEnemy.mapPosition
+              ? '⬇️(num. inferior)' // Green arrow for higher-ranked
+              : member.mapPosition > playerEnemy.mapPosition
+              ? '⬆️(num. superior)' // Red arrow for lower-ranked
+              : '(espejo)'; // Equals sign for equal rank
+
+          starsGroup[stars]?.push(
+            `* ${member.mapPosition}. ${member.name} TH${member.townhallLevel} ${comparisonEmoji} ${playerEnemy.mapPosition} ${playerEnemy.name}. (TH${playerEnemy.townhallLevel})`
+          );
+        }
+      });
+    } else {
+      const attacksPerMember = myClan.attacksPerMember || 2; // Default to 2 attacks per member if not provided
+      const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
+      noAttack.push(`* ${member.mapPosition}. ${member.name} → no atacó (Faltan ${attacksMissing} ataque(s))`);
+    }
+  });
+
+  return `
+📢 Estado de la guerra: ${myClan.status || 'Desconocido'}
+🌟🌟🌟
+${starsGroup[3].join('\n') || 'Ningún ataque de 3 estrellas'}
+
+🌟🌟
+${starsGroup[2].join('\n') || 'Ningún ataque de 2 estrellas'}
+
+🌟
+${starsGroup[1].join('\n') || 'Ningún ataque de 1 estrella'}
+
+❌
+${noAttack.join('\n') || 'Todos atacaron'}
+  `;
+};
+
+const copyToClipboard = (text: string) => {
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Mensaje copiado al portapapeles');
+  });
+};
+
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
-  const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs'>('currentWar');
+  const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('currentWar');
   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
   const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
   const [savedAttacks, setSavedAttacks] = useState<any[]>([]);
+  const [customMessage, setCustomMessage] = useState<string>(''); // State for the custom message
+  const [includeThreeStars, setIncludeThreeStars] = useState(true);
+  const [includeTwoStars, setIncludeTwoStars] = useState(true);
+  const [includeOneStar, setIncludeOneStar] = useState(true);
+  const [includeMissingAttacks, setIncludeMissingAttacks] = useState(true);
 
   useEffect(() => {
     fetchSavedAttacks()
@@ -327,6 +396,29 @@ const WarInfoPage = () => {
     setSelectedWar(war);
   };
 
+  const handleCustomMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCustomMessage(event.target.value);
+  };
+
+  const generateFilteredWarMessage = (warDetails: any) => {
+    if (!warDetails) return '';
+
+    const fullMessage = generateWarMessage(warDetails);
+    const sections = fullMessage.split('🌟🌟🌟');
+
+    const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
+    const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
+    const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
+    const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
+
+    return `
+${includeThreeStars ? `🌟🌟🌟\n${threeStarsSection}` : ''}
+${includeTwoStars ? `🌟🌟\n${twoStarsSection}` : ''}
+${includeOneStar ? `🌟\n${oneStarSection}` : ''}
+${includeMissingAttacks ? `❌\n${missingAttacksSection}` : ''}
+    `.trim();
+  };
+
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
       <h1 className="animate__animated animate__backInDown" style={{ marginBottom: '20px', color: '#ffcc00' }}>
@@ -350,6 +442,19 @@ const WarInfoPage = () => {
           }}
         >
           Estado de Guerra Actual
+        </button>
+        <button
+          onClick={() => setActiveTab('MensajeGuerra')}
+          style={{
+            padding: '10px 20px',
+            border: 'none',
+            borderBottom: activeTab === 'MensajeGuerra' ? '2px solid violet' : 'none',
+            background: 'none',
+            cursor: 'pointer',
+            fontWeight: activeTab === 'MensajeGuerra' ? 'bold' : 'normal',
+          }}
+        >
+          Mensaje de Guerra
         </button>
         <button
           onClick={() => setActiveTab('warLogs')}
@@ -596,6 +701,73 @@ const WarInfoPage = () => {
           ) : (
             <p style={{ color: '#ff0000', fontWeight: 'bold' }}>No hay guerra activa en este momento.</p>
           )}
+        </div>
+      )}
+
+      {activeTab === 'MensajeGuerra' && (
+        <div className="animate__animated animate__fadeIn" style={{ marginTop: '20px', textAlign: 'left' }}>
+          <h2>Mensaje de Guerra</h2>
+          <div style={{ marginBottom: '10px' }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={includeThreeStars}
+                onChange={(e) => setIncludeThreeStars(e.target.checked)}
+              />
+              Incluir ataques de 3 estrellas
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={includeTwoStars}
+                onChange={(e) => setIncludeTwoStars(e.target.checked)}
+              />
+              Incluir ataques de 2 estrellas
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={includeOneStar}
+                onChange={(e) => setIncludeOneStar(e.target.checked)}
+              />
+              Incluir ataques de 1 estrella
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={includeMissingAttacks}
+                onChange={(e) => setIncludeMissingAttacks(e.target.checked)}
+              />
+              Incluir ataques faltantes
+            </label>
+          </div>
+          <pre
+            style={{
+              backgroundColor: '#333',
+              padding: '10px',
+              borderRadius: '5px',
+              overflowX: 'auto',
+              fontSize: '14px',
+            }}
+          >
+            {generateFilteredWarMessage(fullWarDetails)}
+          </pre>
+          <Button
+            onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))}
+            style={{
+              marginTop: '10px',
+              backgroundColor: '#007bff',
+              color: '#fff',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            Copiar Mensaje
+          </Button>
         </div>
       )}
 
