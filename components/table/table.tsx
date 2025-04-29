@@ -155,7 +155,7 @@ export const TableWrapper = () => {
    const [loading, setLoading] = useState(true);
    const [attackLogs, setAttackLogs] = useState<AttackLog[]>([]); // Explicitly type attackLogs
    const [minLevels, setMinLevels] = useState(() => {
-      const clanTag = localStorage.getItem('clanTag');
+      const clanTag = typeof window !== 'undefined' ? localStorage.getItem('clanTag') : null;
       if (clanTag === '%232QL0GCQGQ') {
          return {
             th: '15',

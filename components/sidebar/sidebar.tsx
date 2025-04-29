@@ -128,7 +128,7 @@ export const SidebarWrapper = () => {
                      </option>
                      <option value="%232QL0GCQGQ">Dark Shadows</option>
                      <option value="%232RG9R9JVP">Dark Shadows II</option>
-                     {localStorage.getItem('username') === 'nandods' && (
+                     {typeof window !== 'undefined' && localStorage.getItem('username') === 'nandods' && (
                         <option value="%23GRVGR2YPG">Pollos Hermanos</option>
                      )}
                   </select>
