@@ -74,6 +74,7 @@ const ProgressInfo: React.FC = () => {
 
         const changes = [
             ...compareTroops(newMember, oldMember),
+            ...compareSpells(newMember, oldMember), // Add comparison for spells
             ...compareHeroes(newMember, oldMember),
             ...compareHeroEquipment(newMember, oldMember),
         ];
@@ -88,6 +89,17 @@ const ProgressInfo: React.FC = () => {
                 const oldTroop = oldMember.troops.find((t: { name: any; village: string }) => t.name === newTroop.name && t.village === 'home');
                 return oldTroop && newTroop.level > oldTroop.level
                     ? { type: 'Tropa', name: newTroop.name, oldLevel: oldTroop.level, newLevel: newTroop.level }
+                    : null;
+            })
+            .filter((change: null) => change !== null);
+    };
+
+    const compareSpells = (newMember: any, oldMember: any) => {
+        return newMember.spells
+            .map((newSpell: { name: any; level: number }) => {
+                const oldSpell = oldMember.spells.find((s: { name: any }) => s.name === newSpell.name);
+                return oldSpell && newSpell.level > oldSpell.level
+                    ? { type: 'Hechizo', name: newSpell.name, oldLevel: oldSpell.level, newLevel: newSpell.level }
                     : null;
             })
             .filter((change: null) => change !== null);
@@ -145,6 +157,7 @@ const ProgressInfo: React.FC = () => {
             Tropa: 'Tropa',
             Héroe: 'Héroe',
             Equipamiento: 'Equipamiento',
+            Hechizo: 'Hechizo',
             // Traducciones de nombres de tropas
             'Barbarian': 'Bárbaro',
             'Wall Breaker': 'Rompe Muros',
