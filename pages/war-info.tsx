@@ -131,7 +131,8 @@ ${noAttack.join('\n') || 'Todos atacaron'}
 
 const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text).then(() => {
-    alert('Mensaje copiado al portapapeles');
+    console.log('Texto copiado al portapapeles:', text);
+    
   });
 };
 
@@ -148,6 +149,8 @@ const WarInfoPage = () => {
   const [includeTwoStars, setIncludeTwoStars] = useState(true);
   const [includeOneStar, setIncludeOneStar] = useState(true);
   const [includeMissingAttacks, setIncludeMissingAttacks] = useState(true);
+  const [includeOneMissingAttack, setIncludeOneMissingAttack] = useState(false);
+  const [includeTwoMissingAttacks, setIncludeTwoMissingAttacks] = useState(false);
 
   useEffect(() => {
     fetchSavedAttacks()
@@ -411,11 +414,27 @@ const WarInfoPage = () => {
     const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
     const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
 
+    let filteredMissingAttacksSection = missingAttacksSection;
+
+    if (includeOneMissingAttack) {
+      filteredMissingAttacksSection = filteredMissingAttacksSection
+        .split('\n')
+        .filter((line) => line.includes('Faltan 1 ataque'))
+        .join('\n');
+    }
+
+    if (includeTwoMissingAttacks) {
+      filteredMissingAttacksSection = filteredMissingAttacksSection
+        .split('\n')
+        .filter((line) => line.includes('Faltan 2 ataque'))
+        .join('\n');
+    }
+
     return `
 ${includeThreeStars ? `🌟🌟🌟\n${threeStarsSection}` : ''}
 ${includeTwoStars ? `🌟🌟\n${twoStarsSection}` : ''}
 ${includeOneStar ? `🌟\n${oneStarSection}` : ''}
-${includeMissingAttacks ? `❌\n${missingAttacksSection}` : ''}
+${includeMissingAttacks ? `❌\n${filteredMissingAttacksSection}` : ''}
     `.trim();
   };
 
@@ -742,6 +761,24 @@ ${includeMissingAttacks ? `❌\n${missingAttacksSection}` : ''}
                 onChange={(e) => setIncludeMissingAttacks(e.target.checked)}
               />
               Incluir ataques faltantes
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={includeOneMissingAttack}
+                onChange={(e) => setIncludeOneMissingAttack(e.target.checked)}
+              />
+              Incluir jugadores con 1 ataque faltante
+            </label>
+            <br />
+            <label>
+              <input
+                type="checkbox"
+                checked={includeTwoMissingAttacks}
+                onChange={(e) => setIncludeTwoMissingAttacks(e.target.checked)}
+              />
+              Incluir jugadores con 2 ataques faltantes
             </label>
           </div>
           <pre
