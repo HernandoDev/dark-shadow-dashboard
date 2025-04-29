@@ -54,6 +54,46 @@ const AttackLog: React.FC = () => {
 
     const [isSaving, setIsSaving] = useState(false); // New state to track saving status
 
+    const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+    const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status for war saves
+
+    const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
+
+    const handleWarChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedFileName = event.target.value;
+        const war = warSaves.find((w) => w.fileName === selectedFileName);
+        setSelectedWar(war);
+    };
+
+    const fetchWarSaves = async () => {
+        setLoadingWarSaves(true);
+        try {
+            const response = await APIClashService.getWarSaves();
+            setWarSaves(response);
+        } catch (error) {
+            console.error('Error fetching war saves:', error);
+        } finally {
+            setLoadingWarSaves(false);
+        }
+    };
+
+    const formatWarDate = (fileName: string): string => {
+        const cleanFileName = fileName.replace('.json', ''); // Remove .json extension
+        const parts = cleanFileName.split('_');
+        const type = parts[0] === 'war' ? 'guerra' : 'liga'; // Determine type based on prefix
+        const datePart = parts[2].split('T')[0]; // Extract the date part
+        const [year, month, day] = datePart.split('-');
+        const months = [
+            'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+        return `${parseInt(day)} de ${months[parseInt(month) - 1]} ${year} (${type})`;
+    };
+
+    useEffect(() => {
+        fetchWarSaves(); // Fetch war saves on component mount
+    }, []);
+
     const openModal = async () => {
         setIsModalOpen(true);
         setLoading(true);
@@ -152,7 +192,7 @@ const AttackLog: React.FC = () => {
     const getAttackCardBorderColor = (points: number[], index: number): string => {
         const sortedPoints = [...points].sort((a, b) => b - a); // Sort points in descending order
         const topThree = sortedPoints.slice(0, 3); // Top 3 points
-        const bottomThree = sortedPoints.slice(-3); // Bottom 3 points
+        const bottomThree = sortedPoints.slice(-3); // Bottom 3 attacks
         const fourthWorst = sortedPoints[sortedPoints.length - 4]; // 4th worst point
 
         const currentPoint = points[index];
@@ -181,7 +221,7 @@ const AttackLog: React.FC = () => {
     };
 
     const handleSave = async () => {
-        if (!selectedMember || !selectedAttack || !percentage || !stars || !thRival) {
+        if (!selectedMember || !selectedAttack || !percentage || !stars || !thRival || !selectedWar) {
             console.log('Por favor, complete todos los campos antes de guardar.');
             return;
         }
@@ -192,14 +232,15 @@ const AttackLog: React.FC = () => {
             return;
         }
 
-        // Ensure memberThLevel is always a string prefixed with "TH"
         if (typeof memberThLevel === 'number') {
             memberThLevel = `TH${memberThLevel}`;
         } else if (!memberThLevel.startsWith('TH')) {
-            memberThLevel = memberThLevel; // Avoid adding "TH" again if it already starts with "TH"
+            memberThLevel = memberThLevel;
         }
 
-        setIsSaving(true); // Disable the button during save
+        const warTimestamp = selectedWar.fileName.split('_')[2];
+
+        setIsSaving(true);
 
         const attackData = {
             member: selectedMember,
@@ -208,26 +249,29 @@ const AttackLog: React.FC = () => {
             stars: parseInt(stars, 10),
             description: description || "",
             thRival,
-            memberThLevel, // Use the properly formatted memberThLevel
-            clanTag: getClanTag(), // Retrieve clanTag dynamically
+            memberThLevel,
+            clanTag: getClanTag(),
+            warTimestamp: warTimestamp.replace('.json', ''),
         };
 
         try {
             await APIClashService.saveAttackLog(attackData);
             console.log('Ataque guardado exitosamente.');
             closeModal();
+            // Fetch saved attacks after saving
             fetchSavedAttacks()
-                .then(setSavedAttacks)
+                .then((data) => {
+                    console.log('Ataques guardados obtenidos:', data);
+                    setSavedAttacks(data);
+                })
                 .catch((error) => {
                     console.error('Error al obtener los ataques guardados:', error);
-                    console.log('Hubo un error al obtener los ataques guardados.');
                 })
                 .finally(() => setLoadingSavedAttacks(false));
         } catch (error) {
             console.error('Error al guardar el ataque:', error);
-            console.log('Hubo un error al guardar el ataque.');
         } finally {
-            setIsSaving(false); // Re-enable the button after save
+            setIsSaving(false);
         }
     };
 
@@ -609,12 +653,17 @@ const AttackLog: React.FC = () => {
                                         <li style={{ marginBottom: '5px' }}>
                                             <strong>
                                                 <Star size={16} style={{ marginRight: '5px' }} />
+                                                <Star size={16} style={{ marginRight: '5px' }} />
+
                                                 2 Estrellas:
                                             </strong> {summary.twoStars}
                                         </li>
                                         <li style={{ marginBottom: '5px' }}>
                                             <strong>
                                                 <Star size={16} style={{ marginRight: '5px' }} />
+                                                <Star size={16} style={{ marginRight: '5px' }} />
+                                                <Star size={16} style={{ marginRight: '5px' }} />
+
                                                 3 Estrellas:
                                             </strong> {summary.threeStars}
                                         </li>
@@ -676,7 +725,6 @@ const AttackLog: React.FC = () => {
                     <p style={{ textAlign: 'center', color: '#666' }}>No se encontraron ataques guardados.</p>
                 )}
             </div>
-
             <Modal closeButton open={isModalOpen} onClose={closeModal}>
                 <Modal.Header>
                     <Text h3>Agregar Nuevo Ataque</Text>
@@ -815,6 +863,35 @@ const AttackLog: React.FC = () => {
                                     height: '100px',
                                 }}
                             />
+
+                            <h4 style={{ marginTop: '20px' }}>Registros de Guerras</h4>
+                            {loadingWarSaves ? (
+                                <Loading>Obteniendo registros de guerras...</Loading>
+                            ) : (
+                                <div>
+                                    <select
+                                        id="war-select"
+                                        value={selectedWar?.fileName || ''}
+                                        onChange={handleWarChange}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            borderRadius: '5px',
+                                            fontSize: '16px',
+                                            marginBottom: '20px',
+                                        }}
+                                    >
+                                        <option value="" disabled>
+                                            Seleccione una guerra
+                                        </option>
+                                        {warSaves.map((war, index) => (
+                                            <option key={index} value={war.fileName}>
+                                                {formatWarDate(war.fileName)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
                         </div>
                     )}
                 </Modal.Body>
@@ -826,7 +903,7 @@ const AttackLog: React.FC = () => {
                         auto
                         color="success"
                         onClick={handleSave}
-                        disabled={isSaving || !selectedMember || !selectedAttack || !percentage || !stars || !thRival} // Disable button conditionally
+                        disabled={isSaving || !selectedMember || !selectedAttack || !percentage || !stars || !thRival || !selectedWar} // Disable button conditionally
                     >
                         Guardar
                     </Button>

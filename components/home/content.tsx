@@ -12,6 +12,7 @@ import {CardAgents} from './card-agents';
 import { APIClashService } from '../../services/apiClashService';
 
 import {CardTransactions} from './card-transactions';
+import { Star } from 'react-feather';
 
 const Chart = dynamic(
    () => import('../charts/steam').then((mod) => mod.Steam),
@@ -32,6 +33,7 @@ export const Content = () => {
    const [attackLogs, setAttackLogs] = React.useState<any[] | null>(null);
    const [topPlayers, setTopPlayers] = React.useState<Player[]>([]);
    const [chartData, setChartData] = React.useState<{attack: string; stars: number}[]>([]);
+   const [warStatus, setWarStatus] = React.useState<any | null>(null); // State to store the latest war status
 
    const calculatePoints = (stars: number, memberThLevel: string, thRival: string): number => {
       const memberLevel = parseInt(memberThLevel.replace('TH', ''), 10);
@@ -45,6 +47,29 @@ export const Content = () => {
       }
 
       return points;
+   };
+
+   const formatDate = (isoDate: string): string => {
+      const date = new Date(isoDate);
+      if (isNaN(date.getTime())) {
+         // Handle custom date format like "20250427T210544.000Z"
+         const year = isoDate.substring(0, 4);
+         const month = parseInt(isoDate.substring(4, 6), 10) - 1; // Months are 0-indexed
+         const day = parseInt(isoDate.substring(6, 8), 10);
+         const months = [
+            'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+         ];
+         return `${day} de ${months[month]} de ${year}`;
+      }
+      const day = date.getUTCDate();
+      const month = date.getUTCMonth();
+      const year = date.getUTCFullYear();
+      const months = [
+         'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+         'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      ];
+      return `${day} de ${months[month]} de ${year}`;
    };
 
    React.useEffect(() => {
@@ -119,6 +144,22 @@ export const Content = () => {
       fetchAttackLogs();
    }, []);
 
+   React.useEffect(() => {
+      const fetchWarStatus = async () => {
+         try {
+            const warSaves = await APIClashService.getWarSaves();
+            if (warSaves.length > 0) {
+               const latestWar = warSaves[0]; // Get the latest war save
+               setWarStatus(latestWar.content); // Set the war status
+            }
+         } catch (error) {
+            console.error('Error fetching war status:', error);
+         }
+      };
+
+      fetchWarStatus();
+   }, []);
+
    return (
       <Box css={{overflow: 'hidden', height: '100%'}}>
          <Flex
@@ -145,6 +186,69 @@ export const Content = () => {
                }}
                direction={'column'}
             >
+                    <Box>
+                  <Text
+                     h3
+                     css={{
+                        'textAlign': 'center',
+                        '@sm': {
+                           textAlign: 'inherit',
+                        },
+                     }}
+                  >
+                     Estado de la Guerra del Clan
+                  </Text>
+                  {warStatus ? (
+                     <Box
+                        css={{
+                           width: '100%',
+                           backgroundColor: '$accents0',
+                           boxShadow: '$lg',
+                           borderRadius: '$2xl',
+                           px: '$10',
+                           py: '$10',
+                           textAlign: 'center',
+                        }}
+                     >
+                        <Text>
+                           <strong>Fecha:</strong> {formatDate(warStatus.startTime)}
+                        </Text>
+                        <Text >
+                           <strong>Estado:</strong> {warStatus.state || 'Desconocido'}
+                        </Text>
+                        <Text
+                           css={{
+                              color:
+                                 warStatus.clan.stars > warStatus.opponent.stars ||
+                                 (warStatus.clan.stars === warStatus.opponent.stars &&
+                                    warStatus.clan.destructionPercentage > warStatus.opponent.destructionPercentage)
+                                    ? 'green'
+                                    : 'red',
+                           }}
+                        >
+                           <strong>{warStatus.clan.name}:</strong> {warStatus.clan.stars}
+                           <Star size={16} style={{ marginRight: '5px' }} /> - {warStatus.clan.destructionPercentage}%
+                        </Text>
+                        <Text
+                           css={{
+                              color:
+                                 warStatus.opponent.stars > warStatus.clan.stars ||
+                                 (warStatus.opponent.stars === warStatus.clan.stars &&
+                                    warStatus.opponent.destructionPercentage > warStatus.clan.destructionPercentage)
+                                    ? 'green'
+                                    : 'red',
+                           }}
+                        >
+                           <strong>{warStatus.opponent.name}:</strong> {warStatus.opponent.stars}
+                           <Star size={16} style={{ marginRight: '5px' }} /> - {warStatus.opponent.destructionPercentage}%
+                        </Text>
+                     </Box>
+                  ) : (
+                     <Text css={{ textAlign: 'center', color: 'red' }}>
+                        No se encontró información sobre la guerra.
+                     </Text>
+                  )}
+               </Box>
                {/* Card Section Top */}
                <Box>
                   <Text
@@ -208,6 +312,8 @@ export const Content = () => {
                      ))}
                   </Flex>
                </Box>
+
+          
 
                {/* Chart */}
                <Box>

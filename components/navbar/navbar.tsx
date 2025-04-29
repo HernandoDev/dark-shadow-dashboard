@@ -73,7 +73,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                'zIndex': 1000, // Ensure it stays above other elements
                'borderBottom': '1px solid $border',
                'justifyContent': 'space-between',
-               'width': '100%',
+               'width': '95%',
                '@md': {
                   justifyContent: 'space-between',
                },
