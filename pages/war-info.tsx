@@ -156,6 +156,7 @@ const WarInfoPage = () => {
   const [includeMissingAttacks, setIncludeMissingAttacks] = useState(true);
   const [includeOneMissingAttack, setIncludeOneMissingAttack] = useState(false);
   const [includeTwoMissingAttacks, setIncludeTwoMissingAttacks] = useState(false);
+  const [filterPlayerName, setFilterPlayerName] = useState<string>(''); // State for filtering attacks by player name
 
   useEffect(() => {
     fetchSavedAttacks()
@@ -969,6 +970,19 @@ const WarInfoPage = () => {
                 <h3>Ataques Guardados</h3>
                 {savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)).length > 0 ? (
                   <div>
+                    <input
+                      type="text"
+                      placeholder="Filtrar por nombre de jugador"
+                      value={filterPlayerName}
+                      onChange={(e) => setFilterPlayerName(e.target.value)}
+                      style={{
+                        marginBottom: '20px',
+                        padding: '10px',
+                        borderRadius: '5px',
+                        width: '100%',
+                        fontSize: '16px',
+                      }}
+                    />
                     {/* Group attacks by stars */}
                     {['1', '2', '3'].map((starCount) => (
                       <div key={starCount} style={{ marginBottom: '30px' }}>
@@ -980,7 +994,8 @@ const WarInfoPage = () => {
                             .filter(
                               (attack) =>
                                 attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName) &&
-                                attack.stars === parseInt(starCount)
+                                attack.stars === parseInt(starCount) &&
+                                attack.member.toLowerCase().includes(filterPlayerName.toLowerCase())
                             )
                             .map((attack, index) => (
                               <div
