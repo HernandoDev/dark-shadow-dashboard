@@ -133,15 +133,10 @@ const DonacionesCapital = () => {
                             .map((player, index) => {
                                 const donationDifference = player.totalDonations - player.totalDonationsReceived;
                                 return (
+                                    <div className='bgblue' style={{ width: '100%',  margin: '0 auto' }}>
                                     <div
                                         key={index}
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            padding: '10px',
-                                            border: '1px solid #ccc',
-                                            borderRadius: '8px',
-                                        }}
+                                        className='card animate__animated animate__backInLeft'
                                     >
                                         <strong
                                             style={{
@@ -170,6 +165,7 @@ const DonacionesCapital = () => {
                                                 {donationDifference}
                                             </span>
                                         </div>
+                                    </div>
                                     </div>
                                 );
                             })}

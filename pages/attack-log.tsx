@@ -457,7 +457,9 @@ const AttackLog: React.FC = () => {
                                 });
 
                                 return (
-                                    <div   style={{ textAlign: 'center', marginTop: '20px',paddingBottom: '20px' }}
+                                    
+                                    <div                                 
+                                    style={{ textAlign: 'center', marginTop: '20px',paddingBottom: '20px' }}
                                     >
                                         <h3>Resumen de {playerName}</h3>
                                         <p><span style={{ color: percentageColor }}>
@@ -487,7 +489,9 @@ const AttackLog: React.FC = () => {
                         {filteredPlayerAttacks.length > 0 ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center',paddingBottom: '20px' }}>
                                 {filteredPlayerAttacks.map((attack, index) => (
+                                    <div className='bgblue' key={index}>
                                     <div
+                                     className="card"
                                         key={index}
                                         style={{
                                             border: '1px solid #ccc',
@@ -565,6 +569,7 @@ const AttackLog: React.FC = () => {
                                             )}
                                         </ul>
                                     </div>
+                                    </div>
                                 ))}
                             </div>
                         ) : (
@@ -625,7 +630,13 @@ const AttackLog: React.FC = () => {
                         {Object.entries(getAttackSummary())
                             .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Sort attacks by total points descending
                             .map(([attackName, summary], index) => (
+
                                 <div
+                                className="bgblue"
+                                >
+                                <div
+                                className="card"
+
                                     key={index}
                                     style={{
                                         border: `2px solid ${getAttackCardBorderColor(
@@ -718,6 +729,7 @@ const AttackLog: React.FC = () => {
                                             </ul>
                                         </li>
                                     </ul>
+                                </div>
                                 </div>
                             ))}
                     </div>

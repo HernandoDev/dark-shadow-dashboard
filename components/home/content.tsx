@@ -186,7 +186,7 @@ export const Content = () => {
                }}
                direction={'column'}
             >
-                    <Box>
+                    <Box className='animate__animated animate__backInRight card'>
                   <Text
                      h3
                      css={{
@@ -200,15 +200,7 @@ export const Content = () => {
                   </Text>
                   {warStatus ? (
                      <Box
-                        css={{
-                           width: '100%',
-                           backgroundColor: '$accents0',
-                           boxShadow: '$lg',
-                           borderRadius: '$2xl',
-                           px: '$10',
-                           py: '$10',
-                           textAlign: 'center',
-                        }}
+                       
                      >
                         <Text>
                            <strong>Fecha:</strong> {formatDate(warStatus.startTime)}

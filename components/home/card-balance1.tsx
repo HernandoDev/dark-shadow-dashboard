@@ -21,49 +21,50 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
 
    return (
       <Card 
-      className="animate__animated animate__backInLeft"
+      className="animate__animated animate__backInLeft card"
          css={{
             mw: '300px', // Reduced width from 375px to 300px
             bg: bgColor,
+            border: '1px solid '+bgColor,
             borderRadius: '$xl',
             px: '$6',
             py: '$4',
          }}
       >
-         <Card.Body>
+         <Card.Body style={{color: 'white'}}>
             <Flex direction={'column'} align={'center'} css={{gap: '$4'}}>
-               <Text span css={{color: 'black', textAlign: 'center'}} weight={'bold'} size={'$lg'}>
+               <Text span css={{color: bgColor, textAlign: 'center'}} weight={'bold'} size={'$lg'}>
                   #{position} - {player.member}
                </Text>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
-                  <Text span css={{color: 'black'}} size={'$md'}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
                      Estrellas:
                   </Text>
-                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
                      {player.stars}
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
-                  <Text span css={{color: 'black'}} size={'$md'}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
                      Destrucción %:
                   </Text>
-                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
                      {player.percentage}%
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
-                  <Text span css={{color: 'black'}} size={'$md'}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
                      Ejército:
                   </Text>
-                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
                      {player.army}
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
-                  <Text span css={{color: 'black'}} size={'$md'}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
                      Puntos:
                   </Text>
-                  <Text span css={{color: 'black'}} size={'$md'} weight={'bold'}>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
                      {player.points.toFixed(2)}
                   </Text>
                </Flex>

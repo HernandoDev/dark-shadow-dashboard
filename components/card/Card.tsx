@@ -29,6 +29,7 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails,
 
   return (
     <StyledWrapper borderColor={borderColor}>
+      <div className='card animate__animated animate__backInLeft bgblue'>
       <div className="card">
         <div className="bottom-section">
           <span className="title">{`${position}. ${name || 'N/A'}`}</span> {/* Display position */}
@@ -74,14 +75,21 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, onViewDetails,
           </div>
         </div>
       </div>
+      </div>
     </StyledWrapper>
   );
 };
 
 const StyledWrapper = styled.div<{ borderColor?: string }>`
+.bgblue {
+  background: linear-gradient(135deg, #ffffff00, #593a8a7d, #ffffff00);
+  padding: 1px;
+  border-radius: 1.2rem;
+  box-shadow: 0px 1rem 1.5rem -0.9rem #000000e1;
+}
   .card {
     border-radius: 20px;
-    background: #1b233d;
+  background: linear-gradient(135deg, #0d112078 0%, rgba(106, 76, 166, 0.383) 43%, #0d1120 100%);
     padding: 5px;
     overflow: hidden;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 20px 0px;

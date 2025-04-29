@@ -46,7 +46,7 @@ export const CardTransactions: React.FC<CardTransactionsProps> = ({filterType}) 
 
    return (
       <Card
-         className="animate__animated animate__backInRight"
+         className="card animate__animated animate__backInRight"
          css={{
             mw: '375px',
             height: 'auto',
