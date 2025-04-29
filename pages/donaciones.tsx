@@ -77,7 +77,7 @@ const DonacionesCapital = () => {
                     style={{
                         padding: '10px 20px',
                         border: 'none',
-                        borderBottom: activeTab === 'transactions' ? '2px solid purple' : 'none',
+                        borderBottom: activeTab === 'transactions' ? '2px solid violet' : 'none',
                         background: 'none',
                         cursor: 'pointer',
                         fontWeight: activeTab === 'transactions' ? 'bold' : 'normal',
@@ -90,7 +90,7 @@ const DonacionesCapital = () => {
                     style={{
                         padding: '10px 20px',
                         border: 'none',
-                        borderBottom: activeTab === 'totals' ? '2px solid purple' : 'none',
+                        borderBottom: activeTab === 'totals' ? '2px solid violet' : 'none',
                         background: 'none',
                         cursor: 'pointer',
                         fontWeight: activeTab === 'totals' ? 'bold' : 'normal',
@@ -119,7 +119,7 @@ const DonacionesCapital = () => {
                         style={{
                             marginBottom: '10px',
                             padding: '8px',
-                            border: '1px solid purple',
+                            border: '1px solid violet',
                             borderRadius: '4px',
                             width: '100%',
                         }}
@@ -147,7 +147,7 @@ const DonacionesCapital = () => {
                                             style={{
                                                 fontSize: '16px',
                                                 marginBottom: '5px',
-                                                color: 'purple',
+                                                color: 'violet',
                                             }}
                                         >
                                             {index + 1}. {player.name}

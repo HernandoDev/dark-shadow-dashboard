@@ -48,6 +48,29 @@ const extractTimestampFromFileName = (fileName: string): string => {
   return parts[2].replace('.json', ''); // Extract the timestamp part and remove the .json extension
 };
 
+const getThColor = (memberThLevel: number, thRival: number): string => {
+  if (memberThLevel > thRival) return 'green';
+  if (memberThLevel < thRival) return 'red';
+  return 'gray';
+};
+
+const calculatePoints = (stars: number, memberThLevel: number, thRival: number, multiplier: number): number => {
+  return stars * (memberThLevel / thRival) * multiplier;
+};
+
+const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksPerMember: number) => {
+  const attackCounts = savedAttacks.reduce((acc: any, attack: any) => {
+    acc[attack.member] = (acc[attack.member] || 0) + 1;
+    return acc;
+  }, {});
+
+  return members.map((member: any) => {
+    const attacksMade = attackCounts[member.name] || 0;
+    const attacksMissing = Math.max(0, attacksPerMember - attacksMade);
+    return { name: member.name, attacksMissing };
+  }).filter((member: any) => member.attacksMissing > 0);
+};
+
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
@@ -320,7 +343,7 @@ const WarInfoPage = () => {
           style={{
             padding: '10px 20px',
             border: 'none',
-            borderBottom: activeTab === 'currentWar' ? '2px solid purple' : 'none',
+            borderBottom: activeTab === 'currentWar' ? '2px solid violet' : 'none',
             background: 'none',
             cursor: 'pointer',
             fontWeight: activeTab === 'currentWar' ? 'bold' : 'normal',
@@ -333,7 +356,7 @@ const WarInfoPage = () => {
           style={{
             padding: '10px 20px',
             border: 'none',
-            borderBottom: activeTab === 'warLogs' ? '2px solid purple' : 'none',
+            borderBottom: activeTab === 'warLogs' ? '2px solid violet' : 'none',
             background: 'none',
             cursor: 'pointer',
             fontWeight: activeTab === 'warLogs' ? 'bold' : 'normal',
@@ -372,7 +395,7 @@ const WarInfoPage = () => {
                           ? 'green'
                           : clan.warLog.wins > clan.warLog.losses
                             ? 'red'
-                            : 'purple'
+                            : 'violet'
                         }`,
                       borderRadius: '8px',
                       padding: '10px',
@@ -385,7 +408,7 @@ const WarInfoPage = () => {
                             ? 'green'
                             : clan.warLog.wins > clan.warLog.losses
                               ? 'red'
-                              : 'purple',
+                              : 'violet',
                       }}
                     >
                       Resumen del registro de Guerra (Últimos 60 Días)
@@ -436,7 +459,7 @@ const WarInfoPage = () => {
                                 parseFloat(avgLevel.toFixed(2))
                             ).length
                             ? 'red'
-                            : 'purple'
+                            : 'violet'
                         }`,
                       borderRadius: '8px',
                       padding: '10px',
@@ -475,7 +498,7 @@ const WarInfoPage = () => {
                                   parseFloat(avgLevel.toFixed(2))
                               ).length
                               ? 'red'
-                              : 'purple',
+                              : 'violet',
                       }}
                     >
                       Resumen de diferencias de nivel de héroes y ayuntamiento
@@ -538,7 +561,7 @@ const WarInfoPage = () => {
                         : getClanSummary(clan.members).averageTownHallLevel <
                           getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
                           ? 'red'
-                          : 'purple'
+                          : 'violet'
                       }`,
                     borderRadius: '8px',
                     padding: '10px',
@@ -553,7 +576,7 @@ const WarInfoPage = () => {
                           : getClanSummary(clan.members).averageTownHallLevel <
                             getClanSummary(fullWarDetails?.[0]?.members || []).averageTownHallLevel
                             ? 'red'
-                            : 'purple',
+                            : 'violet',
                       marginBottom: '10px',
                     }}
                   >
@@ -619,24 +642,102 @@ const WarInfoPage = () => {
                   {selectedWar.content.opponent.name}: {selectedWar.content.opponent.stars} <Star size={16} style={{ marginRight: '5px' }} /> - {selectedWar.content.opponent.destructionPercentage}%
                 </strong>
               </p>
-              <p style={{ fontSize: '18px', fontWeight: 'bold', color: 'purple' }}>
+              <p style={{ fontSize: '18px', fontWeight: 'bold', color: 'violet' }}>
                 Resultado: {evaluateWarResult(selectedWar)}
               </p>
               <div style={{ marginTop: '20px' }}>
                 <h3>Ataques Guardados</h3>
                 {savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)).length > 0 ? (
-                  <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {savedAttacks
-                      .filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)) // Filter attacks belonging to the selected war
-                      .map((attack, index) => (
-                        <li key={index} style={{ marginBottom: '10px', textAlign: 'left' }}>
-                          <strong>Estrellas:</strong> {attack.stars} <br />
-                          <strong>warTimestamp:</strong> {attack.warTimestamp} <br />
-                        </li>
-                      ))}
-                  </ul>
+                  <div>
+                    {/* Group attacks by stars */}
+                    {['1', '2', '3'].map((starCount) => (
+                      <div key={starCount} style={{ marginBottom: '30px' }}>
+                        <h2 style={{ color: 'violet', fontSize: '24px', fontWeight: 'bold' }}>
+                          Ataques de {starCount} Estrella{starCount === '1' ? '' : 's'}
+                        </h2>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                          {savedAttacks
+                            .filter(
+                              (attack) =>
+                                attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName) &&
+                                attack.stars === parseInt(starCount)
+                            )
+                            .map((attack, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  border: '1px solid #ccc',
+                                  borderRadius: '10px',
+                                  padding: '15px',
+                                  backgroundColor: '#333',
+                                  color: '#fff',
+                                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                  width: '300px',
+                                }}
+                              >
+                                <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
+                                  <Star size={16} style={{ marginRight: '5px' }} />
+                                  {attack.member}
+                                </h3>
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                  <li style={{ marginBottom: '5px' }}>
+                                    <strong>Ataque:</strong> {attack.attack}
+                                  </li>
+                                  <li style={{ marginBottom: '5px' }}>
+                                    <strong>
+                                      <Star size={16} style={{ marginRight: '5px' }} />
+                                      Porcentaje:
+                                    </strong>{' '}
+                                    {attack.percentage}%
+                                  </li>
+                                  <li style={{ marginBottom: '5px' }}>
+                                    <strong>
+                                      <Star size={16} style={{ marginRight: '5px' }} />
+                                      Estrellas:
+                                    </strong>{' '}
+                                    {attack.stars}
+                                  </li>
+                                  <li style={{ marginBottom: '5px' }}>
+                                    <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                  </li>
+                                  <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
+                                    <strong>TH Rival:</strong> {attack.thRival}
+                                  </li>
+                                  <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
+                                    <strong>TH Miembro:</strong> {attack.memberThLevel}
+                                  </li>
+                                  {attack.description && (
+                                    <li style={{ marginBottom: '5px' }}>
+                                      <strong>Descripción:</strong> {attack.description}
+                                    </li>
+                                  )}
+                                </ul>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <p>No hay ataques guardados disponibles para esta guerra.</p>
+                )}
+              </div>
+              <div style={{ marginTop: '20px' }}>
+                <h3>Jugadores que no atacaron</h3>
+                {selectedWar.content.clan.members ? (
+                  <ul style={{ listStyle: 'none', padding: 0 }}>
+                    {getPlayersWhoDidNotAttack(
+                      selectedWar.content.clan.members,
+                      savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)),
+                      selectedWar.content.attacksPerMember
+                    ).map((member: any, index: number) => (
+                      <li key={index} style={{ marginBottom: '10px', color: 'red' }}>
+                        {member.name} - Faltan {member.attacksMissing} ataque(s)
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No hay información de los miembros del clan.</p>
                 )}
               </div>
             </div>

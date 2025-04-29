@@ -368,7 +368,7 @@ const AttackLog: React.FC = () => {
             <br />
             <p className="animate__animated animate__backInRight">
                 <Shield size={16} style={{ marginRight: '5px' }} />
-                El sistema de puntos <span style={{color:'purple'}}>asigna 1 punto por cada estrella</span> obtenida en un ataque. Si el atacante tiene un TH superior al del rival, <span style={{color:'red'}}>se resta 0.5 puntos</span> . Si el atacante tiene un TH inferior, se suman puntos adicionales: <span style={{color:'yellow'}}> 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. </span>Además, el puntaje final se ajusta <span style={{color:'yellow'}}>dividiéndolo por el número total de veces que el ataque ha sido usado</span>, promoviendo la diversidad y premiando los ataques más efectivos.
+                El sistema de puntos <span style={{color:'violet'}}>asigna 1 punto por cada estrella</span> obtenida en un ataque. Si el atacante tiene un TH superior al del rival, <span style={{color:'red'}}>se resta 0.5 puntos</span> . Si el atacante tiene un TH inferior, se suman puntos adicionales: <span style={{color:'yellow'}}> 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. </span>Además, el puntaje final se ajusta <span style={{color:'yellow'}}>dividiéndolo por el número total de veces que el ataque ha sido usado</span>, promoviendo la diversidad y premiando los ataques más efectivos.
             </p>
             <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
                 <Button auto color="success" icon={<Plus />} onClick={openModal}>
@@ -476,7 +476,7 @@ const AttackLog: React.FC = () => {
                                                     ? 'red'
                                                     : thComparison.equal > thComparison.lower && thComparison.equal > thComparison.higher
                                                     ? 'green'
-                                                    : 'purple'
+                                                    : 'violet'
                                             }}>
                                                 {` ${thComparison.lower} ataques a TH inferior, ${thComparison.equal} ataques a TH igual, ${thComparison.higher} ataques a TH superior`}
                                             </span>
@@ -500,7 +500,7 @@ const AttackLog: React.FC = () => {
                                             
                                         }}
                                     >
-                                        <h3 style={{ textAlign: 'center', color: 'purple', marginBottom: '10px' }}>
+                                        <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
                                             <User size={16} style={{ marginRight: '5px' }} />
                                             {attack.member}
                                         </h3>
@@ -591,7 +591,7 @@ const AttackLog: React.FC = () => {
 
                             return (
                                 <div>
-                                    <p style={{ color: 'purple' }}>
+                                    <p style={{ color: 'violet' }}>
                                         <strong>Mejor ataque:</strong> {bestAttack[0]} con un total de {bestAttack[1].totalPoints.toFixed(2)} puntos, 
                                         usado {bestAttack[1].usageCount} veces y con una media de {bestAttack[1].averagePercentage}% de porcentaje.
                                     </p>
@@ -642,7 +642,7 @@ const AttackLog: React.FC = () => {
                                         width: '300px',
                                     }}
                                 >
-                                    <h3 style={{ textAlign: 'center', color: 'purple', marginBottom: '10px' }}>{attackName}</h3>
+                                    <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{attackName}</h3>
                                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                         <li style={{ marginBottom: '5px' }}>
                                             <strong>

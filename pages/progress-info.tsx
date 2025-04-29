@@ -325,7 +325,7 @@ const ProgressInfo: React.FC = () => {
                             }}
                             
                         >
-                            <h2 style={{ textAlign: 'center', color: 'purple', marginBottom: '10px' }}>{entry.name}</h2>
+                            <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
                             <ul  style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 {entry.changes.map((change: any, idx: number) => (
                                     <li   key={idx} style={{ marginBottom: '5px' }}>
