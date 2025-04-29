@@ -371,9 +371,13 @@ const AttackLog: React.FC = () => {
                 El sistema de puntos <span style={{color:'violet'}}>asigna 1 punto por cada estrella</span> obtenida en un ataque. Si el atacante tiene un TH superior al del rival, <span style={{color:'red'}}>se resta 0.5 puntos</span> . Si el atacante tiene un TH inferior, se suman puntos adicionales: <span style={{color:'yellow'}}> 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. </span>Además, el puntaje final se ajusta <span style={{color:'yellow'}}>dividiéndolo por el número total de veces que el ataque ha sido usado</span>, promoviendo la diversidad y premiando los ataques más efectivos.
             </p>
             <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
-                <Button auto color="success" icon={<Plus />} onClick={openModal}>
-                    Agregar Ataque
-                </Button>
+                {(typeof window !== 'undefined' && 
+                  (localStorage.getItem('username') === 'nandods' || 
+                  (localStorage.getItem('username') === 'gaboadmin' && localStorage.getItem('clanTag') === '%232RG9R9JVP'))) && (
+                    <Button auto color="success" icon={<Plus />} onClick={openModal}>
+                        Agregar Ataque
+                    </Button>
+                )}
             </div>
             <div style={{ marginBottom: '20px' }}>
                 <Input

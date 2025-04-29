@@ -18,6 +18,7 @@ const Login = () => {
 
         if (validUsers[username] === password) {
             localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('username', username); 
             router.push('/');
         } else {
             setError('Credenciales inválidas');
