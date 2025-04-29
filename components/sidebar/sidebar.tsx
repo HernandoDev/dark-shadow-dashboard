@@ -126,8 +126,10 @@ export const SidebarWrapper = () => {
                      <option value="" disabled>
                         Select Clan
                      </option>
-                     <option value="%232QL0GCQGQ">Principal</option>
-                     <option value="%232RG9R9JVP">Cantera</option>
+                     <option value="%232QL0GCQGQ">Dark Shadows
+                     </option>
+                     <option value="%232RG9R9JVP">Dark Shadows II
+                     </option>
                   </select>
                </Sidebar.Body>
 
