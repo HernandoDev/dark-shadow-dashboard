@@ -4,7 +4,6 @@ import { Button } from '@nextui-org/react';
 import { FaStar, FaTrophy, FaTimesCircle } from 'react-icons/fa';
 import { Star } from 'react-feather';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks';
-
 const heroTranslations = {
   "Barbarian King": "Rey Bárbaro",
   "Archer Queen": "Reina Arquera",
@@ -21,26 +20,32 @@ const getClanTag = () => {
 };
 
 const evaluateWarResult = (selectedWar: any) => {
-  const clanTag = getClanTag().replace('%23', '#'); // Formatear el clanTag
-  const isMainClan = selectedWar.content.clan.tag === clanTag;
+  const state = selectedWar.content.state;
+  
+  if (state === "preparation") {
+    return "La guerra está en preparación. No se pueden realizar cálculos.";
+  }  else {
+    const clanTag = getClanTag().replace('%23', '#'); // Formatear el clanTag
+    const isMainClan = selectedWar.content.clan.tag === clanTag;
 
-  const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
-  const opponentClan = isMainClan ? selectedWar.content.opponent : selectedWar.content.clan;
+    const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
+    const opponentClan = isMainClan ? selectedWar.content.opponent : selectedWar.content.clan;
 
-  if (mainClan.stars > opponentClan.stars) {
-    return 'Ganamos la guerra';
-  } else if (mainClan.stars < opponentClan.stars) {
-    return 'Perdimos la guerra';
-  } else {
-    // Empate: comparar porcentaje de destrucción
-    if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
-      return 'Ganamos la guerra';
-    } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
-      return 'Perdimos la guerra';
+    if (mainClan.stars > opponentClan.stars) {
+      return "Ganamos la guerra";
+    } else if (mainClan.stars < opponentClan.stars) {
+      return "Perdimos la guerra";
     } else {
-      return 'La guerra terminó en empate';
+      // Empate: comparar porcentaje de destrucción
+      if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
+        return "Ganamos la guerra";
+      } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
+        return "Perdimos la guerra";
+      } else {
+        return "La guerra terminó en empate";
+      }
     }
-  }
+  } 
 };
 
 const extractTimestampFromFileName = (fileName: string): string => {
@@ -404,37 +409,83 @@ const WarInfoPage = () => {
   };
 
   const generateFilteredWarMessage = (warDetails: any) => {
-    if (!warDetails) return '';
-
+    if (!warSaves || warSaves.length === 0) return 'No hay registros de guerra disponibles.';
+    
+    // Get the latest save
+    const latestSave = warSaves[warSaves.length - 1];
+    const state = latestSave.content.state;
+    const now = new Date();
+  
+    let additionalInfo = '';
+  
+    if (state === "preparation") {
+      const preparationEndTime = new Date(
+        `${latestSave.content.startTime.substring(0, 4)}-${latestSave.content.startTime.substring(4, 6)}-${latestSave.content.startTime.substring(6, 8)}T${latestSave.content.startTime.substring(9, 11)}:${latestSave.content.startTime.substring(11, 13)}:${latestSave.content.startTime.substring(13, 15)}.000Z`
+      );
+      const timeRemaining = Math.max(0, preparationEndTime.getTime() - now.getTime());
+      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+      additionalInfo = `La guerra está en preparación. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+    } else if (state === "inWar") {
+      const battleEndTime = new Date(
+        `${latestSave.content.endTime.substring(0, 4)}-${latestSave.content.endTime.substring(4, 6)}-${latestSave.content.endTime.substring(6, 8)}T${latestSave.content.endTime.substring(9, 11)}:${latestSave.content.endTime.substring(11, 13)}:${latestSave.content.endTime.substring(13, 15)}.000Z`
+      );
+      const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
+      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+  
+      const clanTag = getClanTag().replace('%23', '#');
+      const isMainClan = latestSave.content.clan.tag === clanTag;
+  
+      const mainClan = isMainClan ? latestSave.content.clan : latestSave.content.opponent;
+      const opponentClan = isMainClan ? latestSave.content.opponent : latestSave.content.clan;
+  
+      if (mainClan.stars > opponentClan.stars) {
+        additionalInfo = `Vamos ganando la guerra. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+      } else if (mainClan.stars < opponentClan.stars) {
+        additionalInfo = `Vamos perdiendo la guerra. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+      } else {
+        if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
+          additionalInfo = `Vamos ganando la guerra por porcentaje. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
+          additionalInfo = `Vamos perdiendo la guerra por porcentaje. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        } else {
+          additionalInfo = `La guerra está empatada. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        }
+      }
+    } 
+  
     const fullMessage = generateWarMessage(warDetails);
     const sections = fullMessage.split('🌟🌟🌟');
-
+  
     const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
     const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
     const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
     const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
-
+  
     let filteredMissingAttacksSection = missingAttacksSection;
-
+  
     if (includeOneMissingAttack) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
         .filter((line) => line.includes('Faltan 1 ataque'))
         .join('\n');
     }
-
+  
     if (includeTwoMissingAttacks) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
         .filter((line) => line.includes('Faltan 2 ataque'))
         .join('\n');
     }
-
+  
     return `
-${includeThreeStars ? `🌟🌟🌟\n${threeStarsSection}` : ''}
-${includeTwoStars ? `🌟🌟\n${twoStarsSection}` : ''}
-${includeOneStar ? `🌟\n${oneStarSection}` : ''}
-${includeMissingAttacks ? `❌\n${filteredMissingAttacksSection}` : ''}
+  ${additionalInfo}
+  
+  ${includeThreeStars ? `🌟🌟🌟\n${threeStarsSection}` : ''}
+  ${includeTwoStars ? `🌟🌟\n${twoStarsSection}` : ''}
+  ${includeOneStar ? `🌟\n${oneStarSection}` : ''}
+  ${includeMissingAttacks ? `❌\n${filteredMissingAttacksSection}` : ''}
     `.trim();
   };
 
