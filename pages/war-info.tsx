@@ -548,7 +548,7 @@ const WarInfoPage = () => {
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
   ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN → *Total de ataques faltantes: ${totalMissingAttacks}\nTotal de personas con ataques pendientes: ${totalPlayersWithMissingAttacks}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
+  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN → *Total de ataques faltantes: ${totalMissingAttacks}\nTotal de personas con ataques pendientes: ${totalPlayersWithMissingAttacks+1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
     `.trim();
   };
 
