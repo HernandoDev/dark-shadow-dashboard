@@ -1110,7 +1110,7 @@ const WarInfoPage = () => {
                       {savedAttacks
                         .filter((attack) => attack.stars === 3 && includeThreeStars)
                         .map((attack, index) => (
-                          <div key={index} className="bgblue">
+                          <div key={index} className="bgblue" style={{ width: '100%' }}>
                             <div className="card">
                               <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
                                 <Star size={16} style={{ marginRight: '5px' }} />
@@ -1118,7 +1118,7 @@ const WarInfoPage = () => {
                               </h3>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Ataque:</strong> {attack.attack}
+                                  <strong>Ataque ⚔️:</strong> {attack.attack}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
                                   <strong>Estrellas 🌟:</strong> {attack.stars}
@@ -1127,10 +1127,10 @@ const WarInfoPage = () => {
                                   <strong>Porcentaje:</strong> {attack.percentage}%
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Observaciones:</strong> {attack.description}
+                                  <strong>Observaciones ✍🏼:</strong> {attack.description}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                  <strong>Fecha 📆:</strong> {new Date(attack.timestamp).toLocaleString()}
                                 </li>
                               </ul>
                             </div>
@@ -1142,7 +1142,7 @@ const WarInfoPage = () => {
                       {savedAttacks
                         .filter((attack) => attack.stars === 2 && includeTwoStars)
                         .map((attack, index) => (
-                          <div key={index} className="bgblue">
+                          <div key={index} className="bgblue"  style={{ width: '100%' }}>
                             <div className="card">
                               <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
                                 <Star size={16} style={{ marginRight: '5px' }} />
@@ -1150,13 +1150,16 @@ const WarInfoPage = () => {
                               </h3>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Ataque:</strong> {attack.attack}
+                                  <strong>Ataque ⚔️:</strong> {attack.attack}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
                                   <strong>Porcentaje:</strong> {attack.percentage}%
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                  <strong>Observaciones ✍🏼:</strong> {attack.description}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Fecha 📆:</strong> {new Date(attack.timestamp).toLocaleString()}
                                 </li>
                               </ul>
                             </div>
@@ -1168,7 +1171,7 @@ const WarInfoPage = () => {
                       {savedAttacks
                         .filter((attack) => attack.stars === 1 && includeOneStar)
                         .map((attack, index) => (
-                          <div key={index} className="bgblue">
+                          <div key={index} className="bgblue"  style={{ width: '100%' }}>
                             <div className="card">
                               <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
                                 <Star size={16} style={{ marginRight: '5px' }} />
@@ -1176,13 +1179,16 @@ const WarInfoPage = () => {
                               </h3>
                               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Ataque:</strong> {attack.attack}
+                                  <strong>Ataque ⚔️   :</strong> {attack.attack}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
                                   <strong>Porcentaje:</strong> {attack.percentage}%
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
-                                  <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                  <strong>Observaciones ✍🏼  :</strong> {attack.description}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Fecha 📆:</strong> {new Date(attack.timestamp).toLocaleString()}
                                 </li>
                               </ul>
                             </div>
@@ -1197,7 +1203,7 @@ const WarInfoPage = () => {
                           savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)),
                           selectedWar.content.attacksPerMember
                         ).map((member, index) => (
-                          <div key={index} className="bgblue">
+                          <div key={index} className="bgblue"  style={{ width: '100%' }}>
                             <div className="card">
                               <h3 style={{ textAlign: 'center', color: 'red', marginBottom: '10px' }}>
                                 {member.name} - No atacó
