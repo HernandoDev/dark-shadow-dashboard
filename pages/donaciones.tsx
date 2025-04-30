@@ -69,8 +69,8 @@ const DonacionesCapital = () => {
             <h1>Donaciones</h1>
             <p>Un buen donador es un miembro que ha realizado al menos 1000 donaciones y cuya diferencia entre donaciones realizadas y recibidas es mayor o igual a 0.
                 Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
-<br />
-<br />
+            <br />
+            <br />
             {/* Tabs */}
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
@@ -89,14 +89,14 @@ const DonacionesCapital = () => {
                     className={`tabButton ${activeTab === 'totals' ? 'active' : ''}`}
 
                     onClick={() => setActiveTab('totals')}
-                   
+
                 >
-                       <span>Donaciones Totales por Jugador</span>
+                    <span>Donaciones Totales por Jugador</span>
                     <div className="top"></div>
                     <div className="left"></div>
                     <div className="bottom"></div>
                     <div className="right"></div>
-                    
+
                 </button>
             </div>
 
