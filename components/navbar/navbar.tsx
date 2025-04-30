@@ -81,7 +81,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                '& .nextui-navbar-container': {
                   'border': 'none',
                   'maxWidth': '100%',
-                  'width': '92vw',
+                  'width': '100dvw',
 
                   'gap': '$6',
                   '@md': {
