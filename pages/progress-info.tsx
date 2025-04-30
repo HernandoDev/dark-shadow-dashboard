@@ -245,6 +245,7 @@ const ProgressInfo: React.FC = () => {
             <h1 style={{textAlign:'center'}} className='neonText'
             >Progreso de los jugadores</h1>
             <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. </p>
+            <br />
             <p>Si deseas iniciar un nuevo punto de guardado, pulsa el botón "Crear guardado".</p>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{ padding: '20px' }} className='ButtonNeonAnimate'>

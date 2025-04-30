@@ -101,11 +101,11 @@ const DonacionesCapital = () => {
             {activeTab === 'transactions' && (
 
             <p>Un buen donador es un miembro que ha realizado al menos 1000 donaciones y cuya diferencia entre donaciones realizadas y recibidas es mayor o igual a 0.
-                Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
+               <br /> Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
             )}
             {activeTab === 'totals' && (
             
-                <p>Esta sección muestra las donaciones totales por jugador, incluyendo las donaciones realizadas y recibidas. Puedes filtrar por nombre.</p>
+                <p>Esta sección muestra las donaciones totales por jugador, incluyendo las donaciones realizadas y recibidas.  <br /> Puedes filtrar por nombre.</p>
             )}
            
             {/* Tab Content */}
