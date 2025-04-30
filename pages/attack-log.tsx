@@ -397,9 +397,9 @@ const AttackLog: React.FC = () => {
                                     </div>
                                     <div className="code-fragments">
                                         <span className="code-fragment">GUARDAR</span>
-                                        <span className="code-fragment">PROGRESO</span>
-                                        <span className="code-fragment">JUAGORES</span>
-                                        <span className="code-fragment">CONTROL</span>
+                                        <span className="code-fragment">ATAQUE</span>
+                                        <span className="code-fragment">GUERRA</span>
+                                        <span className="code-fragment">LIGA</span>
 
                                     </div>
                                     <div className="interference"></div>

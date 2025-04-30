@@ -267,7 +267,7 @@ const ProgressInfo: React.FC = () => {
                             <div className="code-fragments">
                                 <span className="code-fragment">GUARDAR</span>
                                 <span className="code-fragment">PROGRESO</span>
-                                <span className="code-fragment">JUAGORES</span>
+                                <span className="code-fragment">JUGADORES</span>
                                 <span className="code-fragment">CONTROL</span>
 
                             </div>

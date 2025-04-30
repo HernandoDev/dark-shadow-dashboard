@@ -100,10 +100,10 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, 
                       <div className="circuit-trace"></div>
                     </div>
                     <div className="code-fragments">
-                      <span className="code-fragment">COPIAR</span>
-                      <span className="code-fragment">PEGAR</span>
-                      <span className="code-fragment">PEGAR</span>
-                      <span className="code-fragment">ENVIAR</span>
+                      <span className="code-fragment">HEROES</span>
+                      <span className="code-fragment">TROPAS</span>
+                      <span className="code-fragment">MASCOTAS</span>
+                      <span className="code-fragment">EQUIPAMENTOS</span>
 
                     </div>
                     <div className="interference"></div>
@@ -139,9 +139,9 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, 
                       <div className="circuit-trace"></div>
                     </div>
                     <div className="code-fragments">
-                      <span className="code-fragment">GUARDAR</span>
-                      <span className="code-fragment">PROGRESO</span>
-                      <span className="code-fragment">JUAGORES</span>
+                      <span className="code-fragment">SIRVE?</span>
+                      <span className="code-fragment">VER ALDEA</span>
+                      <span className="code-fragment">REVISAR</span>
                       <span className="code-fragment">CONTROL</span>
 
                     </div>
