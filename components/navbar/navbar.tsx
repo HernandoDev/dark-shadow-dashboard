@@ -91,16 +91,20 @@ export const NavbarWrapper = ({ children }: Props) => {
             }}
          >
             <Navbar.Content showIn="md">
-               <div style={{ display: 'flex', alignItems: 'center', gap: '50px', justifyContent: 'space-between' }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '40px', justifyContent: 'space-between' }}>
 
                   <div>
-                     <BurguerButton />
                   </div>
+                  <BurguerButton />
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span>{clanName}</span>
                   <img
                      src="/logo-fondo-removebg-preview.png"
                      alt="Logo"
                      style={{ width: '100px', height: '100px' }}
                   />
+                  </div>
                </div>
             </Navbar.Content>
             <Navbar.Content hideIn={'md'}>
