@@ -1118,6 +1118,40 @@ const AttackLog: React.FC = () => {
                     {/* Clan Summary Content */}
                     <div style={{ marginBottom: '20px' }}>
                         <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Resumen del clan</h2>
+                        
+                        {/* New Date Range Filter */}
+                        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                            <div style={{ width: '50%' }}>
+                                <label htmlFor="start-date-summary" style={{ display: 'block', marginBottom: '5px' }}>
+                                    <Calendar size={16} style={{ marginRight: '5px' }} />
+                                    Fecha de inicio
+                                </label>
+                                <input
+                                    className='input'
+                                    id="start-date-summary"
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+                            <div style={{ width: '50%' }}>
+                                <label htmlFor="end-date-summary" style={{ display: 'block', marginBottom: '5px' }}>
+                                    <Calendar size={16} style={{ marginRight: '5px' }} />
+                                    Fecha de fin
+                                </label>
+                                <input
+                                    id="end-date-summary"
+                                    className='input'
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+                        </div>
+                        {/* End of New Date Range Filter */}
+                        
                         {!loadingSavedAttacks && savedAttacks && savedAttacks.length > 0 && (
                             <div className="animate__animated animate__backInLeft" style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
                                 {(() => {
