@@ -21,7 +21,8 @@ const AttackLog: React.FC = () => {
     const [attacks, setAttacks] = useState<string[]>([
         'Spam Dragones + 11 invisibilidades',
         'Druidas y Valquirias',
-        'Hydra Blimp',
+        'Hydra + Blimp/Super Arqueras/ Magos',
+        'Hydra Normal',
         'Spam Terrestre, Lanceros',
         'Spam Aereo + Blimp con Yetis/Globos',
         'Ataque random aereo',
