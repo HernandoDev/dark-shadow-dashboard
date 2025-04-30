@@ -544,13 +544,12 @@ export const TableWrapper = () => {
                gap: '10px',
             }}
          >
-            <Input
+            <input
             className="input"
-               clearable
                placeholder="Buscar jugador"
                value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
-               css={{
+               style={{
                   width: '100%',
                }}
             />

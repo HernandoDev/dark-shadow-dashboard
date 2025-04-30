@@ -357,7 +357,7 @@ const AttackLog: React.FC = () => {
     }, []);
 
     return (
-        <div  style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1 className="animate__animated animate__backInDown" style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <Target size={24} style={{ marginRight: '10px' }} />
                 Registro de Ataques
@@ -369,38 +369,39 @@ const AttackLog: React.FC = () => {
             <br />
             <p className="animate__animated animate__backInRight">
                 <Shield size={16} style={{ marginRight: '5px' }} />
-                El sistema de puntos <span style={{color:'violet'}}>asigna 1 punto por cada estrella</span> obtenida en un ataque. Si el atacante tiene un TH superior al del rival, <span style={{color:'red'}}>se resta 0.5 puntos</span> . Si el atacante tiene un TH inferior, se suman puntos adicionales: <span style={{color:'yellow'}}> 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. </span>Además, el puntaje final se ajusta <span style={{color:'yellow'}}>dividiéndolo por el número total de veces que el ataque ha sido usado</span>, promoviendo la diversidad y premiando los ataques más efectivos.
+                El sistema de puntos <span style={{ color: 'violet' }}>asigna 1 punto por cada estrella</span> obtenida en un ataque. Si el atacante tiene un TH superior al del rival, <span style={{ color: 'red' }}>se resta 0.5 puntos</span> . Si el atacante tiene un TH inferior, se suman puntos adicionales: <span style={{ color: 'yellow' }}> 0.5 puntos si logra 3 estrellas o 0.25 puntos si logra menos de 3 estrellas. </span>Además, el puntaje final se ajusta <span style={{ color: 'yellow' }}>dividiéndolo por el número total de veces que el ataque ha sido usado</span>, promoviendo la diversidad y premiando los ataques más efectivos.
             </p>
             <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
-                {(typeof window !== 'undefined' && 
-                  (localStorage.getItem('username') === 'nandods' || 
-                  (localStorage.getItem('username') === 'gaboadmin' && localStorage.getItem('clanTag') === '%232RG9R9JVP'))) && (
-                    <Button auto color="success" icon={<Plus />} onClick={openModal}>
-                        Agregar Ataque
-                    </Button>
-                )}
+                {(typeof window !== 'undefined' &&
+                    (localStorage.getItem('username') === 'nandods' ||
+                        (localStorage.getItem('username') === 'gaboadmin' && localStorage.getItem('clanTag') === '%232RG9R9JVP'))) && (
+                        <Button auto color="success" icon={<Plus />} onClick={openModal}>
+                            Agregar Ataque
+                        </Button>
+                    )}
             </div>
             <div style={{ marginBottom: '20px' }}>
                 <input
-                className="input"
+                    className="input"
                     placeholder="Buscar jugador"
                     value={playerSearchTerm}
                     onChange={handlePlayerSearch}
                     style={{ marginBottom: '25px', width: '100%' }}
                 />
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                     <div style={{ width: '50%' }}>
                         <label htmlFor="start-date" style={{ display: 'block', marginBottom: '5px' }}>
                             <Calendar size={16} style={{ marginRight: '5px' }} />
                             Fecha de inicio
                         </label>
-                        <Input
+                        <input
+                            className='input'
+
                             id="start-date"
-                            bordered
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            css={{ width: '100%' }}
+                            style={{ width: '100%' }}
                         />
                     </div>
                     <div style={{ width: '50%' }}>
@@ -408,19 +409,20 @@ const AttackLog: React.FC = () => {
                             <Calendar size={16} style={{ marginRight: '5px' }} />
                             Fecha de fin
                         </label>
-                        <Input
+                        <input
                             id="end-date"
-                            bordered
+                            className='input'
+
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            css={{ width: '100%' }}
+                            style={{ width: '100%' }}
                         />
                     </div>
                 </div>
                 {(playerSearchTerm || startDate || endDate) && playerSearchTerm ? (
                     <div className="animate__animated animate__backInLeft" style={{ marginTop: '20px' }}>
-                        <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>
+                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
                             <User size={20} style={{ marginRight: '10px' }} />
                             Ataques Filtrados
                         </h2>
@@ -451,7 +453,7 @@ const AttackLog: React.FC = () => {
 
                                 let thComparison = { lower: 0, equal: 0, higher: 0 };
                                 filteredPlayerAttacks.forEach((attack) => {
-                                        
+
                                     const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
                                     const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
                                     if (memberTh > rivalTh) thComparison.lower++;
@@ -460,18 +462,18 @@ const AttackLog: React.FC = () => {
                                 });
 
                                 return (
-                                    
-                                    <div                                 
-                                    style={{ textAlign: 'center', marginTop: '20px',paddingBottom: '20px' }}
+
+                                    <div
+                                        style={{ textAlign: 'center', marginTop: '20px', paddingBottom: '20px' }}
                                     >
                                         <h3>Resumen de {playerName}</h3>
                                         <p><span style={{ color: percentageColor }}>
-                                            <strong>Media de porcentaje: </strong> 
-                                             {(averagePercentage).toFixed(2)}%</span>
+                                            <strong>Media de porcentaje: </strong>
+                                            {(averagePercentage).toFixed(2)}%</span>
                                         </p>
                                         <p><span style={{ color: starsColor }}>
-                                            <strong>Media de estrellas: </strong> 
-                                             {(averageStars).toFixed(2)}</span>
+                                            <strong>Media de estrellas: </strong>
+                                            {(averageStars).toFixed(2)}</span>
                                         </p>
                                         <p><strong>Ataques favoritos: </strong> {favoriteAttacks.join(', ')}</p>
                                         <p>
@@ -480,8 +482,8 @@ const AttackLog: React.FC = () => {
                                                 color: thComparison.lower > thComparison.equal && thComparison.lower > thComparison.higher
                                                     ? 'red'
                                                     : thComparison.equal > thComparison.lower && thComparison.equal > thComparison.higher
-                                                    ? 'green'
-                                                    : 'violet'
+                                                        ? 'green'
+                                                        : 'violet'
                                             }}>
                                                 {` ${thComparison.lower} ataques a TH inferior, ${thComparison.equal} ataques a TH igual, ${thComparison.higher} ataques a TH superior`}
                                             </span>
@@ -490,88 +492,88 @@ const AttackLog: React.FC = () => {
                                 );
                             })()}
                         {filteredPlayerAttacks.length > 0 ? (
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center',paddingBottom: '20px' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center', paddingBottom: '20px' }}>
                                 {filteredPlayerAttacks.map((attack, index) => (
                                     <div className='bgblue' key={index}>
-                                    <div
-                                     className="card"
-                                        key={index}
-                                        style={{
-                                            border: '1px solid #ccc',
-                                            borderRadius: '10px',
-                                            padding: '15px',
-                                            backgroundColor: '#333',
-                                            color: '#fff',
-                                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                            width: '300px',
-                                            
-                                        }}
-                                    >
-                                        <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
-                                            <User size={16} style={{ marginRight: '5px' }} />
-                                            {attack.member}
-                                        </h3>
-                                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                            <li style={{ marginBottom: '5px' }}>
-                                                <strong>
-                                                    <Target size={16} style={{ marginRight: '5px' }} />
-                                                    Ataque:
-                                                </strong>{' '}
-                                                {attack.attack}
-                                            </li>
-                                            <li style={{ marginBottom: '5px' }}>
-                                                <strong>
-                                                    <Percent size={16} style={{ marginRight: '5px' }} />
-                                                    Porcentaje:
-                                                </strong>{' '}
-                                                {attack.percentage}%
-                                            </li>
-                                            <li style={{ marginBottom: '5px' }}>
-                                                <strong>
-                                                    <Star size={16} style={{ marginRight: '5px' }} />
-                                                    Estrellas:
-                                                </strong>{' '}
-                                                {attack.stars}
-                                            </li>
-                                            <li style={{ marginBottom: '5px' }}>
-                                                <strong>
-                                                    <Calendar size={16} style={{ marginRight: '5px' }} />
-                                                    Fecha:
-                                                </strong>{' '}
-                                                {new Date(attack.timestamp).toLocaleString()}
-                                            </li>
-                                            <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                                <strong>
-                                                    <Shield size={16} style={{ marginRight: '5px' }} />
-                                                    TH Rival:
-                                                </strong>{' '}
-                                                {attack.thRival}
-                                            </li>
-                                            <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                                <strong>
-                                                    <Shield size={16} style={{ marginRight: '5px' }} />
-                                                    TH Miembro:
-                                                </strong>{' '}
-                                                {attack.memberThLevel}
-                                            </li>
-                                            <li style={{ marginBottom: '5px' }}>
-                                                <strong>
-                                                    <Star size={16} style={{ marginRight: '5px' }} />
-                                                    Puntaje:
-                                                </strong>{' '}
-                                                {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, 1).toFixed(2)}
-                                            </li>
-                                            {attack.description && (
+                                        <div
+                                            className="card"
+                                            key={index}
+                                            style={{
+                                                border: '1px solid #ccc',
+                                                borderRadius: '10px',
+                                                padding: '15px',
+                                                backgroundColor: '#333',
+                                                color: '#fff',
+                                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                                width: '300px',
+
+                                            }}
+                                        >
+                                            <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '20px' }}>
+                                                <User size={16} style={{ marginRight: '5px' }} />
+                                                {attack.member}
+                                            </h3>
+                                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                                 <li style={{ marginBottom: '5px' }}>
                                                     <strong>
-                                                        <Info size={16} style={{ marginRight: '5px' }} />
-                                                        Descripción:
+                                                        <Target size={16} style={{ marginRight: '5px' }} />
+                                                        Ataque:
                                                     </strong>{' '}
-                                                    {attack.description}
+                                                    {attack.attack}
                                                 </li>
-                                            )}
-                                        </ul>
-                                    </div>
+                                                <li style={{ marginBottom: '5px' }}>
+                                                    <strong>
+                                                        <Percent size={16} style={{ marginRight: '5px' }} />
+                                                        Porcentaje:
+                                                    </strong>{' '}
+                                                    {attack.percentage}%
+                                                </li>
+                                                <li style={{ marginBottom: '5px' }}>
+                                                    <strong>
+                                                        <Star size={16} style={{ marginRight: '5px' }} />
+                                                        Estrellas:
+                                                    </strong>{' '}
+                                                    {attack.stars}
+                                                </li>
+                                                <li style={{ marginBottom: '5px' }}>
+                                                    <strong>
+                                                        <Calendar size={16} style={{ marginRight: '5px' }} />
+                                                        Fecha:
+                                                    </strong>{' '}
+                                                    {new Date(attack.timestamp).toLocaleString()}
+                                                </li>
+                                                <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
+                                                    <strong>
+                                                        <Shield size={16} style={{ marginRight: '5px' }} />
+                                                        TH Rival:
+                                                    </strong>{' '}
+                                                    {attack.thRival}
+                                                </li>
+                                                <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
+                                                    <strong>
+                                                        <Shield size={16} style={{ marginRight: '5px' }} />
+                                                        TH Miembro:
+                                                    </strong>{' '}
+                                                    {attack.memberThLevel}
+                                                </li>
+                                                <li style={{ marginBottom: '5px' }}>
+                                                    <strong>
+                                                        <Star size={16} style={{ marginRight: '5px' }} />
+                                                        Puntaje:
+                                                    </strong>{' '}
+                                                    {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, 1).toFixed(2)}
+                                                </li>
+                                                {attack.description && (
+                                                    <li style={{ marginBottom: '5px' }}>
+                                                        <strong>
+                                                            <Info size={16} style={{ marginRight: '5px' }} />
+                                                            Descripción:
+                                                        </strong>{' '}
+                                                        {attack.description}
+                                                    </li>
+                                                )}
+                                            </ul>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -581,15 +583,15 @@ const AttackLog: React.FC = () => {
                                 No se encontraron ataques para este rango de fechas.
                             </p>
                         )}
-                       
+
                     </div>
                 ) : null}
             </div>
-            <div  style={{ marginBottom: '20px' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Resumen del clan</h2>
+            <div style={{ marginBottom: '20px' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Resumen del clan</h2>
 
                 {!loadingSavedAttacks && savedAttacks && savedAttacks.length > 0 && (
-                    <div  className="animate__animated animate__backInLeft" style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
+                    <div className="animate__animated animate__backInLeft" style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
                         {(() => {
                             const attackSummary = getAttackSummary();
                             const sortedAttacks = Object.entries(attackSummary).sort(([, a], [, b]) => b.totalPoints - a.totalPoints);
@@ -600,24 +602,24 @@ const AttackLog: React.FC = () => {
                             return (
                                 <div>
                                     <p style={{ color: 'violet' }}>
-                                        <strong>Mejor ataque:</strong> {bestAttack[0]} con un total de {bestAttack[1].totalPoints.toFixed(2)} puntos, 
+                                        <strong>Mejor ataque:</strong> {bestAttack[0]} con un total de {bestAttack[1].totalPoints.toFixed(2)} puntos,
                                         usado {bestAttack[1].usageCount} veces y con una media de {bestAttack[1].averagePercentage}% de porcentaje.
                                     </p>
                                     <br />
                                     {intermediateAttacks.length > 0 && (
-                                        <div style={{color:'yellow'}}>
+                                        <div style={{ color: 'yellow' }}>
                                             <strong>Ataques destacados intermedios:</strong>
-                                                {intermediateAttacks.map(([attackName, summary], index) => (
-                                                    <p  key={index}>
-                                                        {attackName} - {summary.totalPoints.toFixed(2)} puntos, usado {summary.usageCount} veces, 
-                                                        media de {summary.averagePercentage}% de porcentaje.
-                                                    </p>
-                                                ))}
+                                            {intermediateAttacks.map(([attackName, summary], index) => (
+                                                <p key={index}>
+                                                    {attackName} - {summary.totalPoints.toFixed(2)} puntos, usado {summary.usageCount} veces,
+                                                    media de {summary.averagePercentage}% de porcentaje.
+                                                </p>
+                                            ))}
                                         </div>
                                     )}
                                     <br />
                                     <p style={{ color: 'red' }}>
-                                        <strong>Peor ataque:</strong> {worstAttack[0]} con un total de {worstAttack[1].totalPoints.toFixed(2)} puntos, 
+                                        <strong>Peor ataque:</strong> {worstAttack[0]} con un total de {worstAttack[1].totalPoints.toFixed(2)} puntos,
                                         usado {worstAttack[1].usageCount} veces y con una media de {worstAttack[1].averagePercentage}% de porcentaje.
                                     </p>
                                 </div>
@@ -635,104 +637,104 @@ const AttackLog: React.FC = () => {
                             .map(([attackName, summary], index) => (
 
                                 <div
-                                className="bgblue"
+                                    className="bgblue"
                                 >
-                                <div
-                                className="card"
+                                    <div
+                                        className="card"
 
-                                    key={index}
-                                    style={{
-                                        border: `2px solid ${getAttackCardBorderColor(
-                                            Object.entries(getAttackSummary())
-                                                .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Ensure consistent sorting
-                                                .map(([, s]) => s.totalPoints),
-                                            index
-                                        )}`,
-                                        borderRadius: '10px',
-                                        padding: '15px',
-                                        backgroundColor: '#333', // Dark background for better contrast
-                                        color: '#fff', // White text for readability
-                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                        width: '300px',
-                                    }}
-                                >
-                                    <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{attackName}</h3>
-                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Star size={16} style={{ marginRight: '5px' }} />
-                                                1 Estrella:
-                                            </strong> {summary.oneStar}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Star size={16} style={{ marginRight: '5px' }} />
-                                                <Star size={16} style={{ marginRight: '5px' }} />
+                                        key={index}
+                                        style={{
+                                            border: `2px solid ${getAttackCardBorderColor(
+                                                Object.entries(getAttackSummary())
+                                                    .sort(([, a], [, b]) => b.totalPoints - a.totalPoints) // Ensure consistent sorting
+                                                    .map(([, s]) => s.totalPoints),
+                                                index
+                                            )}`,
+                                            borderRadius: '10px',
+                                            padding: '15px',
+                                            backgroundColor: '#333', // Dark background for better contrast
+                                            color: '#fff', // White text for readability
+                                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                            width: '300px',
+                                        }}
+                                    >
+                                        <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '20px' }}>{attackName}</h3>
+                                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                                    1 Estrella:
+                                                </strong> {summary.oneStar}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
 
-                                                2 Estrellas:
-                                            </strong> {summary.twoStars}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Star size={16} style={{ marginRight: '5px' }} />
-                                                <Star size={16} style={{ marginRight: '5px' }} />
-                                                <Star size={16} style={{ marginRight: '5px' }} />
+                                                    2 Estrellas:
+                                                </strong> {summary.twoStars}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
+                                                    <Star size={16} style={{ marginRight: '5px' }} />
 
-                                                3 Estrellas:
-                                            </strong> {summary.threeStars}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Percent size={16} style={{ marginRight: '5px' }} />
-                                                Media de %:
-                                            </strong> {summary.averagePercentage}%
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Shield size={16} style={{ marginRight: '5px' }} />
-                                                Puntos Totales:
-                                            </strong> {summary.totalPoints.toFixed(2)}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Target size={16} style={{ marginRight: '5px' }} />
-                                                Veces Usado:
-                                            </strong> {summary.usageCount}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Shield size={16} style={{ marginRight: '5px' }} />
-                                                Usado contra TH Superior:
-                                            </strong> {summary.usedAgainstHigherTH}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Shield size={16} style={{ marginRight: '5px' }} />
-                                                Usado contra TH Inferior:
-                                            </strong> {summary.usedAgainstLowerTH}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <Shield size={16} style={{ marginRight: '5px' }} />
-                                                Usado contra TH Igual:
-                                            </strong> {summary.usedAgainstEqualTH}
-                                        </li>
-                                        <li style={{ marginBottom: '5px' }}>
-                                            <strong>
-                                                <User size={16} style={{ marginRight: '5px' }} />
-                                                Jugadores:
-                                            </strong>
-                                            <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
-                                                {Array.from(summary.players).map((player, index) => (
-                                                    <li key={index} style={{ marginBottom: '5px' }}>
-                                                <User size={12} style={{ marginRight: '5px' }} />
-                                                        
-                                                        {player}</li>
-                                                ))}
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
+                                                    3 Estrellas:
+                                                </strong> {summary.threeStars}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Percent size={16} style={{ marginRight: '5px' }} />
+                                                    Media de %:
+                                                </strong> {summary.averagePercentage}%
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Shield size={16} style={{ marginRight: '5px' }} />
+                                                    Puntos Totales:
+                                                </strong> {summary.totalPoints.toFixed(2)}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Target size={16} style={{ marginRight: '5px' }} />
+                                                    Veces Usado:
+                                                </strong> {summary.usageCount}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Shield size={16} style={{ marginRight: '5px' }} />
+                                                    Usado contra TH Superior:
+                                                </strong> {summary.usedAgainstHigherTH}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Shield size={16} style={{ marginRight: '5px' }} />
+                                                    Usado contra TH Inferior:
+                                                </strong> {summary.usedAgainstLowerTH}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <Shield size={16} style={{ marginRight: '5px' }} />
+                                                    Usado contra TH Igual:
+                                                </strong> {summary.usedAgainstEqualTH}
+                                            </li>
+                                            <li style={{ marginBottom: '5px' }}>
+                                                <strong>
+                                                    <User size={16} style={{ marginRight: '5px' }} />
+                                                    Jugadores:
+                                                </strong>
+                                                <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
+                                                    {Array.from(summary.players).map((player, index) => (
+                                                        <li key={index} style={{ marginBottom: '5px' }}>
+                                                            <User size={12} style={{ marginRight: '5px' }} />
+
+                                                            {player}</li>
+                                                    ))}
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             ))}
                     </div>
@@ -749,17 +751,18 @@ const AttackLog: React.FC = () => {
                         <Loading>Obteniendo jugadores...</Loading>
                     ) : (
                         <div>
-                            <Input
-                                clearable
-                                bordered
+                            <input
+                                className='input'
                                 placeholder="Buscar miembro"
                                 value={searchTerm}
                                 onChange={handleSearch}
-                                css={{ marginBottom: '10px', width: '100%' }}
+                                style={{ marginBottom: '20px', width: '100%' }}
                             />
                             <select
                                 id="member-select"
                                 value={selectedMember}
+                                className='input'
+
                                 onChange={(e) => setSelectedMember(e.target.value)}
                                 style={{
                                     width: '100%',
@@ -781,17 +784,18 @@ const AttackLog: React.FC = () => {
                                 ))}
                             </select>
 
-                            <Input
-                                clearable
-                                bordered
+                            <input
+                                className='input'
                                 placeholder="Buscar ataque"
                                 value={attackSearchTerm}
                                 onChange={handleAttackSearch}
-                                css={{ marginBottom: '10px', width: '100%' }}
+                                style={{ marginBottom: '20px', width: '100%' }}
                             />
                             <select
                                 id="attack-select"
                                 value={selectedAttack}
+                                className='input'
+
                                 onChange={(e) => setSelectedAttack(e.target.value)}
                                 style={{
                                     width: '100%',
@@ -813,17 +817,19 @@ const AttackLog: React.FC = () => {
                                 ))}
                             </select>
 
-                            <Input
-                                bordered
+                            <input
+                                className='input'
                                 type="number"
                                 placeholder="Porcentaje realizado (%)"
                                 value={percentage}
                                 onChange={(e) => setPercentage(e.target.value)}
-                                css={{ marginBottom: '10px', width: '100%' }}
+                                style={{ marginBottom: '20px', width: '100%' }}
                             />
 
                             <select
                                 id="stars-select"
+                                className='input'
+
                                 value={stars}
                                 onChange={(e) => handleStarsChange(e.target.value)} // Use the new handler
                                 style={{
@@ -831,7 +837,7 @@ const AttackLog: React.FC = () => {
                                     padding: '10px',
                                     borderRadius: '5px',
                                     fontSize: '16px',
-                                    marginBottom: '10px',
+                                    marginBottom: '20px',
                                 }}
                             >
                                 <option value="" disabled>
@@ -845,13 +851,15 @@ const AttackLog: React.FC = () => {
                             <select
                                 id="th-rival-select"
                                 value={thRival}
+                                className='input'
+
                                 onChange={(e) => setThRival(e.target.value)}
                                 style={{
                                     width: '100%',
                                     padding: '10px',
                                     borderRadius: '5px',
                                     fontSize: '16px',
-                                    marginBottom: '10px',
+                                    marginBottom: '20px',
                                 }}
                             >
                                 <option value="" disabled>
@@ -865,6 +873,7 @@ const AttackLog: React.FC = () => {
                             </select>
 
                             <textarea
+                                className='input'
                                 placeholder="Descripción del ataque"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
@@ -873,7 +882,7 @@ const AttackLog: React.FC = () => {
                                     padding: '10px',
                                     borderRadius: '5px',
                                     fontSize: '16px',
-                                    marginBottom: '10px',
+                                    marginBottom: '20px',
                                     resize: 'none',
                                     height: '100px',
                                 }}
@@ -885,6 +894,7 @@ const AttackLog: React.FC = () => {
                             ) : (
                                 <div>
                                     <select
+                                        className='input'
                                         id="war-select"
                                         value={selectedWar?.fileName || ''}
                                         onChange={handleWarChange}

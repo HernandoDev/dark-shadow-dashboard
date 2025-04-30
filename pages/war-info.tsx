@@ -947,6 +947,8 @@ const WarInfoPage = () => {
           ) : (
             <select
               id="war-select"
+              className='input'
+
               value={selectedWar?.fileName || ''}
               onChange={handleWarChange}
               style={{

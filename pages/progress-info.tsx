@@ -252,6 +252,8 @@ const ProgressInfo: React.FC = () => {
           
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
                 <select
+                            className='input'
+                
                     value={selectedOldDate || ''}
                     onChange={(e) => {
                         const newOldDate = e.target.value;
@@ -268,6 +270,8 @@ const ProgressInfo: React.FC = () => {
                     ))}
                 </select>
                 <select
+                            className='input'
+
                     value={selectedNewDate || ''}
                     onChange={(e) => {
                         const newNewDate = e.target.value;
