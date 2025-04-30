@@ -540,13 +540,15 @@ const WarInfoPage = () => {
       .map((line) => parseInt(line.match(/\d+/)?.[0] || '0'))
       .reduce((sum, count) => sum + count, 0);
 
+    const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
+
     return `
   ${additionalInfo}
   
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
   ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN → *Total de ataques faltantes: ${totalMissingAttacks}\n${filteredMissingAttacksSection}*\n\n` : ''}
+  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN → *Total de ataques faltantes: ${totalMissingAttacks}\nTotal de personas con ataques pendientes: ${totalPlayersWithMissingAttacks}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
     `.trim();
   };
 
