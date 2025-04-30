@@ -287,48 +287,52 @@ const ProgressInfo: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
-                <label htmlFor="oldDateSelect" style={{ display: 'none' }}>Selecciona la fecha antigua</label>
-                <select
-                    id="oldDateSelect"
-                    className='input'
-                    value={selectedOldDate || ''}
-                    onChange={(e) => {
-                        const newOldDate = e.target.value;
-                        setSelectedOldDate(newOldDate);
-                        handleDateChange(newOldDate, selectedNewDate);
-                    }}
-                    style={{ padding: '5px', borderRadius: '5px', width: '50%' }}
-                >
-                    <option value="" disabled>Selecciona la fecha antigua</option>
-                    {saves.map((save, index) => (
-                        <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)}>
-                            {save.fileName === 'current_state' ? 'Estado Actual' : formatDateToHumanReadable(extractDateFromFileName(save.fileName))}
-                        </option>
-                    ))}
-                </select>
-                <label htmlFor="newDateSelect" style={{ display: 'none' }}>Selecciona la fecha nueva</label>
-                <select
-                    id="newDateSelect"
-                    className='input'
-                    value={selectedNewDate || ''}
-                    onChange={(e) => {
-                        const newNewDate = e.target.value;
-                        setSelectedNewDate(newNewDate);
-                        handleDateChange(selectedOldDate, newNewDate);
-                    }}
-                    style={{ padding: '5px', borderRadius: '5px', width: '50%' }}
-                >
-                    <option value="" disabled>Selecciona la fecha nueva</option>
-                    {saves.map((save, index) => {
-                        const saveDate = save.fileName === 'current_state' ? 'Estado Actual' : formatDateToHumanReadable(extractDateFromFileName(save.fileName));
-                        const isDisabled = selectedOldDate && saveDate <= formatDateToHumanReadable(selectedOldDate);
-                        return (
-                            <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)} disabled={!!isDisabled}>
-                                {saveDate}
+                <div style={{ width: '50%' }}>
+                    <label htmlFor="oldDateSelect" style={{ display: 'block', marginBottom: '5px' }}>Fecha inicio</label>
+                    <select
+                        id="oldDateSelect"
+                        className='input'
+                        value={selectedOldDate || ''}
+                        onChange={(e) => {
+                            const newOldDate = e.target.value;
+                            setSelectedOldDate(newOldDate);
+                            handleDateChange(newOldDate, selectedNewDate);
+                        }}
+                        style={{ padding: '5px', borderRadius: '5px', width: '100%' }}
+                    >
+                        <option value="" disabled>Fecha inicio</option>
+                        {saves.map((save, index) => (
+                            <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)}>
+                                {save.fileName === 'current_state' ? 'Estado Actual' : formatDateToHumanReadable(extractDateFromFileName(save.fileName))}
                             </option>
-                        );
-                    })}
-                </select>
+                        ))}
+                    </select>
+                </div>
+                <div style={{ width: '50%' }}>
+                    <label htmlFor="newDateSelect" style={{ display: 'block', marginBottom: '5px' }}>Fecha fin</label>
+                    <select
+                        id="newDateSelect"
+                        className='input'
+                        value={selectedNewDate || ''}
+                        onChange={(e) => {
+                            const newNewDate = e.target.value;
+                            setSelectedNewDate(newNewDate);
+                            handleDateChange(selectedOldDate, newNewDate);
+                        }}
+                        style={{ padding: '5px', borderRadius: '5px', width: '100%' }}
+                    >
+                        <option value="" disabled>Fecha fin</option>
+                        {saves.map((save, index) => {
+                            const saveDate = save.fileName === 'current_state' ? 'Estado Actual' : formatDateToHumanReadable(extractDateFromFileName(save.fileName));
+                            const isDisabled = selectedOldDate && saveDate <= formatDateToHumanReadable(selectedOldDate);
+                            return (
+                                <option key={index} value={save.fileName === 'current_state' ? 'current_state' : extractDateFromFileName(save.fileName)} disabled={!!isDisabled}>
+                                    {saveDate}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                 <input
