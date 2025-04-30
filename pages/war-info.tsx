@@ -1127,6 +1127,9 @@ const WarInfoPage = () => {
                                   <strong>Porcentaje:</strong> {attack.percentage}%
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
+                                  <strong>TH rival:</strong> {attack.thRival}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
                                   <strong>Observaciones ✍🏼:</strong> {attack.description}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
@@ -1156,6 +1159,9 @@ const WarInfoPage = () => {
                                   <strong>Porcentaje:</strong> {attack.percentage}%
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
+                                  <strong>TH rival:</strong> {attack.thRival}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
                                   <strong>Observaciones ✍🏼:</strong> {attack.description}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
@@ -1183,6 +1189,9 @@ const WarInfoPage = () => {
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
                                   <strong>Porcentaje:</strong> {attack.percentage}%
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>TH rival:</strong> {attack.thRival}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
                                   <strong>Observaciones ✍🏼  :</strong> {attack.description}
