@@ -4,6 +4,7 @@ import { Button } from '@nextui-org/react';
 import { FaStar, FaTrophy, FaTimesCircle } from 'react-icons/fa';
 import { Calendar, Info, Percent, Shield, Star, Target, User } from 'react-feather';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks';
+import { debug } from 'console';
 const heroTranslations = {
   "Barbarian King": "Rey Bárbaro",
   "Archer Queen": "Reina Arquera",
@@ -79,7 +80,7 @@ const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksP
 const generateWarMessage = (warDetails: any) => {
   if (!warDetails) return '';
 
-  
+
   const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
   const myClan = warDetails.clan
   if (!myClan) return 'No se encontró información de tu clan.';
@@ -93,33 +94,43 @@ const generateWarMessage = (warDetails: any) => {
         const stars = (attack.stars || 0) as 1 | 2 | 3;
 
         // Find the target clan and member by searching for the defenderTag
-        const targetClan =warDetails.opponent
+        const targetClan = warDetails.opponent
         const targetClanName = targetClan ? targetClan.name : 'Desconocido';
         const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
 
         if (playerEnemy) {
           const comparisonEmoji =
             member.mapPosition < playerEnemy.mapPosition
-              ? '⬇️(num. inferior)' // Green arrow for higher-ranked
+              ? '⬇️(num. Inferior)' // Green arrow for higher-ranked
               : member.mapPosition > playerEnemy.mapPosition
-                ? '⬆️(num. superior)' // Red arrow for lower-ranked
-                : '(espejo)'; // Equals sign for equal rank
+                ? '⬆️(num. Superior)' // Red arrow for lower-ranked
+                : '🪞(Espejo)'; // Equals sign for equal rank
+          const ownInfo = `*${member.mapPosition}. ${member.name} (TH${member.townhallLevel})`;
+          const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
+          const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
 
-          starsGroup[stars]?.push(
-            `* ${member.mapPosition}. ${member.name} TH${member.townhallLevel} ${comparisonEmoji} ${playerEnemy.mapPosition}.- ${playerEnemy.name}. (TH${playerEnemy.townhallLevel})`
-          );
+          const message = `${ownInfo} ${comparisonEmoji} VESUS→ ${enemyInfo}${warning}`;
+
+          starsGroup[stars]?.push(message);
+
           console.log(starsGroup);
-          
+
         }
       });
+      if (member.attacks.length === 1) {
+        const attacksPerMember = warDetails.attacksPerMember || 2; // Default to 2 attacks per member if not provided
+        const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
+        if (attacksMissing > 0) {
+          noAttack.push(`* ${member.mapPosition}. ${member.name} → no atacó (Faltan ${attacksMissing} ataque(s))`);
+        }
+      }
     } else {
-      const attacksPerMember = myClan.attacksPerMember || 2; // Default to 2 attacks per member if not provided
+      const attacksPerMember = warDetails.attacksPerMember || 2; // Default to 2 attacks per member if not provided
       const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-
       noAttack.push(`* ${member.mapPosition}. ${member.name} → no atacó (Faltan ${attacksMissing} ataque(s))`);
     }
   });
-  debugger
+
   return `
 📢 Estado de la guerra: ${myClan.status || 'Desconocido'}
 🌟🌟🌟
@@ -461,7 +472,7 @@ const WarInfoPage = () => {
     const latestSave = currentWarDetails;
     const state = latestSave.state;
     const now = new Date();
-    
+
     let additionalInfo = '';
 
     if (state === "preparation") {
@@ -473,7 +484,7 @@ const WarInfoPage = () => {
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
       additionalInfo = `La guerra está en preparación. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
     } else if (state === "inWar") {
-      
+
       const battleEndTime = new Date(
         `${latestSave.endTime.substring(0, 4)}-${latestSave.endTime.substring(4, 6)}-${latestSave.endTime.substring(6, 8)}T${latestSave.endTime.substring(9, 11)}:${latestSave.endTime.substring(11, 13)}:${latestSave.endTime.substring(13, 15)}.000Z`
       );
@@ -488,16 +499,16 @@ const WarInfoPage = () => {
       const opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
 
       if (mainClan.stars > opponentClan.stars) {
-        additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\n\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else if (mainClan.stars < opponentClan.stars) {
-        additionalInfo = `😔 Vamos perdiendo la guerra. 💔\nEl clan oponente tiene más estrellas (${opponentClan.stars}🌟) que nosotros (${mainClan.stars}🌟).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        additionalInfo = `😔 Vamos perdiendo la guerra. 💔\nEl clan oponente tiene más estrellas (${opponentClan.stars}🌟) que nosotros (${mainClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else {
         if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
-          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos ganando por porcentaje! 🎯\nNuestro porcentaje de destrucción (${mainClan.destructionPercentage}%) es mayor que el del oponente (${opponentClan.destructionPercentage}%).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos ganando por porcentaje! 🎯\n\nNuestro porcentaje de destrucción (${mainClan.destructionPercentage}%) es mayor que el del oponente (${opponentClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
-          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos perdiendo por porcentaje! 😓\nEl porcentaje de destrucción del oponente (${opponentClan.destructionPercentage}%) es mayor que el nuestro (${mainClan.destructionPercentage}%).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos perdiendo por porcentaje! 😓\n\nEl porcentaje de destrucción del oponente (${opponentClan.destructionPercentage}%) es mayor que el nuestro (${mainClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         } else {
-          additionalInfo = `🤝 La guerra está completamente empatada. 😮\nAmbos clanes tienen las mismas estrellas (${mainClan.stars}🌟) y el mismo porcentaje de destrucción (${mainClan.destructionPercentage}%).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+          additionalInfo = `🤝 La guerra está completamente empatada. 😮\n\nAmbos clanes tienen las mismas estrellas (${mainClan.stars}🌟) y el mismo porcentaje de destrucción (${mainClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         }
       }
     }
@@ -528,10 +539,10 @@ const WarInfoPage = () => {
     return `
   ${additionalInfo}
   
-  ${includeThreeStars ? `🌟🌟🌟\n${threeStarsSection}` : ''}
-  ${includeTwoStars ? `🌟🌟\n${twoStarsSection}` : ''}
-  ${includeOneStar ? `🌟\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `❌\n${filteredMissingAttacksSection}` : ''}
+  ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
+  ${includeTwoStars ? `\n🌟🌟 2 Estrellas(⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
+  ${includeOneStar ? `\n🌟\n${oneStarSection} (No aceptable)` : ''}
+  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n${filteredMissingAttacksSection}` : ''}
     `.trim();
   };
 
