@@ -1159,13 +1159,7 @@ const WarInfoPage = () => {
                                   </strong>{' '}
                                   {attack.memberThLevel}
                                 </li>
-                                <li style={{ marginBottom: '5px' }}>
-                                  <strong>
-                                    <Star size={16} style={{ marginRight: '5px' }} />
-                                    Puntaje:
-                                  </strong>{' '}
-                                  {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, 1).toFixed(2)}
-                                </li>
+
                                 {attack.description && (
                                   <li style={{ marginBottom: '5px' }}>
                                     <strong>
@@ -1234,13 +1228,7 @@ const WarInfoPage = () => {
                                   </strong>{' '}
                                   {attack.memberThLevel}
                                 </li>
-                                <li style={{ marginBottom: '5px' }}>
-                                  <strong>
-                                    <Star size={16} style={{ marginRight: '5px' }} />
-                                    Puntaje:
-                                  </strong>{' '}
-                                  {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, 1).toFixed(2)}
-                                </li>
+
                                 {attack.description && (
                                   <li style={{ marginBottom: '5px' }}>
                                     <strong>
@@ -1309,13 +1297,7 @@ const WarInfoPage = () => {
                                   </strong>{' '}
                                   {attack.memberThLevel}
                                 </li>
-                                <li style={{ marginBottom: '5px' }}>
-                                  <strong>
-                                    <Star size={16} style={{ marginRight: '5px' }} />
-                                    Puntaje:
-                                  </strong>{' '}
-                                  {calculatePoints(attack.stars, attack.memberThLevel, attack.thRival, 1).toFixed(2)}
-                                </li>
+
                                 {attack.description && (
                                   <li style={{ marginBottom: '5px' }}>
                                     <strong>
