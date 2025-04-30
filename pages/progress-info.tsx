@@ -352,15 +352,19 @@ const ProgressInfo: React.FC = () => {
             <div>
                 {comparisonDates && (
                     <>
-                        <p>
+                        <p style={{ textAlign: 'center', fontSize: '18px', color: 'violet' }}>
                             Comparación entre: {formatDateToHumanReadable(comparisonDates.oldDate)} y {formatDateToHumanReadable(comparisonDates.newDate)}
                         </p>
                         {timeline.length > 0 && (() => {
                             const { topPlayers, bottomPlayers } = getTopAndBottomPlayers(timeline);
                             return (
-                                <div>
-                                    <p>Jugadores con más progreso: {topPlayers.join(', ') || 'Ninguno'}</p>
-                                    <p>Jugadores con menos progreso: {bottomPlayers.join(', ') || 'Ninguno'}</p>
+                                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                    <p style={{ color: 'green', fontWeight: 'bold' }}>
+                                        Jugadores con más progreso: {topPlayers.length > 0 ? topPlayers.join(', ') : 'Ninguno'}
+                                    </p>
+                                    <p style={{ color: 'red', fontWeight: 'bold' }}>
+                                        Jugadores con menos progreso: {bottomPlayers.length > 0 ? bottomPlayers.join(', ') : 'Ninguno'}
+                                    </p>
                                 </div>
                             );
                         })()}
