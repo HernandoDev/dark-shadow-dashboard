@@ -118,7 +118,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                {isAuthenticated && (
                   <button
                      onClick={() => {
-                        localStorage.removeItem('isAuthenticated');
+                        localStorage.clear(); // Clear all localStorage items
                         window.location.href = '/login';
                      }}
                      style={{
