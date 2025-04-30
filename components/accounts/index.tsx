@@ -29,7 +29,7 @@ export const Accounts = () => {
       >
 
 
-         <Text h3>Requisitos mínimos para liga</Text>
+         <Text className='neonText' h1>Requisitos mínimos para liga</Text>
          <Text h5>Aquí puedes establecer el nivel mínimo que debe tener cada héroe.</Text>
 
 

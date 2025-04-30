@@ -358,7 +358,7 @@ const AttackLog: React.FC = () => {
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1 className="animate__animated animate__backInDown" style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <h1 className="animate__animated animate__backInDown neonText" style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <Target size={24} style={{ marginRight: '10px' }} />
                 Registro de Ataques
             </h1>

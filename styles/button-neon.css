@@ -1,4 +1,17 @@
 /* From Uiverse.io by PhantomVail */ 
+.neonText {
+  color: #fff;
+  text-shadow:
+    0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px #c770ff,
+    0 0 82px #c770ff,
+    0 0 92px #c770ff,
+    0 0 102px #c770ff,
+    0 0 151px #c770ff;
+}
+
 .cyber-button {
   position: relative;
   padding: 25px 50px;

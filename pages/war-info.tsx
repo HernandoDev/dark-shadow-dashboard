@@ -533,7 +533,7 @@ const WarInfoPage = () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
-      <h1 className="animate__animated animate__backInDown" style={{ marginBottom: '20px', color: '#ffcc00' }}>
+      <h1 className="animate__animated animate__backInDown neonText" style={{ marginBottom: '20px'}}>
         Información de Guerra
       </h1>
       <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
