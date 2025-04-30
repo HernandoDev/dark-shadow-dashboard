@@ -484,16 +484,16 @@ const WarInfoPage = () => {
       const opponentClan = isMainClan ? latestSave.content.opponent : latestSave.content.clan;
 
       if (mainClan.stars > opponentClan.stars) {
-        additionalInfo = `Vamos ganando la guerra. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else if (mainClan.stars < opponentClan.stars) {
-        additionalInfo = `Vamos perdiendo la guerra. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+        additionalInfo = `😔 Vamos perdiendo la guerra. 💔\nEl clan oponente tiene más estrellas (${opponentClan.stars}🌟) que nosotros (${mainClan.stars}🌟).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else {
         if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
-          additionalInfo = `Vamos ganando la guerra por porcentaje. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos ganando por porcentaje! 🎯\nNuestro porcentaje de destrucción (${mainClan.destructionPercentage}%) es mayor que el del oponente (${opponentClan.destructionPercentage}%).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
-          additionalInfo = `Vamos perdiendo la guerra por porcentaje. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos perdiendo por porcentaje! 😓\nEl porcentaje de destrucción del oponente (${opponentClan.destructionPercentage}%) es mayor que el nuestro (${mainClan.destructionPercentage}%).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         } else {
-          additionalInfo = `La guerra está empatada. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+          additionalInfo = `🤝 La guerra está completamente empatada. 😮\nAmbos clanes tienen las mismas estrellas (${mainClan.stars}🌟) y el mismo porcentaje de destrucción (${mainClan.destructionPercentage}%).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
         }
       }
     }
