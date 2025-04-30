@@ -7,14 +7,16 @@ import '../styles/loader.css'; // Import the new loader styles
 import '../styles/button-neon.css'; // Import the new loader styles
 import '../styles/button-tabs-animate.css'; // Import the new loader styles
 import '../styles/button-neon-animate.css'; // Import the new loader styles
-
+import '../styles/button-switch.css'
 import '../styles/custom-input.css'; // Add this line
+
 import type { AppProps } from 'next/app';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { Layout } from '../components/layout/layout';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 const lightTheme = createTheme({
    type: 'light',
@@ -75,77 +77,85 @@ function MyApp({ Component, pageProps }: AppProps) {
    }, []);
 
    return (
-      <NextThemesProvider
-         defaultTheme="system"
-         attribute="class"
-         value={{
-            light: lightTheme.className,
-            dark: darkTheme.className,
-         }}
-      >
-         <NextUIProvider>
-            {activeRequests > 0 && (
-               <div
-                  style={{
-                     position: 'fixed',
-                     top: 0,
-                     left: 0,
-                     width: '100%',
-                     height: '100%',
-                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                     display: 'flex',
-                     justifyContent: 'center',
-                     alignItems: 'center',
-                     gap: '15px',
-                     zIndex: 9999,
-                  }}
-               >
-                  <div className="loader">
-                     <svg viewBox="0 0 80 80">
-                        <circle r="32" cy="40" cx="40"></circle>
-                     </svg>
+      <>
+         <Head>
+            <link
+               rel="stylesheet"
+               href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+            />
+         </Head>
+         <NextThemesProvider
+            defaultTheme="system"
+            attribute="class"
+            value={{
+               light: lightTheme.className,
+               dark: darkTheme.className,
+            }}
+         >
+            <NextUIProvider>
+               {activeRequests > 0 && (
+                  <div
+                     style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '15px',
+                        zIndex: 9999,
+                     }}
+                  >
+                     <div className="loader">
+                        <svg viewBox="0 0 80 80">
+                           <circle r="32" cy="40" cx="40"></circle>
+                        </svg>
+                     </div>
+                     <div className="loader triangle">
+                        <svg viewBox="0 0 86 80">
+                           <polygon points="43 8 79 72 7 72"></polygon>
+                        </svg>
+                     </div>
+                     <div className="loader">
+                        <svg viewBox="0 0 80 80">
+                           <rect height="64" width="64" y="8" x="8"></rect>
+                        </svg>
+                     </div>
                   </div>
-                  <div className="loader triangle">
-                     <svg viewBox="0 0 86 80">
-                        <polygon points="43 8 79 72 7 72"></polygon>
-                     </svg>
-                  </div>
-                  <div className="loader">
-                     <svg viewBox="0 0 80 80">
-                        <rect height="64" width="64" y="8" x="8"></rect>
-                     </svg>
-                  </div>
-               </div>
-            )}
-            {router.pathname !== '/login' && (
-               <div
-                  style={{
-                     backgroundImage: "url('/logo-fondo-removebg-preview.png')",
-                     backgroundRepeat: 'no-repeat',
-                     backgroundSize: 'cover',
-                     backgroundPosition: 'center',
-                     backgroundPositionX: isMobile ? 'center' : '7vw',
-                     position: 'fixed',
-                     top: 0,
-                     left: 0,
-                     width: '100%',
-                     height: '100%',
-                     opacity: 0.15,
-                     zIndex: 0,
-                  }}
-               />
-            )}
-            {isAuthenticated ? (
-               <Layout>
-                  <div style={{ marginTop: isMobile ? '20%' : '6%' }}>
-                     <Component {...pageProps} />
-                  </div>
-               </Layout>
-            ) : (
-               <Component {...pageProps} />
-            )}
-         </NextUIProvider>
-      </NextThemesProvider>
+               )}
+               {router.pathname !== '/login' && (
+                  <div
+                     style={{
+                        backgroundImage: "url('/logo-fondo-removebg-preview.png')",
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundPositionX: isMobile ? 'center' : '7vw',
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        opacity: 0.15,
+                        zIndex: 0,
+                     }}
+                  />
+               )}
+               {isAuthenticated ? (
+                  <Layout>
+                     <div style={{ marginTop: isMobile ? '20%' : '6%' }}>
+                        <Component {...pageProps} />
+                     </div>
+                  </Layout>
+               ) : (
+                  <Component {...pageProps} />
+               )}
+            </NextUIProvider>
+         </NextThemesProvider>
+      </>
    );
 }
 

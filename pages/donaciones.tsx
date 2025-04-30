@@ -7,6 +7,7 @@ const DonacionesCapital = () => {
     const [aggregatedDonations, setAggregatedDonations] = useState<any[]>([]); // Aggregated donations per player
     const [activeTab, setActiveTab] = useState<'transactions' | 'totals'>('transactions'); // State for active tab
     const [nameFilter, setNameFilter] = useState(''); // State for name filter
+    const [isDescending, setIsDescending] = useState(true); // State for sorting order
 
     useEffect(() => {
         const fetchSaves = async () => {
@@ -132,12 +133,30 @@ const DonacionesCapital = () => {
                             width: '100%',
                         }}
                     />
+                    <button
+                        onClick={() => setIsDescending(!isDescending)}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '18px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '10px',
+                        }}
+                    >
+                        {isDescending ? <i className="bi bi-sort-down"></i> : <i className="bi bi-sort-up"></i>}
+                    </button>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {aggregatedDonations
                             .filter((player) =>
                                 player.name.toLowerCase().includes(nameFilter.toLowerCase())
                             )
-                            .sort((a, b) => b.totalDonations - a.totalDonations) // Sort by highest total donations
+                            .sort((a, b) =>
+                                isDescending
+                                    ? b.totalDonations - a.totalDonations
+                                    : a.totalDonations - b.totalDonations
+                            ) // Sort by total donations based on isDescending
                             .map((player, index) => {
                                 const donationDifference = player.totalDonations - player.totalDonationsReceived;
                                 return (

@@ -12,6 +12,7 @@ const ProgressInfo: React.FC = () => {
     const [selectedNewDate, setSelectedNewDate] = useState<string | null>('current_state'); // Default to current state
     const [loading, setLoading] = useState<boolean>(true); // Loading state
     const [playerFilter, setPlayerFilter] = useState<string>('');
+    const [sortLabel, setSortLabel] = useState<string>(''); // State for sorting label
 
     useEffect(() => {
         const fetchMembers = async () => {
@@ -27,6 +28,11 @@ const ProgressInfo: React.FC = () => {
         fetchMembers();
     }, [clanTag]);
 
+    useEffect(() => {
+        // Execute sorting logic on initial load
+        setTimeline((prevTimeline) => [...prevTimeline].sort((a, b) => b.changes.length - a.changes.length));
+        setSortLabel('Ordenado por mayor progreso');
+    }, []);
 
     const getSaves = async () => {
         const dataMembers = await APIClashService.getClanMembersWithDetails();
@@ -242,7 +248,7 @@ const ProgressInfo: React.FC = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1 style={{textAlign:'center'}} className='neonText'
+            <h1 style={{ textAlign: 'center' }} className='neonText'
             >Progreso de los jugadores</h1>
             <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. </p>
             <br />
@@ -350,6 +356,7 @@ const ProgressInfo: React.FC = () => {
                     }}
                 />
             </div>
+          
             <div>
                 {comparisonDates && (
                     <>
@@ -371,6 +378,35 @@ const ProgressInfo: React.FC = () => {
                         })()}
                     </>
                 )}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                <label className="switch">
+                    <input
+                        type="checkbox"
+                        defaultChecked={true} // Set default to checked
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setTimeline([...timeline].sort((a, b) => b.changes.length - a.changes.length));
+                                setSortLabel('Ordenado por mayor progreso');
+                            } else {
+                                setTimeline([...timeline].sort((a, b) => a.changes.length - b.changes.length));
+                                setSortLabel('Ordenado por menor progreso');
+                            }
+                        }}
+                    />
+                    <div className="slider">
+                        <div className="slider-btn">
+                            <div className="light"></div>
+                            <div className="texture"></div>
+                            <div className="texture"></div>
+                            <div className="texture"></div>
+                            <div className="light"></div>
+                        </div>
+                    </div>
+                </label>
+                <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'violet' }}>
+                    {sortLabel}
+                </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
                 {translateChanges(timeline)
