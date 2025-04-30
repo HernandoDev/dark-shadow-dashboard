@@ -135,7 +135,7 @@ export const NavbarWrapper = ({ children }: Props) => {
                      className="Btn"
                      style={{
                         ...(typeof window !== 'undefined' && window.innerWidth > 768
-                           ? { left: '-10dvw' } // Apply only for web version
+                           ? { left: '-17dvw' } // Apply only for web version
                            : {}),
                      }}
                   >
