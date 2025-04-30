@@ -106,14 +106,15 @@ export const SidebarWrapper = () => {
                         href="donaciones"
                      />
                   </SidebarMenu>
+                  <h6>Selecionar Clan</h6>
                   <select
+                  className='input'
                      value={clanTag}
                      onChange={handleClanChange}
                      style={{
                         width: '100%',
                         padding: '8px',
                         marginBottom: '10px',
-                        backgroundColor: '#1e293b', // Dark background
                         color: '#ffffff', // White text
                         border: '1px solid #4b5563', // Gray border
                         borderRadius: '8px', // Rounded corners
