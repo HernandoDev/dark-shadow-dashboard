@@ -121,13 +121,13 @@ const generateWarMessage = (warDetails: any) => {
         const attacksPerMember = warDetails.attacksPerMember || 2; // Default to 2 attacks per member if not provided
         const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
         if (attacksMissing > 0) {
-          noAttack.push(`* ${member.mapPosition}. ${member.name} → no atacó (Faltan ${attacksMissing} ataque(s))`);
+          noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s))`);
         }
       }
     } else {
       const attacksPerMember = warDetails.attacksPerMember || 2; // Default to 2 attacks per member if not provided
       const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-      noAttack.push(`* ${member.mapPosition}. ${member.name} → no atacó (Faltan ${attacksMissing} ataque(s))`);
+      noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s))`);
     }
   });
 
