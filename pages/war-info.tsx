@@ -109,7 +109,7 @@ const generateWarMessage = (warDetails: any) => {
           const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
           const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
 
-          const message = `${ownInfo} VESUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
+          const message = `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
 
           starsGroup[stars]?.push(message);
 
@@ -548,7 +548,7 @@ const WarInfoPage = () => {
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
   ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN → *Total de ataques faltantes: ${totalMissingAttacks}\nTotal de personas con ataques pendientes: ${totalPlayersWithMissingAttacks+1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
+  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks+1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
     `.trim();
   };
 
