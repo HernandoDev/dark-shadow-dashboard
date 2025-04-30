@@ -557,7 +557,7 @@ export const TableWrapper = () => {
 
          {isMobile ? (
             <div>
-               <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
+               <h1 style={{ color: 'greenyellow', fontSize: '24px',marginTop:'20px' }}>Miembros que cumplen los requisitos mínimos</h1>
                {sortedMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
                   const missingMember = missing45Days?.find((missing) => missing.tag === member.tag); // Find member in missing45Days
