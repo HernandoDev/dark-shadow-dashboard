@@ -574,7 +574,7 @@ const WarInfoPage = () => {
       {activeTab === 'currentWar' && (
 
       <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
-        En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador. Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
+        En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador.<br />Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
       </p>
     )}
       {activeTab === 'MensajeGuerra' && (
@@ -1121,7 +1121,13 @@ const WarInfoPage = () => {
                                   <strong>Ataque:</strong> {attack.attack}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
+                                  <strong>Estrellas 🌟:</strong> {attack.stars}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
                                   <strong>Porcentaje:</strong> {attack.percentage}%
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Observaciones:</strong> {attack.description}
                                 </li>
                                 <li style={{ marginBottom: '5px' }}>
                                   <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
