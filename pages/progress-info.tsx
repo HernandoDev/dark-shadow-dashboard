@@ -244,7 +244,8 @@ const ProgressInfo: React.FC = () => {
         <div style={{ padding: '20px' }}>
             <h1 style={{textAlign:'center'}} className='neonText'
             >Progreso de los jugadores</h1>
-            <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. Si deseas iniciar un nuevo punto de guardado, pulsa el botón "Crear guardado".</p>
+            <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. </p>
+            <p>Si deseas iniciar un nuevo punto de guardado, pulsa el botón "Crear guardado".</p>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{ padding: '20px' }} className='ButtonNeonAnimate'>
                     <div className="grid-bg">
@@ -286,9 +287,10 @@ const ProgressInfo: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+                <label htmlFor="oldDateSelect" style={{ display: 'none' }}>Selecciona la fecha antigua</label>
                 <select
+                    id="oldDateSelect"
                     className='input'
-
                     value={selectedOldDate || ''}
                     onChange={(e) => {
                         const newOldDate = e.target.value;
@@ -304,9 +306,10 @@ const ProgressInfo: React.FC = () => {
                         </option>
                     ))}
                 </select>
+                <label htmlFor="newDateSelect" style={{ display: 'none' }}>Selecciona la fecha nueva</label>
                 <select
+                    id="newDateSelect"
                     className='input'
-
                     value={selectedNewDate || ''}
                     onChange={(e) => {
                         const newNewDate = e.target.value;
