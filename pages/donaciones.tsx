@@ -66,7 +66,7 @@ const DonacionesCapital = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1 className='neonText'>Donaciones</h1>
+            <h1 style={{textAlign:'center'}} className='neonText'>Donaciones</h1>
             <p>Un buen donador es un miembro que ha realizado al menos 1000 donaciones y cuya diferencia entre donaciones realizadas y recibidas es mayor o igual a 0.
                 Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
             <br />

@@ -126,7 +126,7 @@ const LeaguePointsPage = () => {
 
    return (
       <div>
-         <h1 className='neonText'>Puntos de Liga</h1>
+         <h1 style={{textAlign:'center'}} className='neonText'>Puntos de Liga</h1>
          <table>
             <thead>
                <tr>

@@ -29,7 +29,7 @@ export const Accounts = () => {
       >
 
 
-         <Text className='neonText' h2>Requisitos mínimos</Text>
+         <Text style={{textAlign:'center'}} className='neonText' h2>Requisitos mínimos</Text>
          <Text h5>Aquí puedes establecer el nivel mínimo que debe tener cada héroe.</Text>
 
 
