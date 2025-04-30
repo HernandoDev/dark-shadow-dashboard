@@ -1050,90 +1050,160 @@ const WarInfoPage = () => {
                         fontSize: '16px',
                       }}
                     />
-                    {/* Group attacks by stars */}
-                    {['1', '2', '3'].map((starCount) => (
-                      <div key={starCount} style={{ marginBottom: '30px' }}>
-                        <h2 style={{ color: 'violet', fontSize: '24px', fontWeight: 'bold' }}>
-                          Ataques de {starCount} Estrella{starCount === '1' ? '' : 's'}
-                        </h2>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-                          {savedAttacks
-                            .filter(
-                              (attack) =>
-                                attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName) &&
-                                attack.stars === parseInt(starCount) &&
-                                attack.member.toLowerCase().includes(filterPlayerName.toLowerCase())
-                            )
-                            .map((attack, index) => (
-                              <div
-                                key={index}
-                                className='bgblue'
-                              >
-                                <div className='card'>
-                                  <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
-                                    <Star size={16} style={{ marginRight: '5px' }} />
-                                    {attack.member}
-                                  </h3>
-                                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                                    <li style={{ marginBottom: '5px' }}>
-                                      <strong>Ataque:</strong> {attack.attack}
-                                    </li>
-                                    <li style={{ marginBottom: '5px' }}>
-                                      <strong>
-                                        <Star size={16} style={{ marginRight: '5px' }} />
-                                        Porcentaje:
-                                      </strong>{' '}
-                                      {attack.percentage}%
-                                    </li>
-                                    <li style={{ marginBottom: '5px' }}>
-                                      <strong>
-                                        <Star size={16} style={{ marginRight: '5px' }} />
-                                        Estrellas:
-                                      </strong>{' '}
-                                      {attack.stars}
-                                    </li>
-                                    <li style={{ marginBottom: '5px' }}>
-                                      <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
-                                    </li>
-                                    <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                      <strong>TH Rival:</strong> {attack.thRival}
-                                    </li>
-                                    <li style={{ marginBottom: '5px', color: getThColor(attack.memberThLevel, attack.thRival) }}>
-                                      <strong>TH Miembro:</strong> {attack.memberThLevel}
-                                    </li>
-                                    {attack.description && (
-                                      <li style={{ marginBottom: '5px' }}>
-                                        <strong>Descripción:</strong> {attack.description}
-                                      </li>
-                                    )}
-                                  </ul>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
+                    <div style={{ marginBottom: '20px' }}>
+                      <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Filtros de Ataques</h3>
+                      <label className="checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          checked={includeThreeStars}
+                          onChange={(e) => setIncludeThreeStars(e.target.checked)}
+                        />
+                        <span className="checkmark">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                          </svg>
+                        </span>
+                        <span className="label">Mostrar ataques de 3 estrellas</span>
+                      </label>
+                      <label className="checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          checked={includeTwoStars}
+                          onChange={(e) => setIncludeTwoStars(e.target.checked)}
+                        />
+                        <span className="checkmark">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                          </svg>
+                        </span>
+                        <span className="label">Mostrar ataques de 2 estrellas</span>
+                      </label>
+                      <label className="checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          checked={includeOneStar}
+                          onChange={(e) => setIncludeOneStar(e.target.checked)}
+                        />
+                        <span className="checkmark">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                          </svg>
+                        </span>
+                        <span className="label">Mostrar ataques de 1 estrella</span>
+                      </label>
+                      <label className="checkbox-wrapper">
+                        <input
+                          type="checkbox"
+                          checked={includeMissingAttacks}
+                          onChange={(e) => setIncludeMissingAttacks(e.target.checked)}
+                        />
+                        <span className="checkmark">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                          </svg>
+                        </span>
+                        <span className="label">Mostrar jugadores no atacados</span>
+                      </label>
+                    </div>
+                    <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Ataques de 3 Estrellas</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                      {savedAttacks
+                        .filter((attack) => attack.stars === 3 && includeOneStar)
+                        .map((attack, index) => (
+                          <div key={index} className="bgblue">
+                            <div className="card">
+                              <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
+                                <Star size={16} style={{ marginRight: '5px' }} />
+                                {attack.member}
+                              </h3>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Ataque:</strong> {attack.attack}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Porcentaje:</strong> {attack.percentage}%
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Ataques de 2 Estrellas</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                      {savedAttacks
+                        .filter((attack) => attack.stars === 2 && includeTwoStars)
+                        .map((attack, index) => (
+                          <div key={index} className="bgblue">
+                            <div className="card">
+                              <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
+                                <Star size={16} style={{ marginRight: '5px' }} />
+                                {attack.member}
+                              </h3>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Ataque:</strong> {attack.attack}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Porcentaje:</strong> {attack.percentage}%
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Ataques de 1 Estrella</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                      {savedAttacks
+                        .filter((attack) => attack.stars === 1 && includeOneStar)
+                        .map((attack, index) => (
+                          <div key={index} className="bgblue">
+                            <div className="card">
+                              <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>
+                                <Star size={16} style={{ marginRight: '5px' }} />
+                                {attack.member}
+                              </h3>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Ataque:</strong> {attack.attack}
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Porcentaje:</strong> {attack.percentage}%
+                                </li>
+                                <li style={{ marginBottom: '5px' }}>
+                                  <strong>Fecha:</strong> {new Date(attack.timestamp).toLocaleString()}
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    <h3 style={{ textAlign: 'center', color: 'red', marginBottom: '10px' }}>Jugadores No Atacaron</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                      {includeMissingAttacks &&
+                        getPlayersWhoDidNotAttack(
+                          selectedWar.content.clan.members,
+                          savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)),
+                          selectedWar.content.attacksPerMember
+                        ).map((member, index) => (
+                          <div key={index} className="bgblue">
+                            <div className="card">
+                              <h3 style={{ textAlign: 'center', color: 'red', marginBottom: '10px' }}>
+                                {member.name} - No atacó
+                              </h3>
+                              <p>Faltan {member.attacksMissing} ataque(s)</p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 ) : (
                   <p>No hay ataques guardados disponibles para esta guerra.</p>
-                )}
-              </div>
-              <div style={{ marginTop: '20px' }}>
-                <h3>Jugadores que no atacaron</h3>
-                {selectedWar.content.clan.members ? (
-                  <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {getPlayersWhoDidNotAttack(
-                      selectedWar.content.clan.members,
-                      savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)),
-                      selectedWar.content.attacksPerMember
-                    ).map((member: any, index: number) => (
-                      <li key={index} style={{ marginBottom: '10px', color: 'red' }}>
-                        {member.name} - Faltan {member.attacksMissing} ataque(s)
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No hay información de los miembros del clan.</p>
                 )}
               </div>
             </div>
