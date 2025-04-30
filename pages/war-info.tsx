@@ -538,7 +538,7 @@ const WarInfoPage = () => {
       </h1>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px',justifyContent: 'center' }}>
         <button
           className={`tabButton ${activeTab === 'currentWar' ? 'active' : ''}`}
           onClick={() => setActiveTab('currentWar')}

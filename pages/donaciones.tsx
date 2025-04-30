@@ -70,7 +70,7 @@ const DonacionesCapital = () => {
             
             {/* Tabs */}
 
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px',justifyContent:'center' }}>
                 <button
                     className={`tabButton ${activeTab === 'transactions' ? 'active' : ''}`}
                     onClick={() => setActiveTab('transactions')}
