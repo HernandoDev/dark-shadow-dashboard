@@ -587,7 +587,7 @@ const AttackLog: React.FC = () => {
                                 </h2>
 
                                 {/* Section: Ataques de 3 Estrellas */}
-                                {includeThreeStars && (
+                                {includeThreeStars && filteredPlayerAttacks.some((attack) => attack.stars === 3) && (
                                     <div>
                                         <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Ataques de 3 Estrellas</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
@@ -672,7 +672,7 @@ const AttackLog: React.FC = () => {
                                 )}
 
                                 {/* Section: Ataques de 2 Estrellas */}
-                                {includeTwoStars && (
+                                {includeTwoStars && filteredPlayerAttacks.some((attack) => attack.stars === 2) && (
                                     <div>
                                         <h3 style={{ textAlign: 'center', color: 'yellow', marginBottom: '10px' }}>Ataques de 2 Estrellas</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
@@ -757,7 +757,7 @@ const AttackLog: React.FC = () => {
                                 )}
 
                                 {/* Section: Ataques de 1 Estrella */}
-                                {includeOneStar && (
+                                {includeOneStar && filteredPlayerAttacks.some((attack) => attack.stars === 1) && (
                                     <div>
                                         <h3 style={{ textAlign: 'center', color: 'red', marginBottom: '10px' }}>Ataques de 1 Estrella</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
@@ -842,7 +842,11 @@ const AttackLog: React.FC = () => {
                                 )}
 
                                 {/* Section: Ataques contra TH Superior */}
-                                {includeHigherTh && (
+                                {includeHigherTh && filteredPlayerAttacks.some((attack) => {
+                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                    return memberTh < rivalTh;
+                                }) && (
                                     <div>
                                         <h3 style={{ textAlign: 'center', color: 'blue', marginBottom: '10px' }}>Ataques contra TH Superior</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
@@ -931,7 +935,11 @@ const AttackLog: React.FC = () => {
                                 )}
 
                                 {/* Section: Ataques contra TH Inferior */}
-                                {includeLowerTh && (
+                                {includeLowerTh && filteredPlayerAttacks.some((attack) => {
+                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                    return memberTh > rivalTh;
+                                }) && (
                                     <div>
                                         <h3 style={{ textAlign: 'center', color: 'green', marginBottom: '10px' }}>Ataques contra TH Inferior</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
@@ -1020,7 +1028,11 @@ const AttackLog: React.FC = () => {
                                 )}
 
                                 {/* Section: Ataques contra Mismo TH */}
-                                {includeEqualTh && (
+                                {includeEqualTh && filteredPlayerAttacks.some((attack) => {
+                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                    return memberTh === rivalTh;
+                                }) && (
                                     <div>
                                         <h3 style={{ textAlign: 'center', color: 'orange', marginBottom: '10px' }}>Ataques contra Mismo TH</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
