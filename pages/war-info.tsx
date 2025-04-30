@@ -264,7 +264,7 @@ const WarInfoPage = () => {
         setIncludeTwoStars(true);
         setIncludeOneStar(true);
         setIncludeMissingAttacks(true);
-        setIncludeTwoMissingAttacks(false);
+        setIncludeTwoMissingAttacks(true);
         setIncludeOneMissingAttack(false);
       } else {
         // Select all except "Incluir jugadores con 2 ataques faltantes"
@@ -857,9 +857,11 @@ const WarInfoPage = () => {
                 type="checkbox"
                 checked={includeMissingAttacks}
                 onChange={(e) => {
-                  setIncludeMissingAttacks(e.target.checked);
-                  if (!e.target.checked) {
+                  const isChecked = e.target.checked;
+                  setIncludeMissingAttacks(isChecked);
+                  if (!isChecked) {
                     setIncludeOneMissingAttack(false); // Deselect the second checkbox
+                    setIncludeTwoMissingAttacks(false); // Deselect the third checkbox
                   }
                 }}
               />
@@ -875,7 +877,12 @@ const WarInfoPage = () => {
                 type="checkbox"
                 checked={includeOneMissingAttack}
                 disabled={!includeMissingAttacks} // Disable if the first checkbox is unchecked
-                onChange={(e) => setIncludeOneMissingAttack(e.target.checked)}
+                onChange={(e) => {
+                  setIncludeOneMissingAttack(e.target.checked);
+                  if (e.target.checked) {
+                    setIncludeTwoMissingAttacks(false); // Deselect the third checkbox
+                  }
+                }}
               />
               <span className="checkmark">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -884,7 +891,25 @@ const WarInfoPage = () => {
               </span>
               <span className="label">Solo jugadores con 1 ataque faltante</span>
             </label>
- 
+            <label className="checkbox-wrapper">
+              <input
+                type="checkbox"
+                checked={includeTwoMissingAttacks}
+                disabled={!includeMissingAttacks} // Disable if the first checkbox is unchecked
+                onChange={(e) => {
+                  setIncludeTwoMissingAttacks(e.target.checked);
+                  if (e.target.checked) {
+                    setIncludeOneMissingAttack(false); // Deselect the second checkbox
+                  }
+                }}
+              />
+              <span className="checkmark">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.285 6.707l-11.285 11.285-5.285-5.285 1.414-1.414 3.871 3.871 9.871-9.871z" />
+                </svg>
+              </span>
+              <span className="label">Solo jugadores con 2 ataques faltantes</span>
+            </label>
           </div>
           <pre
             style={{
