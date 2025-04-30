@@ -178,12 +178,12 @@ export const TableWrapper = () => {
          };
       }
       return {
-         th: '15',
-         rey: '85',
-         reina: '85',
-         centinela: '60',
-         luchadora: '35',
-         principe: '55',
+         th: '9',
+         rey: '20',
+         reina: '15',
+         centinela: '0',
+         luchadora: '0',
+         principe: '5',
       }; // Default values
    });
 
@@ -633,12 +633,15 @@ export const TableWrapper = () => {
                      <Table.Column>Principe</Table.Column>
                      <Table.Column>Ejércitos más usados</Table.Column>
                      <Table.Column>Promedio de Estrellas</Table.Column>
+                     <Table.Column>Sin ataques en 45 días</Table.Column>
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
                      {sortedMeetingRequirements.map((member, index) => {
-                        const topArmies = getTopUsedArmies(member.name) || []; // Ensure topArmies is an array
-                        const averageStars = calculateAverageStars(member.name) || 'N/A'; // Ensure averageStars is not undefined
+                        const topArmies = getTopUsedArmies(member.name) || [];
+                        const averageStars = calculateAverageStars(member.name) || 'N/A';
+                        const missingMember = missing45Days?.find((missing) => missing.tag === member.tag);
+                        const noAttacksIn45Days = (missingMember?.missingAttacks ?? 0) > 0 ? 'Sí' : 'No';
                         return (
                            <Table.Row key={member.tag}>
                               <Table.Cell>{index + 1}</Table.Cell>
@@ -651,6 +654,7 @@ export const TableWrapper = () => {
                               <Table.Cell>{`Principe ${member.heroes?.[6]?.level || 'N/A'}`}</Table.Cell>
                               <Table.Cell>{topArmies.join(', ')}</Table.Cell>
                               <Table.Cell>{averageStars}</Table.Cell>
+                              <Table.Cell>{noAttacksIn45Days}</Table.Cell>
                               <Table.Cell>
                                  <Button auto flat onClick={() => openModal(member)}>
                                     👁️
@@ -678,12 +682,15 @@ export const TableWrapper = () => {
                      <Table.Column>Principe</Table.Column>
                      <Table.Column>Ejércitos más usados</Table.Column>
                      <Table.Column>Promedio de Estrellas</Table.Column>
+                     <Table.Column>Sin ataques en 45 días</Table.Column>
                      <Table.Column>Acciones</Table.Column>
                   </Table.Header>
                   <Table.Body>
                      {sortedNotMeetingRequirements.map((member, index) => {
-                        const topArmies = getTopUsedArmies(member.name) || []; // Ensure topArmies is an array
-                        const averageStars = calculateAverageStars(member.name) || 'N/A'; // Ensure averageStars is not undefined
+                        const topArmies = getTopUsedArmies(member.name) || [];
+                        const averageStars = calculateAverageStars(member.name) || 'N/A';
+                        const missingMember = missing45Days?.find((missing) => missing.tag === member.tag);
+                        const noAttacksIn45Days = (missingMember?.missingAttacks ?? 0) > 0 ? 'Sí' : 'No';
                         return (
                            <Table.Row key={member.tag}>
                               <Table.Cell>{index + 1}</Table.Cell>
@@ -708,6 +715,7 @@ export const TableWrapper = () => {
                               </Table.Cell>
                               <Table.Cell>{topArmies.join(', ')}</Table.Cell>
                               <Table.Cell>{averageStars}</Table.Cell>
+                              <Table.Cell>{noAttacksIn45Days}</Table.Cell>
                               <Table.Cell>
                                  <Button auto flat onClick={() => openModal(member)}>
                                     👁️
