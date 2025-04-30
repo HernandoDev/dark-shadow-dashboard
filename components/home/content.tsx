@@ -219,7 +219,7 @@ export const Content = () => {
                            }}
                         >
                            <strong>{warStatus.clan.name}:</strong> {warStatus.clan.stars}
-                           <Star size={16} style={{ marginRight: '5px' }} /> - {warStatus.clan.destructionPercentage}%
+                           <Star size={16} style={{ marginRight: '5px' }} /> - {warStatus.clan.destructionPercentage.toFixed(2)}%
                         </Text>
                         <Text
                            css={{
@@ -232,7 +232,7 @@ export const Content = () => {
                            }}
                         >
                            <strong>{warStatus.opponent.name}:</strong> {warStatus.opponent.stars}
-                           <Star size={16} style={{ marginRight: '5px' }} /> - {warStatus.opponent.destructionPercentage}%
+                           <Star size={16} style={{ marginRight: '5px' }} /> - {warStatus.opponent.destructionPercentage.toFixed(2)}%
                         </Text>
                      </Box>
                   ) : (

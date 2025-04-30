@@ -579,7 +579,7 @@ const WarInfoPage = () => {
     )}
       {activeTab === 'MensajeGuerra' && (
         <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
-          En esta ventana se generará un mensaje de guerra para enviar al clan, mostrando el estado de la guerra y los ataques realizados por cada jugador.Usa los filtros para personalizar el mensaje según tus preferencias. Puedes copiar el mensaje generado al portapapeles para compartirlo fácilmente.
+          En esta ventana se generará un mensaje de guerra para enviar al clan, mostrando el estado de la guerra y los ataques realizados por cada jugador. <br /> Usa los filtros para personalizar el mensaje según tus preferencias. <br /><br /> Puedes copiar el mensaje generado al portapapeles para compartirlo fácilmente.
         </p>
       )}
       {activeTab === 'warLogs' && (
@@ -1021,12 +1021,12 @@ const WarInfoPage = () => {
               <p><strong>Fecha:</strong> {formatDate(selectedWar.content.startTime)}</p>
               <p>
                 <strong style={{ fontSize: '22px' }}>
-                  {selectedWar.content.clan.name}: {selectedWar.content.clan.stars} <Star size={16} style={{ marginRight: '5px' }} /> - {selectedWar.content.clan.destructionPercentage}%
+                  {selectedWar.content.clan.name}: {selectedWar.content.clan.stars} <Star size={16} style={{ marginRight: '5px' }} /> - {selectedWar.content.clan.destructionPercentage.toFixed(2)}%
                 </strong>
               </p>
               <p>
                 <strong style={{ fontSize: '22px' }}>
-                  {selectedWar.content.opponent.name}: {selectedWar.content.opponent.stars} <Star size={16} style={{ marginRight: '5px' }} /> - {selectedWar.content.opponent.destructionPercentage}%
+                  {selectedWar.content.opponent.name}: {selectedWar.content.opponent.stars} <Star size={16} style={{ marginRight: '5px' }} /> - {selectedWar.content.opponent.destructionPercentage.toFixed(2)}%
                 </strong>
               </p>
               <p style={{ fontSize: '18px', fontWeight: 'bold', color: 'violet' }}>
@@ -1108,7 +1108,7 @@ const WarInfoPage = () => {
                     <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Ataques de 3 Estrellas</h3>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
                       {savedAttacks
-                        .filter((attack) => attack.stars === 3 && includeOneStar)
+                        .filter((attack) => attack.stars === 3 && includeThreeStars)
                         .map((attack, index) => (
                           <div key={index} className="bgblue">
                             <div className="card">
