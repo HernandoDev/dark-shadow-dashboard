@@ -20,9 +20,10 @@ interface CardProps {
   topArmies?: string[]; // Add topArmies prop
   borderColor?: string; // Add borderColor prop
   tag: string; // Add tag prop
+  missingAttacks?: number; // Add missingAttacks prop
 }
 
-const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, onViewDetails, minLevels, position, topArmies, borderColor, tag }) => {
+const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, onViewDetails, minLevels, position, topArmies, borderColor, tag, missingAttacks }) => {
   const openInGameProfile = () => {
     const url = `https://link.clashofclans.com/es?action=OpenPlayerProfile&tag=${encodeURIComponent(tag)}`;
     window.open(url, '_blank');
@@ -31,56 +32,61 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, 
   return (
     <StyledWrapper borderColor={borderColor}>
       <div className='card animate__animated animate__backInLeft bgblue'>
-      <div className="card">
-        <div className="bottom-section">
-          <span className="title">{`${position}. ${name || 'N/A'}`}</span> {/* Display position */}
-          <div className="row row1">
-            <div style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }} className="item">
-              <span className="big-text">TH</span>
-              <span className="regular-text">{townHallLevel || 'N/A'}</span>
+        <div className="card">
+          <div className="bottom-section">
+            <span className="title">{`${position}. ${name || 'N/A'}`}</span> {/* Display position */}
+            <div className="row row1">
+              <div style={{ color: townHallLevel < minLevels.th ? '#B22222' : 'inherit' }} className="item">
+                <span className="big-text">TH</span>
+                <span className="regular-text">{townHallLevel || 'N/A'}</span>
+              </div>
+              <div style={{ color: heroes?.[0]?.level < minLevels.rey ? '#B22222' : 'inherit' }} className="item">
+                <span className="big-text">Rey</span>
+                <span className="regular-text">{heroes?.[0]?.level || 'N/A'}</span>
+              </div>
+              <div style={{ color: heroes?.[1]?.level < minLevels.reina ? '#B22222' : 'inherit' }} className="item">
+                <span className="big-text">Reina</span>
+                <span className="regular-text">{heroes?.[1]?.level || 'N/A'}</span>
+              </div>
             </div>
-            <div style={{ color: heroes?.[0]?.level < minLevels.rey ? '#B22222' : 'inherit' }} className="item">
-              <span className="big-text">Rey</span>
-              <span className="regular-text">{heroes?.[0]?.level || 'N/A'}</span>
+            <div className="row row1">
+              <div style={{ color: heroes?.[2]?.level < minLevels.centinela ? '#B22222' : 'inherit' }} className="item">
+                <span className="big-text">Centinela</span>
+                <span className="regular-text">{heroes?.[2]?.level || 'N/A'}</span>
+              </div>
+              <div style={{ color: heroes?.[4]?.level < minLevels.luchadora ? '#B22222' : 'inherit' }} className="item">
+                <span className="big-text">Luchadora</span>
+                <span className="regular-text">{heroes?.[4]?.level || 'N/A'}</span>
+              </div>
+              <div style={{ color: heroes?.[6]?.level < minLevels.principe ? '#B22222' : 'inherit' }} className="item">
+                <span className="big-text">Principe</span>
+                <span className="regular-text">{heroes?.[6]?.level || 'N/A'}</span>
+              </div>
             </div>
-            <div style={{ color: heroes?.[1]?.level < minLevels.reina ? '#B22222' : 'inherit' }} className="item">
-              <span className="big-text">Reina</span>
-              <span className="regular-text">{heroes?.[1]?.level || 'N/A'}</span>
+            {topArmies && topArmies.length > 0 && (
+              <div style={{ color: 'white', fontSize: '15px' }} className="top-armies">
+                Ejércitos más usados: <br />
+                {topArmies.join(', ')}
+              </div>
+            )}
+            {averageStars && (
+              <div style={{ textAlign: 'center', marginTop: '10px', color: 'white', fontSize: '15px' }}>
+                Promedio de estrellas: {averageStars}
+              </div>
+            )}
+            {missingAttacks !== null && missingAttacks !== undefined && missingAttacks > 0 && (
+              <div style={{ textAlign: 'center', marginTop: '10px', color: 'red', fontSize: '15px' }}>
+                Ataques faltantes en 45 días: {missingAttacks}
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+              <Button onClick={onViewDetails}>👁️ Ver Detalles</Button>
             </div>
-          </div>
-          <div className="row row1">
-            <div style={{ color: heroes?.[2]?.level < minLevels.centinela ? '#B22222' : 'inherit' }} className="item">
-              <span className="big-text">Centinela</span>
-              <span className="regular-text">{heroes?.[2]?.level || 'N/A'}</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+              <Button onClick={openInGameProfile}>Abrir jugador en el juego</Button>
             </div>
-            <div style={{ color: heroes?.[4]?.level < minLevels.luchadora ? '#B22222' : 'inherit' }} className="item">
-              <span className="big-text">Luchadora</span>
-              <span className="regular-text">{heroes?.[4]?.level || 'N/A'}</span>
-            </div>
-            <div style={{ color: heroes?.[6]?.level < minLevels.principe ? '#B22222' : 'inherit' }} className="item">
-              <span className="big-text">Principe</span>
-              <span className="regular-text">{heroes?.[6]?.level || 'N/A'}</span>
-            </div>
-          </div>
-          {topArmies && topArmies.length > 0 && (
-            <div style={{color:'white', fontSize:'15px'}} className="top-armies">
-             Ejércitos más usados: <br />
-             {topArmies.join(', ')}
-            </div>
-          )}
-          {averageStars && (
-            <div style={{ textAlign: 'center', marginTop: '10px', color: 'white', fontSize: '15px' }}>
-              Promedio de estrellas: {averageStars}
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-            <Button onClick={onViewDetails}>👁️ Ver Detalles</Button>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-            <Button onClick={openInGameProfile}>Abrir jugador en el juego</Button>
           </div>
         </div>
-      </div>
       </div>
     </StyledWrapper>
   );

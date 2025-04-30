@@ -151,6 +151,8 @@ const renderValidatedList = (
 };
 
 export const TableWrapper = () => {
+   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+
    const [members, setMembers] = useState<Member[]>([]);
    const [loading, setLoading] = useState(true);
    const [attackLogs, setAttackLogs] = useState<AttackLog[]>([]); // Explicitly type attackLogs
@@ -185,7 +187,111 @@ export const TableWrapper = () => {
       }; // Default values
    });
 
+   const getMissinAttacks = (warSaves: any[]) => {
+      const missingAttacksMap: {
+         [key: string]: {
+            name: string;
+            tag: string;
+            townhallLevel: number;
+            missingAttacks: number;
+            totalMissingAttacks: number;
+         }
+      } = {};
+
+      const missing45DaysMap: {
+         [key: string]: {
+            name: string;
+            tag: string;
+            townhallLevel: number;
+            missingAttacks: number;
+            totalMissingAttacks: number;
+         }
+      } = {};
+
+      const now = new Date();
+      const fortyFiveDaysAgo = new Date();
+      fortyFiveDaysAgo.setDate(now.getDate() - 45);
+
+      warSaves.forEach((war) => {
+         const { content } = war;
+         if (content.state !== 'warEnded') return; // Skip if the war is not in progress
+         const { clan } = content;
+         const rawStartTime = content.startTime;
+         // Insert a hyphen between the year, month, and day if necessary
+         const isoFormattedDate = `${rawStartTime.slice(0, 4)}-${rawStartTime.slice(4, 6)}-${rawStartTime.slice(6, 11)}:${rawStartTime.slice(11, 13)}:${rawStartTime.slice(13)}`;
+         const warStartTime = new Date(isoFormattedDate);
+         clan.members.forEach((member: any) => {
+            const attacksLeft = content.attacksPerMember - (member.opponentAttacks || 0);
+
+            if (attacksLeft > 0) {
+               if (!missingAttacksMap[member.tag]) {
+                  missingAttacksMap[member.tag] = {
+                     name: member.name,
+                     tag: member.tag,
+                     townhallLevel: member.townhallLevel,
+                     missingAttacks: 0,
+                     totalMissingAttacks: 0,
+                  };
+               }
+               missingAttacksMap[member.tag].missingAttacks++;
+               missingAttacksMap[member.tag].totalMissingAttacks += attacksLeft;
+
+               // Correct date comparison logic
+               if (warStartTime >= fortyFiveDaysAgo && warStartTime <= now) {
+                  if (!missing45DaysMap[member.tag]) {
+                     missing45DaysMap[member.tag] = {
+                        name: member.name,
+                        tag: member.tag,
+                        townhallLevel: member.townhallLevel,
+                        missingAttacks: 0,
+                        totalMissingAttacks: 0,
+                     };
+                  }
+                  missing45DaysMap[member.tag].missingAttacks++;
+                  missing45DaysMap[member.tag].totalMissingAttacks += attacksLeft;
+               }
+            }
+         });
+      });
+
+      const totalMissingAttacks = Object.values(missingAttacksMap);
+      const missing45Days = Object.values(missing45DaysMap);
+      console.log('Total Missing Attacks:', totalMissingAttacks);
+      console.log('Missing Attacks in Last 45 Days:', missing45Days);
+
+      setMissingAttacks(totalMissingAttacks); // Update state with the total missing attacks
+      setMissing45Days(missing45Days); // Update state with the missing attacks in the last 45 days
+
+      return { totalMissingAttacks, missing45Days };
+   };
+
+   const fetchWarSaves = async () => {
+      try {
+         const response = await APIClashService.getWarSaves();
+         setWarSaves(response);
+         getMissinAttacks(response);
+      } catch (error) {
+         console.error('Error fetching war saves:', error);
+      }
+   };
+
    const [clanTag, setClanTag] = useState('%232QL0GCQGQ'); // Updated to use state
+   const [missingAttacks, setMissingAttacks] = useState<{
+      name: string;
+      tag: string;
+      townhallLevel: number;
+      missingAttacks: number;
+      totalMissingAttacks: number;
+   }[] | undefined>(undefined);
+
+   const [missing45Days, setMissing45Days] = useState<{
+      name: string;
+      tag: string;
+      townhallLevel: number;
+      missingAttacks: number;
+      totalMissingAttacks: number;
+   }[] | undefined>(undefined);
+
    const [searchQuery, setSearchQuery] = useState('');
    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
    const { setVisible, bindings } = useModal(); // Modal control
@@ -308,7 +414,7 @@ export const TableWrapper = () => {
    };
 
    const getTopUsedArmies = (memberName: string) => {
-      
+
       const memberAttacks = attackLogs.filter((attack) => attack.member === memberName);
       const armyUsageCount: { [key: string]: number } = {};
 
@@ -326,9 +432,14 @@ export const TableWrapper = () => {
    const calculateAverageStars = (memberName: string) => {
       const memberAttacks = attackLogs.filter((attack) => attack.member === memberName);
       const totalStars = memberAttacks.reduce((sum, attack) => sum + attack.stars, 0);
-      const result =memberAttacks.length > 0 ? (totalStars / memberAttacks.length).toFixed(2) : 'N/A';
+      const result = memberAttacks.length > 0 ? (totalStars / memberAttacks.length).toFixed(2) : 'N/A';
       return result
 
+   };
+
+   const getMissingAttacksForMember = (memberTag: string) => {
+      const missingMember = missing45Days?.find((missing) => missing.tag === memberTag);
+      return missingMember ? missingMember.missingAttacks : 0;
    };
 
    useEffect(() => {
@@ -336,6 +447,7 @@ export const TableWrapper = () => {
          try {
             const data = await APIClashService.getClanMembersWithDetails();
             setMembers(data.detailedMembers as Member[] || []);
+            fetchWarSaves();
          } catch (error) {
             console.error('Error fetching members:', error);
          } finally {
@@ -399,7 +511,7 @@ export const TableWrapper = () => {
 
    return (
       <Box css={{ padding: '20px' }}>
-  
+
 
          <div
             style={{
@@ -447,6 +559,7 @@ export const TableWrapper = () => {
                <h1 style={{ color: 'greenyellow', fontSize: '24px' }}>Miembros que cumplen los requisitos mínimos</h1>
                {sortedMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
+                  const missingMember = missing45Days?.find((missing) => missing.tag === member.tag); // Find member in missing45Days
                   return (
                      <div className="animate__animated animate__backInLeft" style={{ padding: '15px' }} key={member.tag}>
                         <Card
@@ -463,9 +576,10 @@ export const TableWrapper = () => {
                               luchadora: parseInt(minLevels.luchadora),
                               principe: parseInt(minLevels.principe),
                            }}
-                           topArmies={topArmies} // Pass topArmies prop
-                           tag={member.tag} // Pass tag prop
-                           averageStars={calculateAverageStars(member.name)} // Pass average stars prop
+                           topArmies={topArmies}
+                           tag={member.tag}
+                           averageStars={calculateAverageStars(member.name)}
+                           missingAttacks={missingMember?.missingAttacks || 0} // Pass missing attacks
                         />
                      </div>
                   );
@@ -474,6 +588,7 @@ export const TableWrapper = () => {
                <h2 style={{ color: 'red', fontSize: '24px', marginTop: '20px' }}>Miembros que no cumplen los requisitos mínimos</h2>
                {sortedNotMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
+                  const missingMember = missing45Days?.find((missing) => missing.tag === member.tag); // Find member in missing45Days
                   return (
                      <div style={{ padding: '15px' }} key={member.tag}>
                         <Card
@@ -490,10 +605,11 @@ export const TableWrapper = () => {
                               luchadora: parseInt(minLevels.luchadora),
                               principe: parseInt(minLevels.principe),
                            }}
-                           topArmies={topArmies} // Pass topArmies prop
-                           tag={member.tag} // Pass tag prop
-                           borderColor="#dc2626" // Add red border for non-compliant members
-                           averageStars={calculateAverageStars(member.name)} // Pass average stars prop
+                           topArmies={topArmies}
+                           tag={member.tag}
+                           borderColor="#dc2626"
+                           averageStars={calculateAverageStars(member.name)}
+                           missingAttacks={missingMember?.missingAttacks || 0} // Pass missing attacks
                         />
                      </div>
                   );
