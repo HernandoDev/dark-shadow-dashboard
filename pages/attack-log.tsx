@@ -382,7 +382,40 @@ const AttackLog: React.FC = () => {
             <h1 className="animate__animated animate__backInDown neonText" style={{ textAlign: 'center', marginBottom: '20px' }}>
                 Registro de Ataques
             </h1>
+            {(typeof window !== 'undefined' &&
+                    (localStorage.getItem('username') === 'nandods' ||
+                        (localStorage.getItem('username') === 'gaboadmin' && localStorage.getItem('clanTag') === '%232RG9R9JVP'))) && (
 
+            <div className="button-container">
+                  <button  onClick={openModal} className="green-hacker-button" data-text="Guardar Ataque">
+                    Guardar Ataque
+                    <div className="green-neon-frame"></div>
+                    <div className="circuit-traces">
+                      <div className="circuit-trace"></div>
+                      <div className="circuit-trace"></div>
+                      <div className="circuit-trace"></div>
+                      <div className="circuit-trace"></div>
+                      <div className="circuit-trace"></div>
+                    </div>
+                    <div className="code-fragments">
+                      <span className="code-fragment">GUERRA!!</span>
+                      <span className="code-fragment">LIGA!!</span>
+                      <span className="code-fragment">ATAQUES!!</span>
+                      <span className="code-fragment">EJERCITOS</span>
+                    </div>
+                    <div className="interference"></div>
+                    <div className="scan-bars">
+                      <div className="scan-bar"></div>
+                      <div className="scan-bar"></div>
+                      <div className="scan-bar"></div>
+                    </div>
+                    <div className="text-glow"></div>
+                  </button>
+                </div>
+                    )}
+<br />
+<br />
+           
             {/* Tab Buttons */}
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', justifyContent: 'center' }}>
 
