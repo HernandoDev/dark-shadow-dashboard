@@ -178,12 +178,12 @@ export const TableWrapper = () => {
          };
       }
       return {
-         th: '9',
-         rey: '20',
-         reina: '15',
-         centinela: '0',
-         luchadora: '0',
-         principe: '5',
+         th: '15',
+         rey: '90',
+         reina: '90',
+         centinela: '65',
+         luchadora: '40',
+         principe: '70',
       }; // Default values
    });
 
