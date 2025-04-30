@@ -540,8 +540,8 @@ const WarInfoPage = () => {
   ${additionalInfo}
   
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
-  ${includeTwoStars ? `\n🌟🌟 2 Estrellas(⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
-  ${includeOneStar ? `\n🌟\n${oneStarSection} (No aceptable)` : ''}
+  ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
+  ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
   ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n${filteredMissingAttacksSection}` : ''}
     `.trim();
   };
