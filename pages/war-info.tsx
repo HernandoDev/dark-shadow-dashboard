@@ -109,7 +109,7 @@ const generateWarMessage = (warDetails: any) => {
           const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
           const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
 
-          const message = `${ownInfo} ${comparisonEmoji} VESUS→ ${enemyInfo}${warning}`;
+          const message = `${ownInfo} VESUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
 
           starsGroup[stars]?.push(message);
 
@@ -534,15 +534,19 @@ const WarInfoPage = () => {
         .split('\n')
         .filter((line) => line.includes('Faltan 2 ataque'))
         .join('\n');
-
     }
+
+    const totalMissingAttacks = (filteredMissingAttacksSection.match(/Faltan \d+ ataque/g) || [])
+      .map((line) => parseInt(line.match(/\d+/)?.[0] || '0'))
+      .reduce((sum, count) => sum + count, 0);
+
     return `
   ${additionalInfo}
   
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
   ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n${filteredMissingAttacksSection}` : ''}
+  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN → Total de ataques faltantes: ${totalMissingAttacks}\n${filteredMissingAttacksSection}\n\n` : ''}
     `.trim();
   };
 
