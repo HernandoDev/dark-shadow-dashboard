@@ -366,6 +366,11 @@ const AttackLog: React.FC = () => {
                 <Info size={16} style={{ marginRight: '5px' }} />
                 Esta ventana muestra los ataques más usados en el clan y su rendimiento. Verás una lista con los ataques, sus resultados y los jugadores que los usan. Usa la barra de búsqueda para ver los ataques de un jugador específico y el botón "Agregar" para guardar nuevos ataques.
             </p>
+            <p className="animate__animated animate__backInLeft">
+                <Info size={16} style={{ marginRight: '5px' }} />
+                Usa los filtros para buscar ataques específicos por jugador. Puedes filtrar por jugador, rango de fechas o ambos. 
+                Esto te permitirá analizar el rendimiento de los ataques en diferentes contextos.
+            </p>
             <br />
             <p className="animate__animated animate__backInRight">
                 <Shield size={16} style={{ marginRight: '5px' }} />

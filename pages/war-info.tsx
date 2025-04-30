@@ -533,13 +533,10 @@ const WarInfoPage = () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
-      <h1 className="animate__animated animate__backInDown neonText" style={{ marginBottom: '20px'}}>
+      <h1 className="animate__animated animate__backInDown neonText" style={{ marginBottom: '20px' }}>
         Información de Guerra
       </h1>
-      <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
-        En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador. Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
-      </p>
-<br />
+
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
         <button
@@ -573,6 +570,27 @@ const WarInfoPage = () => {
           <div className="right"></div>
         </button>
       </div>
+      <br />
+      {activeTab === 'currentWar' && (
+
+      <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+        En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador. Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
+      </p>
+    )}
+      {activeTab === 'MensajeGuerra' && (
+        <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+          En esta ventana se generará un mensaje de guerra para enviar al clan, mostrando el estado de la guerra y los ataques realizados por cada jugador.Usa los filtros para personalizar el mensaje según tus preferencias. Puedes copiar el mensaje generado al portapapeles para compartirlo fácilmente.
+        </p>
+      )}
+      {activeTab === 'warLogs' && (
+        <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+          En esta ventana se mostrarán los registros de guerra pasados, permitiendo seleccionar un registro específico para ver los detalles y los ataques.
+        </p>
+      )}
+
+      {/* Clan Selection Buttons */}
+      <br />
+
 
       {/* Tab Content */}
       {activeTab === 'currentWar' && (
