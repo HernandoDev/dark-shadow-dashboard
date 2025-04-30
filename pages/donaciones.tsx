@@ -68,35 +68,35 @@ const DonacionesCapital = () => {
         <div style={{ padding: '20px' }}>
             <h1>Donaciones</h1>
             <p>Un buen donador es un miembro que ha realizado al menos 1000 donaciones y cuya diferencia entre donaciones realizadas y recibidas es mayor o igual a 0.
-            Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
-            
+                Un mal donador es un miembro que ha realizado menos de 1000 donaciones o cuya diferencia entre donaciones realizadas y recibidas es menor a 0.</p>
+<br />
+<br />
             {/* Tabs */}
+
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <button
+                    className={`tabButton ${activeTab === 'transactions' ? 'active' : ''}`}
                     onClick={() => setActiveTab('transactions')}
-                    style={{
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderBottom: activeTab === 'transactions' ? '2px solid violet' : 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                        fontWeight: activeTab === 'transactions' ? 'bold' : 'normal',
-                    }}
+
                 >
-                    Malos y Buenos Donadores
+                    <span>Malos y Buenos Donadores</span>
+                    <div className="top"></div>
+                    <div className="left"></div>
+                    <div className="bottom"></div>
+                    <div className="right"></div>
                 </button>
                 <button
+                    className={`tabButton ${activeTab === 'totals' ? 'active' : ''}`}
+
                     onClick={() => setActiveTab('totals')}
-                    style={{
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderBottom: activeTab === 'totals' ? '2px solid violet' : 'none',
-                        background: 'none',
-                        cursor: 'pointer',
-                        fontWeight: activeTab === 'totals' ? 'bold' : 'normal',
-                    }}
+                   
                 >
-                    Donaciones Totales por Jugador
+                       <span>Donaciones Totales por Jugador</span>
+                    <div className="top"></div>
+                    <div className="left"></div>
+                    <div className="bottom"></div>
+                    <div className="right"></div>
+                    
                 </button>
             </div>
 
@@ -133,39 +133,39 @@ const DonacionesCapital = () => {
                             .map((player, index) => {
                                 const donationDifference = player.totalDonations - player.totalDonationsReceived;
                                 return (
-                                    <div className='bgblue' style={{ width: '100%',  margin: '0 auto' }}>
-                                    <div
-                                        key={index}
-                                        className='card animate__animated animate__backInLeft'
-                                    >
-                                        <strong
-                                            style={{
-                                                fontSize: '16px',
-                                                marginBottom: '5px',
-                                                color: 'violet',
-                                            }}
+                                    <div className='bgblue' style={{ width: '100%', margin: '0 auto' }}>
+                                        <div
+                                            key={index}
+                                            className='card animate__animated animate__backInLeft'
                                         >
-                                            {index + 1}. {player.name}
-                                        </strong>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                                            <span>Donaciones Totales:</span>
-                                            <span style={{ color: '#4caf50' }}>{player.totalDonations}</span>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                                            <span>Donaciones Recibidas Totales:</span>
-                                            <span style={{ color: '#673ab7' }}>{player.totalDonationsReceived}</span>
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 'bold' }}>
-                                            <span>Diferencia:</span>
-                                            <span
+                                            <strong
                                                 style={{
-                                                    color: donationDifference < 0 ? 'red' : 'green',
+                                                    fontSize: '16px',
+                                                    marginBottom: '5px',
+                                                    color: 'violet',
                                                 }}
                                             >
-                                                {donationDifference}
-                                            </span>
+                                                {index + 1}. {player.name}
+                                            </strong>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                                                <span>Donaciones Totales:</span>
+                                                <span style={{ color: '#4caf50' }}>{player.totalDonations}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                                                <span>Donaciones Recibidas Totales:</span>
+                                                <span style={{ color: '#673ab7' }}>{player.totalDonationsReceived}</span>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 'bold' }}>
+                                                <span>Diferencia:</span>
+                                                <span
+                                                    style={{
+                                                        color: donationDifference < 0 ? 'red' : 'green',
+                                                    }}
+                                                >
+                                                    {donationDifference}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
                                     </div>
                                 );
                             })}

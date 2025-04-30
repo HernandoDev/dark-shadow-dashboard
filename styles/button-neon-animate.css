@@ -18,8 +18,8 @@
   .hacker-button {
     position: relative;
     width: 280px;
-    height: 90px;
-    font-size: 1.6em;
+    height: 50px;
+    font-size: 1em;
     font-family: "Courier New", monospace;
     font-weight: bolder;
     color: #e6e6fa; /* Lavender for clear contrast */
@@ -58,6 +58,98 @@
     animation: neon-flicker 1.8s infinite;
     z-index: -1;
     box-shadow: 0 0 15px rgba(106, 13, 173, 0.5);
+  }
+  
+  /* Green button styles */
+  .green-hacker-button {
+    position: relative;
+    width: 280px;
+    height: 50px;
+    font-size: 0.9em;
+    font-family: "Courier New", monospace;
+    font-weight: bolder;
+    color: #e6ffe6; /* Light green for clear contrast */
+    background: #1a4a2a; /* Dark green background */
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.3s ease,
+      background 0.3s ease,
+      color 0.3s ease;
+    z-index: 2;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    text-shadow:
+      0 0 5px #00ff00,
+      0 0 10px #00cc00; /* Neon green glow for readability */
+  }
+  
+  /* Green neon frame */
+  .green-neon-frame {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: calc(100% + 10px);
+    border: 3px solid #00ff00;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    animation: green-neon-flicker 1.8s infinite;
+    z-index: -1;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+  }
+  
+  /* Blue button styles */
+  .blue-hacker-button {
+    position: relative;
+    width: 280px;
+    height: 50px;
+    font-size: 0.9em;
+    font-family: "Courier New", monospace;
+    font-weight: bolder;
+    color: #e6f0ff; /* Light blue for clear contrast */
+    background: #4775d2; /* Dark blue background */
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.3s ease,
+      background 0.3s ease,
+      color 0.3s ease;
+    z-index: 2;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    text-shadow:
+      0 0 5px #008cff,
+      0 0 10px #005fcc; /* Neon blue glow for readability */
+  }
+  
+  /* Blue neon frame */
+  .blue-neon-frame {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: calc(100% + 10px);
+    border: 3px solid #008cff;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    animation: blue-neon-flicker 1.8s infinite;
+    z-index: -1;
+    box-shadow: 0 0 15px rgba(0, 140, 255, 0.5);
   }
   
   /* Circuit traces */
@@ -258,6 +350,44 @@
     animation: text-glow-pulse 1s infinite;
   }
   
+  /* Hover effects for green button */
+  .green-hacker-button:hover {
+    transform: scale(1.12) skew(-4deg);
+    box-shadow:
+      0 0 60px #00ff00,
+      0 0 120px rgba(0, 255, 0, 0.7),
+      inset 0 0 40px rgba(0, 255, 0, 0.4);
+    background: #2a6a3a; /* Lighter dark green */
+    color: #f0fff0; /* White-green for max clarity */
+    text-shadow:
+      0 0 10px #00ff00,
+      0 0 20px #00cc00;
+  }
+  
+  .green-hacker-button:hover .green-neon-frame {
+    animation: green-neon-flicker 0.4s infinite;
+    border-color: #00cc00;
+  }
+  
+  /* Hover effects for blue button */
+  .blue-hacker-button:hover {
+    transform: scale(1.12) skew(-4deg);
+    box-shadow:
+      0 0 60px #008cff,
+      0 0 120px rgba(0, 140, 255, 0.7),
+      inset 0 0 40px rgba(0, 140, 255, 0.4);
+    background: #2a3a6a; /* Lighter dark blue */
+    color: #f0f8ff; /* White-blue for max clarity */
+    text-shadow:
+      0 0 10px #008cff,
+      0 0 20px #005fcc;
+  }
+  
+  .blue-hacker-button:hover .blue-neon-frame {
+    animation: blue-neon-flicker 0.4s infinite;
+    border-color: #005fcc;
+  }
+  
   /* Click effects */
   .hacker-button:active {
     transform: scale(0.92) skew(4deg);
@@ -269,6 +399,32 @@
   
   .hacker-button:active .neon-frame {
     border-color: #8a2be2;
+  }
+  
+  /* Click effects for green button */
+  .green-hacker-button:active {
+    transform: scale(0.92) skew(4deg);
+    box-shadow: 0 0 25px #00ff00;
+    background: #3a8a4a; /* Even lighter green */
+    color: #e6ffe6;
+    text-shadow: 0 0 15px #00cc00;
+  }
+  
+  .green-hacker-button:active .green-neon-frame {
+    border-color: #00cc00;
+  }
+  
+  /* Click effects for blue button */
+  .blue-hacker-button:active {
+    transform: scale(0.92) skew(4deg);
+    box-shadow: 0 0 25px #008cff;
+    background: #3a4a8a; /* Even lighter blue */
+    color: #e6f0ff;
+    text-shadow: 0 0 15px #005fcc;
+  }
+  
+  .blue-hacker-button:active .blue-neon-frame {
+    border-color: #005fcc;
   }
   
   /* Animations */
@@ -302,6 +458,56 @@
     80% {
       opacity: 0.95;
       box-shadow: 0 0 25px rgba(106, 13, 173, 0.7);
+    }
+  }
+  
+  /* Green neon flicker animation */
+  @keyframes green-neon-flicker {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    }
+    20% {
+      opacity: 0.7;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+    40% {
+      opacity: 0.9;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+    }
+    60% {
+      opacity: 0.6;
+      box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+    }
+    80% {
+      opacity: 0.95;
+      box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
+    }
+  }
+  
+  /* Blue neon flicker animation */
+  @keyframes blue-neon-flicker {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 15px rgba(0, 140, 255, 0.5);
+    }
+    20% {
+      opacity: 0.7;
+      box-shadow: 0 0 10px rgba(0, 140, 255, 0.3);
+    }
+    40% {
+      opacity: 0.9;
+      box-shadow: 0 0 20px rgba(0, 140, 255, 0.6);
+    }
+    60% {
+      opacity: 0.6;
+      box-shadow: 0 0 5px rgba(0, 140, 255, 0.2);
+    }
+    80% {
+      opacity: 0.95;
+      box-shadow: 0 0 25px rgba(0, 140, 255, 0.7);
     }
   }
   
@@ -355,4 +561,3 @@
       transform: translateY(100%);
     }
   }
-  

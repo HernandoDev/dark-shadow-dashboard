@@ -375,9 +375,46 @@ const AttackLog: React.FC = () => {
                 {(typeof window !== 'undefined' &&
                     (localStorage.getItem('username') === 'nandods' ||
                         (localStorage.getItem('username') === 'gaboadmin' && localStorage.getItem('clanTag') === '%232RG9R9JVP'))) && (
-                        <Button auto color="success" icon={<Plus />} onClick={openModal}>
-                            Agregar Ataque
-                        </Button>
+
+                        <div style={{ padding: '20px' }} className='ButtonNeonAnimate'>
+                            <div className="grid-bg">
+                                <div className="grid-line"></div>
+                                <div className="grid-line"></div>
+                                <div className="grid-line"></div>
+                                <div className="grid-line"></div>
+                                <div className="grid-line"></div>
+                            </div>
+                            <div className="button-container">
+                                <button onClick={openModal} className="green-hacker-button" data-text="+ Agregar Ataque">
+                                    + Agregar Ataque
+                                    <div className="green-neon-frame"></div>
+                                    <div className="circuit-traces">
+                                        <div className="circuit-trace"></div>
+                                        <div className="circuit-trace"></div>
+                                        <div className="circuit-trace"></div>
+                                        <div className="circuit-trace"></div>
+                                        <div className="circuit-trace"></div>
+                                    </div>
+                                    <div className="code-fragments">
+                                        <span className="code-fragment">GUARDAR</span>
+                                        <span className="code-fragment">PROGRESO</span>
+                                        <span className="code-fragment">JUAGORES</span>
+                                        <span className="code-fragment">CONTROL</span>
+
+                                    </div>
+                                    <div className="interference"></div>
+                                    <div className="scan-bars">
+                                        <div className="scan-bar"></div>
+                                        <div className="scan-bar"></div>
+                                        <div className="scan-bar"></div>
+                                    </div>
+                                    <div className="text-glow"></div>
+                                </button>
+                            </div>
+                        </div>
+                        // <Button auto color="success" icon={<Plus />} onClick={openModal}>
+                        //     Agregar Ataque
+                        // </Button>
                     )}
             </div>
             <div style={{ marginBottom: '20px' }}>

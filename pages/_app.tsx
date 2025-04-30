@@ -5,6 +5,7 @@ import '../styles/war-info.css';
 import 'animate.css';
 import '../styles/loader.css'; // Import the new loader styles
 import '../styles/button-neon.css'; // Import the new loader styles
+import '../styles/button-tabs-animate.css'; // Import the new loader styles
 import '../styles/button-neon-animate.css'; // Import the new loader styles
 
 import '../styles/custom-input.css'; // Add this line

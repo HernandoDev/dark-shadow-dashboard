@@ -539,47 +539,38 @@ const WarInfoPage = () => {
       <p style={{ marginBottom: '20px', fontSize: '16px', lineHeight: '1.5' }}>
         En esta ventana se consultarán todos los clanes de una guerra o liga, obteniendo la media del nivel de héroes y ayuntamiento de cada jugador. Se buscarán los registros de guerra del clan en los últimos 60 días y se compararán con los de nuestro clan para mostrar la diferencia de nivel.
       </p>
-
+<br />
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
         <button
+          className={`tabButton ${activeTab === 'currentWar' ? 'active' : ''}`}
           onClick={() => setActiveTab('currentWar')}
-          style={{
-            padding: '10px 20px',
-            border: 'none',
-            borderBottom: activeTab === 'currentWar' ? '2px solid violet' : 'none',
-            background: 'none',
-            cursor: 'pointer',
-            fontWeight: activeTab === 'currentWar' ? 'bold' : 'normal',
-          }}
         >
-          Estado de Guerra Actual
+          <span>Estado de Guerra Actual</span>
+          <div className="top"></div>
+          <div className="left"></div>
+          <div className="bottom"></div>
+          <div className="right"></div>
         </button>
         <button
+          className={`tabButton ${activeTab === 'MensajeGuerra' ? 'active' : ''}`}
           onClick={() => setActiveTab('MensajeGuerra')}
-          style={{
-            padding: '10px 20px',
-            border: 'none',
-            borderBottom: activeTab === 'MensajeGuerra' ? '2px solid violet' : 'none',
-            background: 'none',
-            cursor: 'pointer',
-            fontWeight: activeTab === 'MensajeGuerra' ? 'bold' : 'normal',
-          }}
         >
-          Mensaje de Guerra
+          <span> Mensaje de Guerra</span>
+          <div className="top"></div>
+          <div className="left"></div>
+          <div className="bottom"></div>
+          <div className="right"></div>
         </button>
         <button
+          className={`tabButton ${activeTab === 'warLogs' ? 'active' : ''}`}
           onClick={() => setActiveTab('warLogs')}
-          style={{
-            padding: '10px 20px',
-            border: 'none',
-            borderBottom: activeTab === 'warLogs' ? '2px solid violet' : 'none',
-            background: 'none',
-            cursor: 'pointer',
-            fontWeight: activeTab === 'warLogs' ? 'bold' : 'normal',
-          }}
         >
-          Registros de Guerras Pasadas
+          <span>  Registros de Guerras Pasadas</span>
+          <div className="top"></div>
+          <div className="left"></div>
+          <div className="bottom"></div>
+          <div className="right"></div>
         </button>
       </div>
 
@@ -922,41 +913,42 @@ const WarInfoPage = () => {
           >
             {generateFilteredWarMessage(fullWarDetails)}
           </pre>
-          <div className="grid-bg">
-            <div className="grid-line"></div>
-            <div className="grid-line"></div>
-            <div className="grid-line"></div>
-            <div className="grid-line"></div>
-            <div className="grid-line"></div>
-          </div>
-          <div className="button-container">
-            <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))}className="hacker-button" data-text=" Copiar Mensaje">
-            Copiar Mensaje
-              <div className="neon-frame"></div>
-              <div className="circuit-traces">
-                <div className="circuit-trace"></div>
-                <div className="circuit-trace"></div>
-                <div className="circuit-trace"></div>
-                <div className="circuit-trace"></div>
-                <div className="circuit-trace"></div>
-              </div>
-              <div className="code-fragments">
-                <span className="code-fragment">COPIAR</span>
-                <span className="code-fragment">PEGAR</span>
-                <span className="code-fragment">PEGAR</span>
-                <span className="code-fragment">ENVIAR</span>
+          <div className='ButtonNeonAnimate'>
+            <div className="grid-bg">
+              <div className="grid-line"></div>
+              <div className="grid-line"></div>
+              <div className="grid-line"></div>
+              <div className="grid-line"></div>
+              <div className="grid-line"></div>
+            </div>
+            <div className="button-container">
+              <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))} className="hacker-button" data-text=" Copiar Mensaje">
+                Copiar Mensaje
+                <div className="neon-frame"></div>
+                <div className="circuit-traces">
+                  <div className="circuit-trace"></div>
+                  <div className="circuit-trace"></div>
+                  <div className="circuit-trace"></div>
+                  <div className="circuit-trace"></div>
+                  <div className="circuit-trace"></div>
+                </div>
+                <div className="code-fragments">
+                  <span className="code-fragment">COPIAR</span>
+                  <span className="code-fragment">PEGAR</span>
+                  <span className="code-fragment">PEGAR</span>
+                  <span className="code-fragment">ENVIAR</span>
 
-              </div>
-              <div className="interference"></div>
-              <div className="scan-bars">
-                <div className="scan-bar"></div>
-                <div className="scan-bar"></div>
-                <div className="scan-bar"></div>
-              </div>
-              <div className="text-glow"></div>
-            </button>
+                </div>
+                <div className="interference"></div>
+                <div className="scan-bars">
+                  <div className="scan-bar"></div>
+                  <div className="scan-bar"></div>
+                  <div className="scan-bar"></div>
+                </div>
+                <div className="text-glow"></div>
+              </button>
+            </div>
           </div>
-
           {/* <Button
             className="cyber-button"
             onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))}

@@ -245,15 +245,49 @@ const ProgressInfo: React.FC = () => {
             <h1>Informacion de progreso de los jugadores</h1>
             <p>En esta ventana verás las mejoras de héroes y tropas entre dos periodos de tiempo. Si deseas iniciar un nuevo punto de guardado, pulsa el botón "Crear guardado".</p>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <Button bordered color="success" onClick={saveProgress}>
-                    Guardar Progreso
-                </Button>
+                <div style={{ padding: '20px' }} className='ButtonNeonAnimate'>
+                    <div className="grid-bg">
+                        <div className="grid-line"></div>
+                        <div className="grid-line"></div>
+                        <div className="grid-line"></div>
+                        <div className="grid-line"></div>
+                        <div className="grid-line"></div>
+                    </div>
+                    <div className="button-container">
+                        <button onClick={saveProgress} className="green-hacker-button" data-text="Guardar Progreso">
+                            Guardar Progreso
+                            <div className="green-neon-frame"></div>
+                            <div className="circuit-traces">
+                                <div className="circuit-trace"></div>
+                                <div className="circuit-trace"></div>
+                                <div className="circuit-trace"></div>
+                                <div className="circuit-trace"></div>
+                                <div className="circuit-trace"></div>
+                            </div>
+                            <div className="code-fragments">
+                                <span className="code-fragment">GUARDAR</span>
+                                <span className="code-fragment">PROGRESO</span>
+                                <span className="code-fragment">JUAGORES</span>
+                                <span className="code-fragment">CONTROL</span>
+
+                            </div>
+                            <div className="interference"></div>
+                            <div className="scan-bars">
+                                <div className="scan-bar"></div>
+                                <div className="scan-bar"></div>
+                                <div className="scan-bar"></div>
+                            </div>
+                            <div className="text-glow"></div>
+                        </button>
+                    </div>
+                </div>
+
             </div>
-          
+
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
                 <select
-                            className='input'
-                
+                    className='input'
+
                     value={selectedOldDate || ''}
                     onChange={(e) => {
                         const newOldDate = e.target.value;
@@ -270,7 +304,7 @@ const ProgressInfo: React.FC = () => {
                     ))}
                 </select>
                 <select
-                            className='input'
+                    className='input'
 
                     value={selectedNewDate || ''}
                     onChange={(e) => {
@@ -294,7 +328,7 @@ const ProgressInfo: React.FC = () => {
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                 <input
-                className="input"
+                    className="input"
                     type="text"
                     placeholder="Filtrar por nombre de jugador"
                     value={playerFilter}
@@ -330,7 +364,7 @@ const ProgressInfo: React.FC = () => {
                     .filter((entry) => entry.name.toLowerCase().includes(playerFilter.toLowerCase()))
                     .map((entry, index) => (
                         <div
-                        className="animate__animated animate__backInLeft card"
+                            className="animate__animated animate__backInLeft card"
                             key={index}
                             style={{
                                 border: '1px solid #ccc',
@@ -341,12 +375,12 @@ const ProgressInfo: React.FC = () => {
                                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                                 width: '300px',
                             }}
-                            
+
                         >
                             <h2 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>{entry.name}</h2>
-                            <ul  style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                 {entry.changes.map((change: any, idx: number) => (
-                                    <li   key={idx} style={{ marginBottom: '5px' }}>
+                                    <li key={idx} style={{ marginBottom: '5px' }}>
                                         {change.type}: {change.name} (De nivel {change.oldLevel} a nivel {change.newLevel})
                                     </li>
                                 ))}
