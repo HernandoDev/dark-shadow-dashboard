@@ -922,7 +922,43 @@ const WarInfoPage = () => {
           >
             {generateFilteredWarMessage(fullWarDetails)}
           </pre>
-          <Button
+          <div className="grid-bg">
+            <div className="grid-line"></div>
+            <div className="grid-line"></div>
+            <div className="grid-line"></div>
+            <div className="grid-line"></div>
+            <div className="grid-line"></div>
+          </div>
+          <div className="button-container">
+            <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))}className="hacker-button" data-text=" Copiar Mensaje">
+            Copiar Mensaje
+              <div className="neon-frame"></div>
+              <div className="circuit-traces">
+                <div className="circuit-trace"></div>
+                <div className="circuit-trace"></div>
+                <div className="circuit-trace"></div>
+                <div className="circuit-trace"></div>
+                <div className="circuit-trace"></div>
+              </div>
+              <div className="code-fragments">
+                <span className="code-fragment">COPIAR</span>
+                <span className="code-fragment">PEGAR</span>
+                <span className="code-fragment">PEGAR</span>
+                <span className="code-fragment">ENVIAR</span>
+
+              </div>
+              <div className="interference"></div>
+              <div className="scan-bars">
+                <div className="scan-bar"></div>
+                <div className="scan-bar"></div>
+                <div className="scan-bar"></div>
+              </div>
+              <div className="text-glow"></div>
+            </button>
+          </div>
+
+          {/* <Button
+            className="cyber-button"
             onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))}
             style={{
               marginTop: '10px',
@@ -934,7 +970,7 @@ const WarInfoPage = () => {
             }}
           >
             Copiar Mensaje
-          </Button>
+          </Button> */}
         </div>
       )}
 
@@ -991,7 +1027,7 @@ const WarInfoPage = () => {
                 {savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)).length > 0 ? (
                   <div>
                     <input
-                    className="input"
+                      className="input"
                       type="text"
                       placeholder="Filtrar por nombre de jugador"
                       value={filterPlayerName}
