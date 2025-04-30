@@ -79,23 +79,21 @@ const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksP
 const generateWarMessage = (warDetails: any) => {
   if (!warDetails) return '';
 
+  
   const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
-  const myClan = warDetails.find((clan: any) => clan.tag === clanTag);
+  const myClan = warDetails.clan
   if (!myClan) return 'No se encontró información de tu clan.';
 
   const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
   const noAttack: string[] = [];
 
   myClan.members.forEach((member: any) => {
-
-    if (member.attacks && member.attacks.length > 1) {
+    if (member.attacks && member.attacks.length > 0) {
       member.attacks.forEach((attack: any) => {
         const stars = (attack.stars || 0) as 1 | 2 | 3;
 
         // Find the target clan and member by searching for the defenderTag
-        const targetClan = warDetails.find((clan: any) =>
-          clan.members.some((m: any) => m.tag === attack.defenderTag)
-        );
+        const targetClan =warDetails.opponent
         const targetClanName = targetClan ? targetClan.name : 'Desconocido';
         const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
 
@@ -110,6 +108,8 @@ const generateWarMessage = (warDetails: any) => {
           starsGroup[stars]?.push(
             `* ${member.mapPosition}. ${member.name} TH${member.townhallLevel} ${comparisonEmoji} ${playerEnemy.mapPosition}.- ${playerEnemy.name}. (TH${playerEnemy.townhallLevel})`
           );
+          console.log(starsGroup);
+          
         }
       });
     } else {
@@ -119,6 +119,7 @@ const generateWarMessage = (warDetails: any) => {
       noAttack.push(`* ${member.mapPosition}. ${member.name} → no atacó (Faltan ${attacksMissing} ataque(s))`);
     }
   });
+  debugger
   return `
 📢 Estado de la guerra: ${myClan.status || 'Desconocido'}
 🌟🌟🌟
@@ -158,6 +159,7 @@ const WarInfoPage = () => {
   const [includeOneMissingAttack, setIncludeOneMissingAttack] = useState(false);
   const [includeTwoMissingAttacks, setIncludeTwoMissingAttacks] = useState(false);
   const [filterPlayerName, setFilterPlayerName] = useState<string>(''); // State for filtering attacks by player name
+  const [currentWarDetails, setcurrentWarDetails] = useState<any>({}); // State for filtering attacks by player name
 
   useEffect(() => {
     fetchSavedAttacks()
@@ -186,6 +188,7 @@ const WarInfoPage = () => {
           setFullWarDetails(fullDetails);
         } else {
           const currentWarDetails = await APIClashService.getClanCurrentWar();
+          setcurrentWarDetails(currentWarDetails);
           const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
           const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
 
@@ -452,36 +455,37 @@ const WarInfoPage = () => {
   };
 
   const generateFilteredWarMessage = (warDetails: any) => {
-    if (!warSaves || warSaves.length === 0) return 'No hay registros de guerra disponibles.';
+    console.log(currentWarDetails);
 
     // Get the latest save
-    const latestSave = warSaves[warSaves.length - 1];
-    const state = latestSave.content.state;
+    const latestSave = currentWarDetails;
+    const state = latestSave.state;
     const now = new Date();
-
+    
     let additionalInfo = '';
 
     if (state === "preparation") {
       const preparationEndTime = new Date(
-        `${latestSave.content.startTime.substring(0, 4)}-${latestSave.content.startTime.substring(4, 6)}-${latestSave.content.startTime.substring(6, 8)}T${latestSave.content.startTime.substring(9, 11)}:${latestSave.content.startTime.substring(11, 13)}:${latestSave.content.startTime.substring(13, 15)}.000Z`
+        `${latestSave.startTime.substring(0, 4)}-${latestSave.startTime.substring(4, 6)}-${latestSave.startTime.substring(6, 8)}T${latestSave.startTime.substring(9, 11)}:${latestSave.startTime.substring(11, 13)}:${latestSave.startTime.substring(13, 15)}.000Z`
       );
       const timeRemaining = Math.max(0, preparationEndTime.getTime() - now.getTime());
       const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
       additionalInfo = `La guerra está en preparación. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
     } else if (state === "inWar") {
+      
       const battleEndTime = new Date(
-        `${latestSave.content.endTime.substring(0, 4)}-${latestSave.content.endTime.substring(4, 6)}-${latestSave.content.endTime.substring(6, 8)}T${latestSave.content.endTime.substring(9, 11)}:${latestSave.content.endTime.substring(11, 13)}:${latestSave.content.endTime.substring(13, 15)}.000Z`
+        `${latestSave.endTime.substring(0, 4)}-${latestSave.endTime.substring(4, 6)}-${latestSave.endTime.substring(6, 8)}T${latestSave.endTime.substring(9, 11)}:${latestSave.endTime.substring(11, 13)}:${latestSave.endTime.substring(13, 15)}.000Z`
       );
       const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
       const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
 
       const clanTag = getClanTag().replace('%23', '#');
-      const isMainClan = latestSave.content.clan.tag === clanTag;
+      const isMainClan = latestSave.clan.tag === clanTag;
 
-      const mainClan = isMainClan ? latestSave.content.clan : latestSave.content.opponent;
-      const opponentClan = isMainClan ? latestSave.content.opponent : latestSave.content.clan;
+      const mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
+      const opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
 
       if (mainClan.stars > opponentClan.stars) {
         additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
@@ -498,7 +502,7 @@ const WarInfoPage = () => {
       }
     }
 
-    const fullMessage = generateWarMessage(warDetails);
+    const fullMessage = generateWarMessage(currentWarDetails);
     const sections = fullMessage.split('🌟🌟🌟');
 
     const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
