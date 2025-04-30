@@ -381,14 +381,12 @@ const AttackLog: React.FC = () => {
                 )}
             </div>
             <div style={{ marginBottom: '20px' }}>
-                <Input
-                    clearable
-                    bordered
+                <input
+                className="input"
                     placeholder="Buscar jugador"
                     value={playerSearchTerm}
                     onChange={handlePlayerSearch}
-                    css={{ marginBottom: '10px', width: '100%' }}
-                    labelLeft={<User size={16} />}
+                    style={{ marginBottom: '25px', width: '100%' }}
                 />
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
                     <div style={{ width: '50%' }}>

@@ -523,6 +523,7 @@ export const TableWrapper = () => {
          >
             {(Object.keys(minLevels) as Array<keyof typeof minLevels>).map((key) => (
                <Input
+               className="input"
                   key={key}
                   label={`Nivel Minimo ${key.toUpperCase()}`}
                   type="number"
@@ -544,6 +545,7 @@ export const TableWrapper = () => {
             }}
          >
             <Input
+            className="input"
                clearable
                placeholder="Buscar jugador"
                value={searchQuery}

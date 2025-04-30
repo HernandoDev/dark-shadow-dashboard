@@ -989,6 +989,7 @@ const WarInfoPage = () => {
                 {savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)).length > 0 ? (
                   <div>
                     <input
+                    className="input"
                       type="text"
                       placeholder="Filtrar por nombre de jugador"
                       value={filterPlayerName}

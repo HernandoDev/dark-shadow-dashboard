@@ -290,6 +290,7 @@ const ProgressInfo: React.FC = () => {
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                 <input
+                className="input"
                     type="text"
                     placeholder="Filtrar por nombre de jugador"
                     value={playerFilter}

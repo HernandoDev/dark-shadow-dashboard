@@ -4,6 +4,7 @@ import '../styles/checkbox.css';
 import '../styles/war-info.css';
 import 'animate.css';
 import '../styles/loader.css'; // Import the new loader styles
+import '../styles/custom-input.css'; // Add this line
 import type { AppProps } from 'next/app';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';

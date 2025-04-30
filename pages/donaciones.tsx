@@ -116,10 +116,10 @@ const DonacionesCapital = () => {
                         placeholder="Filtrar por nombre"
                         value={nameFilter}
                         onChange={(e) => setNameFilter(e.target.value)}
+                        className="input"
                         style={{
                             marginBottom: '10px',
                             padding: '8px',
-                            border: '1px solid violet',
                             borderRadius: '4px',
                             width: '100%',
                         }}
