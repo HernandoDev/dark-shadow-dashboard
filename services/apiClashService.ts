@@ -145,5 +145,25 @@ export const APIClashService = {
       throw new Error('Error al obtener los registros de guerras');
     }
     return res.json();
+  },
+
+  saveReport: async (reportData: { player: string; report: string }) => {
+    const res = await fetch(`${baseUrl}/reports/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reportData),
+    });
+    if (!res.ok) {
+        throw new Error('Error al guardar el reporte');
+    }
+    return res.json();
+  },
+
+  getReports: async () => {
+    const res = await fetch(`${baseUrl}/reports`);
+    if (!res.ok) {
+        throw new Error('Error al obtener los reportes');
+    }
+    return res.json();
   }
 };
