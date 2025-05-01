@@ -14,6 +14,8 @@ const Login = () => {
             gaboadmin: 'gaboadmin',
             mrayo123: 'mrayo123',
             nandods: 'nandods',
+            maxpvp: 'maxpvp',
+
         };
 
         if (validUsers[username] === password) {
