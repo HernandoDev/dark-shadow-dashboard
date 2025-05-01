@@ -139,7 +139,7 @@ export const APIClashService = {
 
   deleteAttack: async (attackId: string) => {
     const res = await fetch(`${baseUrl}/attack-log/delete`, {
-        method: 'POST',
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({id: attackId, clanTag: getClanTag()}),
     });
