@@ -136,6 +136,20 @@ export const APIClashService = {
     return res.json();
   },
 
+
+  deleteAttack: async (attackId: string) => {
+    const res = await fetch(`${baseUrl}/attack-log/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({id: attackId, clanTag: getClanTag()}),
+    });
+    if (!res.ok) {
+        throw new Error('Error al borrar el ataque');
+    }
+    return res.json();
+  },
+ 
+
   getWarSaves: async () => {
     const clanTag = getClanTag();
     if (!clanTag) throw new Error('Clan tag not set');

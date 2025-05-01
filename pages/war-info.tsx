@@ -154,6 +154,23 @@ const copyToClipboard = (text: string) => {
   });
 };
 
+const deleteAttack = async (attackId: string) => {
+  try {
+    debugger
+    const  result = await APIClashService.deleteAttack(attackId);
+    debugger
+    if (result) {
+      window.location.reload(); // Reload the page to reflect the changes
+      console.log(`Attack with ID ${attackId} deleted successfully.`);
+
+    } else {
+      console.error(`Failed to delete attack with ID ${attackId}.`);
+    }
+  } catch (error) {
+    console.error(`Error deleting attack with ID ${attackId}:`, error);
+  }
+};
+
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
@@ -548,7 +565,7 @@ const WarInfoPage = () => {
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
   ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks+1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
+  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks + 1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
     `.trim();
   };
 
@@ -1057,6 +1074,7 @@ const WarInfoPage = () => {
                 <h3>Ataques Guardados</h3>
                 {savedAttacks.filter((attack) => attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)).length > 0 ? (
                   <div>
+
                     <input
                       className="input"
                       type="text"
@@ -1129,6 +1147,7 @@ const WarInfoPage = () => {
                     {includeThreeStars &&
                       savedAttacks.some((attack) => attack.stars === 3 && attack.warTimestamp === extractTimestampFromFileName(selectedWar.fileName)) && (
                         <div>
+
                           <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '10px' }}>Ataques de 3 Estrellas</h3>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
                             {savedAttacks
@@ -1136,6 +1155,7 @@ const WarInfoPage = () => {
                               .map((attack, index) => (
                                 <div key={index} className="bgblue" style={{ width: '100%' }}>
                                   <div className="card">
+
                                     <h3 style={{ textAlign: 'center', color: 'violet', marginBottom: '20px' }}>
                                       <User size={16} style={{ marginRight: '5px' }} />
                                       {attack.member}
@@ -1194,6 +1214,11 @@ const WarInfoPage = () => {
                                         </li>
                                       )}
                                     </ul>
+                                    <i
+                                      style={{ textAlign: 'right', color: 'red', cursor: 'pointer' }}
+                                      className="bi bi-trash"
+                                      onClick={() => deleteAttack(attack.id)}
+                                    ></i>
                                   </div>
                                 </div>
                               ))}
