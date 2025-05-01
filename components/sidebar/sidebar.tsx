@@ -72,7 +72,7 @@ export const SidebarWrapper = () => {
                      <SidebarItem
                         isActive={router.pathname === '/accounts'}
                         title="Requisitos minimos"
-                        icon={<AccountsIcon />}
+                        icon={<FilterIcon />}
                         href="accounts"
                      />
                      <SidebarItem
@@ -102,14 +102,20 @@ export const SidebarWrapper = () => {
                      <SidebarItem
                         isActive={router.pathname === '/donaciones'}
                         title="Registro de donaciones"
-                        icon={<AccountsIcon />}
+                        icon={<PaymentsIcon />}
                         href="donaciones"
                      />
                      <SidebarItem
                         isActive={router.pathname === '/reportes'}
                         title="Reporte de Jugadores"
-                        icon={<AccountsIcon />}
+                        icon={<ChangeLogIcon />}
                         href="reportes"
+                     />
+                     <SidebarItem
+                        isActive={router.pathname === '/player-info'}
+                        title="Perfiles de Jugadores"
+                        icon={<CustomersIcon />}
+                        href="player-info"
                      />
                   </SidebarMenu>
                   <h6>Selecionar Clan</h6>
