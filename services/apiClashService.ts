@@ -69,7 +69,8 @@ export const APIClashService = {
   },
 
   getPlayerInfo: async (playerTag: string) => {
-    const res = await fetch(`${baseUrl}/players/${playerTag}`);
+    const encodedTag = playerTag.replace('#', '%23'); // Ensure the tag is encoded
+    const res = await fetch(`${baseUrl}/players/${encodedTag}`);
     return res.json();
   },
 

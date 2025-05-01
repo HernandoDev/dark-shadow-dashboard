@@ -7,9 +7,10 @@ import DonationsTab from '../components/player-info/DonationsTab';
 
 const PlayerInfo = () => {
   const [warSaves, setWarSaves] = useState<any[]>([]);
-  const [clanMembers, setClanMembers] = useState<string[]>([]);
+  const [clanMembers, setClanMembers] = useState<{ name: string; tag: string }[]>([]); // Update type
   const [filteredMembers, setFilteredMembers] = useState<string[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
+  const [selectedPlayerTag, setSelectedPlayerTag] = useState<string>(''); // Add state for player tag
   const [playerWarRecords, setPlayerWarRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingWarSaves, setLoadingWarSaves] = useState(false);
@@ -32,9 +33,8 @@ const PlayerInfo = () => {
     setLoading(true);
     try {
       const response = await APIClashService.getClanMembers();
-      const memberNames = response.items.map((member: { name: string }) => member.name);
-      setClanMembers(memberNames);
-      setFilteredMembers(memberNames);
+      setClanMembers(response.items); // Store full member objects
+      setFilteredMembers(response.items.map((member: { name: string }) => member.name)); // Filter by name
     } catch (error) {
       console.error('Error fetching clan members:', error);
     } finally {
@@ -53,11 +53,15 @@ const PlayerInfo = () => {
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const filterText = event.target.value.toLowerCase();
-    setFilteredMembers(clanMembers.filter((name) => name.toLowerCase().includes(filterText)));
+    setFilteredMembers(clanMembers.map((member) => member.name).filter((name) => name.toLowerCase().includes(filterText)));
   };
 
   const handlePlayerSelection = (playerName: string) => {
     setSelectedPlayer(playerName);
+    const selectedMember = clanMembers.find((member) => member.name === playerName); // Find member object
+    if (selectedMember) {
+      setSelectedPlayerTag(selectedMember.tag.replace('#', '%23')); // Encode the player's tag
+    }
     const records = filterWarRecords(warSaves, playerName);
     setPlayerWarRecords(records);
   };
@@ -121,7 +125,7 @@ const PlayerInfo = () => {
           attackPerformance={attackPerformance}
         />
       )}
-      {activeTab === 'donaciones' && <DonationsTab selectedPlayer={selectedPlayer} />}
+      {activeTab === 'donaciones' && <DonationsTab selectedPlayer={selectedPlayer} selectedPlayerTag={selectedPlayerTag} />}
     </div>
   );
 };
