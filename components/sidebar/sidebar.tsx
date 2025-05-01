@@ -53,8 +53,8 @@ export const SidebarWrapper = () => {
       >
          {collapsed ? <Sidebar.Overlay onClick={setCollapsed} /> : null}
 
-         <Sidebar style={{marginTop:'40px'}} collapsed={collapsed}>
-        
+         <Sidebar style={{ marginTop: '40px' }} collapsed={collapsed}>
+
             <Flex
                direction={'column'}
                justify={'between'}
@@ -99,16 +99,22 @@ export const SidebarWrapper = () => {
                         icon={<DevIcon />}
                         href="attack-log"
                      />
-                       <SidebarItem
+                     <SidebarItem
                         isActive={router.pathname === '/donaciones'}
                         title="Registro de donaciones"
                         icon={<AccountsIcon />}
                         href="donaciones"
                      />
+                     <SidebarItem
+                        isActive={router.pathname === '/reportes'}
+                        title="Reporte de Jugadores"
+                        icon={<AccountsIcon />}
+                        href="reportes"
+                     />
                   </SidebarMenu>
                   <h6>Selecionar Clan</h6>
                   <select
-                  className='input'
+                     className='input'
                      value={clanTag}
                      onChange={handleClanChange}
                      style={{
