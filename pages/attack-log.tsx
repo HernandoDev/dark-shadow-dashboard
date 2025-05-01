@@ -618,7 +618,51 @@ const AttackLog: React.FC = () => {
                                     <User size={20} style={{ marginRight: '10px' }} />
                                     Ataques Filtrados
                                 </h2>
-
+                                {/* Player Summary */}
+                                {filteredPlayerAttacks.length > 0 && (
+                                    <div style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
+                                        <h3 style={{ color: 'violet' }}>Jugador: {filteredPlayerAttacks[0].member}</h3>
+                                        <p>
+                                            <strong>Media de Estrellas:</strong> {(
+                                                filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0) /
+                                                filteredPlayerAttacks.length
+                                            ).toFixed(2)}
+                                        </p>
+                                        <p>
+                                            <strong>Media de Porcentaje:</strong> {(
+                                                filteredPlayerAttacks.reduce((sum, attack) => sum + attack.percentage, 0) /
+                                                filteredPlayerAttacks.length
+                                            ).toFixed(2)}%
+                                        </p>
+                                        <p>
+                                            <strong>Ataques contra TH Superior:</strong> {
+                                                filteredPlayerAttacks.filter((attack) => {
+                                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                                    return memberTh < rivalTh;
+                                                }).length
+                                            }
+                                        </p>
+                                        <p>
+                                            <strong>Ataques contra TH Inferior:</strong> {
+                                                filteredPlayerAttacks.filter((attack) => {
+                                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                                    return memberTh > rivalTh;
+                                                }).length
+                                            }
+                                        </p>
+                                        <p>
+                                            <strong>Ataques contra Mismo TH:</strong> {
+                                                filteredPlayerAttacks.filter((attack) => {
+                                                    const memberTh = parseInt(attack.memberThLevel.replace('TH', ''), 10);
+                                                    const rivalTh = parseInt(attack.thRival.replace('TH', ''), 10);
+                                                    return memberTh === rivalTh;
+                                                }).length
+                                            }
+                                        </p>
+                                    </div>
+                                )}
                                 {/* Section: Ataques de 3 Estrellas */}
                                 {includeThreeStars && filteredPlayerAttacks.some((attack) => attack.stars === 3) && (
                                     <div>
