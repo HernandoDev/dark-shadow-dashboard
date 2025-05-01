@@ -70,7 +70,7 @@ const AttackLog: React.FC = () => {
     const [includeLowerTh, setIncludeLowerTh] = useState(false);
     const [includeEqualTh, setIncludeEqualTh] = useState(false);
 
-    const [selectAllFilters, setSelectAllFilters] = useState(false);
+    const [selectAllFilters, setSelectAllFilters] = useState(true);
 
     useEffect(() => {
         setIncludeThreeStars(selectAllFilters);
