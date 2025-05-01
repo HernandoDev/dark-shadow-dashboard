@@ -52,6 +52,7 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
     const [showHeroes, setShowHeroes] = useState(false);
     const [showHeroEquipment, setShowHeroEquipment] = useState(false);
     const [showSpells, setShowSpells] = useState(false);
+    const [showPets, setShowPets] = useState(false); // New state for pets section
 
     const getColorByLevelDifference = (currentLevel: number, maxLevel: number): string => {
         const difference = maxLevel - currentLevel;
@@ -60,6 +61,107 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
         if (difference <= 3) return 'yellow'; // Moderate difference
         return 'red'; // Significant difference
     };
+
+    const petNames = [
+        'L.A.S.S.I', 'Mighty Yak', 'Electro Owl', 'Unicorn', 'Phoenix',
+        'Poison Lizard', 'Diggy', 'Frosty', 'Spirit Fox', 'Angry Jelly', 'Sneezy'
+    ];
+
+    const translationMap: Record<string, string> = {
+        // Troops
+        'Barbarian': 'Bárbaro',
+        'Archer': 'Arquera',
+        'Goblin': 'Duende',
+        'Giant': 'Gigante',
+        'Wall Breaker': 'Rompemuros',
+        'Balloon': 'Globo',
+        'Wizard': 'Mago',
+        'Healer': 'Sanadora',
+        'Dragon': 'Dragón',
+        'P.E.K.K.A': 'P.E.K.K.A',
+        'Minion': 'Esbirro',
+        'Hog Rider': 'Montapuercos',
+        'Valkyrie': 'Valquiria',
+        'Golem': 'Gólem',
+        'Witch': 'Bruja',
+        'Lava Hound': 'Sabueso de Lava',
+        'Bowler': 'Lanzarrocas',
+        'Baby Dragon': 'Dragón Bebé',
+        'Miner': 'Minero',
+        'Super Barbarian': 'Súper Bárbaro',
+        'Super Archer': 'Súper Arquera',
+        'Super Wall Breaker': 'Súper Rompemuros',
+        'Super Giant': 'Súper Gigante',
+        'Wall Wrecker': 'Demoledor de Muros',
+        'Battle Blimp': 'Dirigible de Batalla',
+        'Yeti': 'Yeti',
+        'Sneaky Goblin': 'SuperDuende Furtivo',
+        'Super Miner': 'Súper Minero',
+        'Rocket Balloon': 'Globo Cohete',
+        'Ice Golem': 'Gólem de Hielo',
+        'Electro Dragon': 'Dragón Eléctrico',
+        'Stone Slammer': 'Aplastamuros',
+        'Inferno Dragon': 'Dragón Infernal',
+        'Super Valkyrie': 'Súper Valquiria',
+        'Dragon Rider': 'Jinete de Dragón',
+        'Super Witch': 'Súper Bruja',
+        'Siege Barracks': 'Cuartel de Asedio',
+        'Ice Hound': 'Sabueso de Hielo',
+        'Super Bowler': 'Súper Lanzarrocas',
+        'Super Dragon': 'Súper Dragón',
+        'Headhunter': 'Cazadora',
+        'Super Wizard': 'Súper Mago',
+        'Super Minion': 'Súper Esbirro',
+        'Log Launcher': 'Lanzatrones',
+        'Flame Flinger': 'Lanzallamas',
+        'Battle Drill': 'Taladro de Batalla',
+        'Electro Titan': 'Titán Eléctrico',
+        'Apprentice Warden': 'Guardián Aprendiz',
+        'Super Hog Rider': 'Súper Montapuercos',
+        'Root Rider': 'Jinete de Raíz',
+        'Druid': 'Druida',
+        'Thrower': 'Lanzador',
+        'Furnace': 'Horno',
+
+        // Pets
+        'L.A.S.S.I': 'L.A.S.S.I',
+        'Mighty Yak': 'Yak Mamut',
+        'Electro Owl': 'Búho Eléctrico',
+        'Unicorn': 'Unicornio',
+        'Phoenix': 'Fénix',
+        'Poison Lizard': 'Lagarto Venenoso',
+        'Diggy': 'Pangolin',
+        'Frosty': 'Morsa de Hielo',
+        'Spirit Fox': 'Zorro Espiritual',
+        'Angry Jelly': 'Medusa Furiosa',
+        'Sneezy': 'Achuss',
+
+        // Spells
+        'Lightning Spell': 'Hechizo de Rayo',
+        'Healing Spell': 'Hechizo de Curación',
+        'Rage Spell': 'Hechizo de Furia',
+        'Jump Spell': 'Hechizo de Salto',
+        'Freeze Spell': 'Hechizo de Hielo',
+        'Poison Spell': 'Hechizo de Veneno',
+        'Earthquake Spell': 'Hechizo de Terremoto',
+        'Haste Spell': 'Hechizo de Aceleración',
+        'Clone Spell': 'Hechizo de Clonación',
+        'Skeleton Spell': 'Hechizo de Esqueletos',
+        'Bat Spell': 'Hechizo de Murciélagos',
+        'Invisibility Spell': 'Hechizo de Invisibilidad',
+        'Recall Spell': 'Hechizo de Invocacion',
+        'Overgrowth Spell': 'Hechizo de Crecimiento',
+        'Revive Spell': 'Hechizo de Resurrección',
+
+        // Heroes
+        'Barbarian King': 'Rey Bárbaro',
+        'Archer Queen': 'Reina Arquera',
+        'Grand Warden': 'Gran Centinela',
+        'Royal Champion': 'Campeona Real',
+        'Minion Prince': 'Príncipe Esbirro',
+    };
+
+    const translate = (name: string): string => translationMap[name] || name;
 
     useEffect(() => {
         const fetchPlayerDonations = async () => {
@@ -114,16 +216,14 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
             </div>
         );
     }
-
+    let donationDifference;
     if (!playerDonations) {
-        return (
-            <div>
-                <p>No se encontraron datos de donaciones para {selectedPlayer}.</p>
-            </div>
-        );
+        donationDifference = 0
+
+    }else{
+         donationDifference = playerDonations.totalDonations - playerDonations.totalDonationsReceived;
     }
 
-    const donationDifference = playerDonations.totalDonations - playerDonations.totalDonationsReceived;
 
     return (
         <div>
@@ -134,11 +234,11 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
                 <div className="card animate__animated animate__backInLeft">
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                         <span>Donaciones Totales:</span>
-                        <span style={{ color: '#4caf50' }}>{playerDonations.totalDonations}</span>
+                        <span style={{ color: '#4caf50' }}>{playerDonations?.totalDonations}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                         <span>Donaciones Recibidas Totales:</span>
-                        <span style={{ color: '#673ab7' }}>{playerDonations.totalDonationsReceived}</span>
+                        <span style={{ color: '#673ab7' }}>{playerDonations?.totalDonationsReceived}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 'bold' }}>
                         <span>Diferencia:</span>
@@ -178,11 +278,31 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
                             <div className="bgblue">
                                 <div className="card">
                                     {playerInfo.troops
-                                        .filter((troop) => troop.village === "home")
+                                        .filter((troop) => troop.village === "home" && !petNames.includes(troop.name))
                                         .map((troop, index) => (
                                             <p key={index} style={{ color: getColorByLevelDifference(troop.level, troop.maxLevel) }}>
-                                                <strong>{troop.name}:</strong> Nivel {troop.level} / {troop.maxLevel}
+                                                <strong>{translate(troop.name)}:</strong> Nivel {troop.level} / {troop.maxLevel}
                                                 {troop.superTroopIsActive && <span style={{ color: 'gold' }}> (Super)</span>}
+                                            </p>
+                                        ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Pets Section */}
+                    <div style={{ marginTop: '20px' }}>
+                        <h3 onClick={() => setShowPets(!showPets)} style={{ cursor: 'pointer' }}>
+                            Mascotas {showPets ? '▲' : '▼'}
+                        </h3>
+                        {showPets && (
+                            <div className="bgblue">
+                                <div className="card">
+                                    {playerInfo.troops
+                                        .filter((troop) => petNames.includes(troop.name))
+                                        .map((pet, index) => (
+                                            <p key={index} style={{ color: getColorByLevelDifference(pet.level, pet.maxLevel) }}>
+                                                <strong>{translate(pet.name)}:</strong> Nivel {pet.level} / {pet.maxLevel}
                                             </p>
                                         ))}
                                 </div>
@@ -203,13 +323,13 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
                                         .map((hero, index) => (
                                             <div key={index} style={{ marginBottom: '10px' }}>
                                                 <p style={{ color: getColorByLevelDifference(hero.level, hero.maxLevel) }}>
-                                                    <strong>{hero.name}:</strong> Nivel {hero.level} / {hero.maxLevel}
+                                                    <strong>{translate(hero.name)}:</strong> Nivel {hero.level} / {hero.maxLevel}
                                                 </p>
                                                 {hero.equipment && hero.equipment.length > 0 && (
                                                     <ul style={{ listStyle: 'none', paddingLeft: '10px' }}>
                                                         {hero.equipment.map((equip, equipIndex) => (
                                                             <li key={equipIndex} style={{ color: getColorByLevelDifference(equip.level, equip.maxLevel) }}>
-                                                                <strong>{equip.name}:</strong> Nivel {equip.level} / {equip.maxLevel}
+                                                                <strong>{translate(equip.name)}:</strong> Nivel {equip.level} / {equip.maxLevel}
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -233,7 +353,7 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
                                         .filter((equipment) => equipment.village === "home")
                                         .map((equipment, index) => (
                                             <p key={index} style={{ color: getColorByLevelDifference(equipment.level, equipment.maxLevel) }}>
-                                                <strong>{equipment.name}:</strong> Nivel {equipment.level} / {equipment.maxLevel}
+                                                <strong>{translate(equipment.name)}:</strong> Nivel {equipment.level} / {equipment.maxLevel}
                                             </p>
                                         ))}
                                 </div>
@@ -253,7 +373,7 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
                                         .filter((spell) => spell.village === "home")
                                         .map((spell, index) => (
                                             <p key={index} style={{ color: getColorByLevelDifference(spell.level, spell.maxLevel) }}>
-                                                <strong>{spell.name}:</strong> Nivel {spell.level} / {spell.maxLevel}
+                                                <strong>{translate(spell.name)}:</strong> Nivel {spell.level} / {spell.maxLevel}
                                             </p>
                                         ))}
                                 </div>
