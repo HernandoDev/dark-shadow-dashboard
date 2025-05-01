@@ -1291,6 +1291,11 @@ const WarInfoPage = () => {
                                         </li>
                                       )}
                                     </ul>
+                                    <i
+                                      style={{ textAlign: 'right', color: 'red', cursor: 'pointer' }}
+                                      className="bi bi-trash"
+                                      onDoubleClick={() => deleteAttack(attack.id)}
+                                    ></i>
                                   </div>
                                 </div>
                               ))}
@@ -1365,6 +1370,11 @@ const WarInfoPage = () => {
                                         </li>
                                       )}
                                     </ul>
+                                    <i
+                                      style={{ textAlign: 'right', color: 'red', cursor: 'pointer' }}
+                                      className="bi bi-trash"
+                                      onDoubleClick={() => deleteAttack(attack.id)}
+                                    ></i>
                                   </div>
                                 </div>
                               ))}
