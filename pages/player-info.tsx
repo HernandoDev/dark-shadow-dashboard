@@ -109,7 +109,7 @@ const PlayerInfo = () => {
           className={`tabButton ${activeTab === 'donaciones' ? 'active' : ''}`}
           onClick={() => setActiveTab('donaciones')}
         >
-          <span>Donaciones</span>
+          <span>Info Player</span>
         </button>
       </div>
 
@@ -121,7 +121,7 @@ const PlayerInfo = () => {
           attackPerformance={attackPerformance}
         />
       )}
-      {activeTab === 'donaciones' && <DonationsTab />}
+      {activeTab === 'donaciones' && <DonationsTab selectedPlayer={selectedPlayer} />}
     </div>
   );
 };
