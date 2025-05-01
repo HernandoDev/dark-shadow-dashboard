@@ -156,9 +156,7 @@ const copyToClipboard = (text: string) => {
 
 const deleteAttack = async (attackId: string) => {
   try {
-    debugger
     const  result = await APIClashService.deleteAttack(attackId);
-    debugger
     if (result) {
       window.location.reload(); // Reload the page to reflect the changes
       console.log(`Attack with ID ${attackId} deleted successfully.`);
@@ -1217,7 +1215,7 @@ const WarInfoPage = () => {
                                     <i
                                       style={{ textAlign: 'right', color: 'red', cursor: 'pointer' }}
                                       className="bi bi-trash"
-                                      onClick={() => deleteAttack(attack.id)}
+                                      onDoubleClick={() => deleteAttack(attack.id)}
                                     ></i>
                                   </div>
                                 </div>
