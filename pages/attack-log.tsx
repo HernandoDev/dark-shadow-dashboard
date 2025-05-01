@@ -620,7 +620,7 @@ const AttackLog: React.FC = () => {
                                 </h2>
                                 {/* Player Summary */}
                                 {filteredPlayerAttacks.length > 0 && (
-                                    <div style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
+                                    <div className='card' style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
                                         <h3 style={{ color: 'violet' }}>Jugador: {filteredPlayerAttacks[0].member}</h3>
                                         <p>
                                             <strong>Media de Estrellas:</strong> {(
@@ -660,6 +660,25 @@ const AttackLog: React.FC = () => {
                                                     return memberTh === rivalTh;
                                                 }).length
                                             }
+                                        </p>
+                                        <p>
+                                            <strong>Ejércitos Favoritos:</strong>
+                                            <ul style={{ listStyle: 'none', padding: 0, margin: '10px 0' }}>
+                                                {Object.entries(
+                                                    filteredPlayerAttacks.reduce((acc, attack) => {
+                                                        acc[attack.attack] = (acc[attack.attack] || 0) + 1;
+                                                        return acc;
+                                                    }, {} as Record<string, number>)
+                                                )
+                                                    .sort(([, a], [, b]) => (b as number) - (a as number))
+                                                    .slice(0, 3)
+                                                    .map(([army, count], index) => (
+                                                        <li key={index}>
+                                                            <Target size={16} style={{ marginRight: '5px' }} />
+                                                            {String(army)} ({Number(count)} usos)
+                                                        </li>
+                                                    ))}
+                                            </ul>
                                         </p>
                                     </div>
                                 )}
