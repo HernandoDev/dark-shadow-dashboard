@@ -100,6 +100,7 @@ const PlayerInfo = () => {
     const [loading, setLoading] = useState(false);
     const [loadingWarSaves, setLoadingWarSaves] = useState(false);
     const [savedAttacks, setSavedAttacks] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'resumen' | 'donaciones'>('resumen'); // State for active tab
 
     // Fetch data
     const fetchWarSaves = async () => {
@@ -199,55 +200,106 @@ const PlayerInfo = () => {
                 ))}
             </select>
 
-            {selectedPlayer && playerSummary && (
-                <div className="bgblue">
-                    <div className="card">
-                        <h2>Resumen de guerra {selectedPlayer}</h2>
-                        <p><strong>Total de Guerras Jugadas:</strong> {playerSummary.totalWars}</p>
-                        <p><strong>Media de estrellas:</strong> {playerSummary.averageStars} <Star size={16} style={{ marginRight: '5px' }} /></p>
-                        <p><strong>Media de destrucción:</strong> {playerSummary.averageDestruction}%</p>
-                        <p><strong>Ataques no realizados:</strong> {playerSummary.missedAttacks}</p>
-                    </div>
+            {/* Tabs */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', justifyContent: 'center' }}>
+                <button
+                    className={`tabButton ${activeTab === 'resumen' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('resumen')}
+                >
+                    <span>Resumen Ataques</span>
+                    <div className="top"></div>
+                    <div className="left"></div>
+                    <div className="bottom"></div>
+                    <div className="right"></div>
+                </button>
+                <button
+                    className={`tabButton ${activeTab === 'donaciones' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('donaciones')}
+                >
+                    <span>Donaciones</span>
+                    <div className="top"></div>
+                    <div className="left"></div>
+                    <div className="bottom"></div>
+                    <div className="right"></div>
+                </button>
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'resumen' && (
+                <div>
+                    {selectedPlayer && playerSummary ? (
+                        <div className="bgblue">
+                            <div className="card">
+                                <h2>Resumen de guerra {selectedPlayer}</h2>
+                                <p><strong>Total de Guerras Jugadas:</strong> {playerSummary.totalWars}</p>
+                                <p><strong>Media de estrellas:</strong> {playerSummary.averageStars} <Star size={16} style={{ marginRight: '5px' }} /></p>
+                                <p><strong>Media de destrucción:</strong> {playerSummary.averageDestruction}%</p>
+                                <p><strong>Ataques no realizados:</strong> {playerSummary.missedAttacks}</p>
+                            </div>
+                        </div>
+                    ) : (
+                        selectedPlayer && (
+                            <div className="bgblue">
+                                <div className="card">
+                                    <h2>No se encontraron datos para {selectedPlayer}</h2>
+                                    <p>Por favor, verifica que el jugador seleccionado tenga registros disponibles.</p>
+                                </div>
+                            </div>
+                        )
+                    )}
+
+                    {selectedPlayer && attackPerformance.length > 0 ? (
+                        <div>
+                            <h2>Resumen de Rendimiento por Tipo de Ataque</h2>
+                            <ul style={{ listStyle: 'none', padding: 0 }}>
+                                {attackPerformance.map((performance, index) => (
+                                    <div className='bgblue'>
+                                        <div className='card'>
+                                            <li key={index} style={{ marginBottom: '10px' }}>
+                                                <span style={{ color: 'gold' }}> <strong>Ejército:</strong> {performance.attackType} <br /></span>
+                                                <strong>Veces Usado:</strong> {performance.count} <br />
+                                                <strong>Media de Estrellas:</strong>
+                                                <span style={{
+                                                    color: parseFloat(performance.averageStars) < 2 ? 'red' :
+                                                        parseFloat(performance.averageStars) <= 2.2 ? 'yellow' : 'green'
+                                                }}>
+                                                    {performance.averageStars}
+                                                </span> <br />
+                                                <strong>Media de Destrucción:</strong>
+                                                <span style={{
+                                                    color: parseFloat(performance.averageDestruction) < 55 ? 'red' :
+                                                        parseFloat(performance.averageDestruction) <= 60 ? 'yellow' : 'green'
+                                                }}>
+                                                    {performance.averageDestruction}%
+                                                </span> <br />
+                                                <strong>Ataques contra TH superior:</strong> {performance.higherThCount} <br />
+                                                <strong>Ataques contra TH igual:</strong> {performance.equalThCount} <br />
+                                                <strong>Ataques contra TH inferior:</strong> {performance.lowerThCount} <br />
+                                            </li>
+                                        </div>
+                                    </div>
+                                ))}
+                            </ul>
+                        </div>
+                    ) : (
+                        selectedPlayer && (
+                            <div className="bgblue">
+                                <div className="card">
+                                    <h2>No se encontraron datos  para {selectedPlayer}</h2>
+                                    <p>Por favor, verifica que el jugador tenga ataques registrados.</p>
+                                </div>
+                            </div>
+                        )
+                    )}
                 </div>
             )}
 
-            {selectedPlayer && attackPerformance.length > 0 && (
-                <div >
-                        <h2>Resumen de Rendimiento por Tipo de Ataque</h2>
-                        <ul style={{ listStyle: 'none', padding: 0 }}>
-                            {attackPerformance.map((performance, index) => (
-                            <div className='bgblue'>
-                                <div className='card'>
-                                <li key={index} style={{ marginBottom: '10px' }}>
-                                  <span  style={{color:'gold'}} > <strong>Ejército:</strong> {performance.attackType} <br /></span>
-                                    <strong>Veces Usado:</strong> {performance.count} <br />
-                                    <strong>Media de Estrellas:</strong> 
-                                    <span style={{
-                                        color: parseFloat(performance.averageStars) < 2 ? 'red' : 
-                                               parseFloat(performance.averageStars) <= 2.2 ? 'yellow' : 'green'
-                                    }}>
-                                        {performance.averageStars}
-                                    </span> <br />
-                                    <strong>Media de Destrucción:</strong> 
-                                    <span style={{
-                                        color: parseFloat(performance.averageDestruction) < 55 ? 'red' : 
-                                               parseFloat(performance.averageDestruction) <= 60 ? 'yellow' : 'green'
-                                    }}>
-                                        {performance.averageDestruction}%
-                                    </span> <br />
-                                    <strong>Ataques contra TH superior:</strong> {performance.higherThCount} <br />
-                                    <strong>Ataques contra TH igual:</strong> {performance.equalThCount} <br />
-                                    <strong>Ataques contra TH inferior:</strong> {performance.lowerThCount} <br />
-                                </li>
-                                </div>
-                            </div>
-                              
-                            ))}
-                        </ul>
-                    </div>
+            {activeTab === 'donaciones' && (
+                <div>
+                    <h2>Donaciones</h2>
+                    <p>¡Hola! Aquí se mostrarán las donaciones en el futuro.</p>
+                </div>
             )}
-
-        
         </div>
     );
 };
