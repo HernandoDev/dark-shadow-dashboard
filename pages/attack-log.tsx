@@ -622,11 +622,21 @@ const AttackLog: React.FC = () => {
                                 {filteredPlayerAttacks.length > 0 && (
                                     <div className='card' style={{ marginBottom: '20px', textAlign: 'center', color: '#fff' }}>
                                         <h3 style={{ color: 'violet' }}>Jugador: {filteredPlayerAttacks[0].member}</h3>
-                                        <p>
-                                            <strong>Media de Estrellas:</strong> {(
-                                                filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0) /
-                                                filteredPlayerAttacks.length
-                                            ).toFixed(2)}
+                                        <p style={{
+                                                color: (() => {
+                                                    const avgStars = filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0) / filteredPlayerAttacks.length;
+                                                    if (avgStars > 2.2) return 'green';
+                                                    if (avgStars >= 2 && avgStars <= 2.2) return 'yellow';
+                                                    return 'red';
+                                                })()
+                                            }}>
+                                            <strong>Media de Estrellas:</strong>{' '}
+                                            <span >
+                                                {(
+                                                    filteredPlayerAttacks.reduce((sum, attack) => sum + attack.stars, 0) /
+                                                    filteredPlayerAttacks.length
+                                                ).toFixed(2)}
+                                            </span>
                                         </p>
                                         <p>
                                             <strong>Media de Porcentaje:</strong> {(
