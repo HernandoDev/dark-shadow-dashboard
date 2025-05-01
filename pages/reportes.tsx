@@ -82,10 +82,10 @@ const ReportesPage = () => {
                         <div className="circuit-trace"></div>
                     </div>
                     <div className="code-fragments">
-                        <span className="code-fragment">GUERRA!!</span>
-                        <span className="code-fragment">LIGA!!</span>
-                        <span className="code-fragment">ATAQUES!!</span>
-                        <span className="code-fragment">EJERCITOS</span>
+                        <span className="code-fragment">INSULTOS</span>
+                        <span className="code-fragment">INACTIVIDAD</span>
+                        <span className="code-fragment">TOXICO</span>
+                        <span className="code-fragment">NO RESPETO</span>
                     </div>
                     <div className="interference"></div>
                     <div className="scan-bars">
