@@ -10,6 +10,11 @@ const ReportesPage = () => {
     const [selectedPlayer, setSelectedPlayer] = useState<string>('');
     const [reportText, setReportText] = useState<string>('');
     const [reports, setReports] = useState<any[]>([]);
+    const [filterText, setFilterText] = useState<string>(''); // Add state for filtering reports
+
+    const filteredReports = reports
+        .filter((report) => report.player.toLowerCase().includes(filterText.toLowerCase()))
+        .reverse(); // Reverse the order to show the latest report first
 
     useEffect(() => {
         const fetchClanMembers = async () => {
@@ -102,14 +107,35 @@ const ReportesPage = () => {
 
             <div style={{ margin: '20px' }}>
                 <h2>Reportes Registrados</h2>
-                {reports.length === 0 ? (
+                <input
+                    className="input"
+                    type="text"
+                    placeholder="Filtrar por nombre de jugador..."
+                    value={filterText}
+                    onChange={(e) => setFilterText(e.target.value)}
+                    style={{
+                        width: '100%',
+                        padding: '10px',
+                        marginBottom: '10px',
+                        borderRadius: '5px',
+                    }}
+                />
+                {filteredReports.length === 0 ? (
                     <p>No hay reportes registrados.</p>
                 ) : (
                     <ul style={{ listStyle: 'none', padding: 0 }}>
-                        {reports.map((report, index) => (
-                            <div className='bgblue'>
-                                <div className='card'>
-                                    <li key={index} style={{ marginBottom: '10px', border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
+                        {filteredReports.map((report, index) => (
+                            <div className="bgblue">
+                                <div className="card">
+                                    <li
+                                        key={index}
+                                        style={{
+                                            marginBottom: '10px',
+                                            border: '1px solid #ccc',
+                                            padding: '10px',
+                                            borderRadius: '5px',
+                                        }}
+                                    >
                                         <strong>Jugador:</strong> {report.player} <br />
                                         <strong>Reporte:</strong> {report.report}
                                     </li>
