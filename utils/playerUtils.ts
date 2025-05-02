@@ -1,34 +1,56 @@
-export const calculatePlayerSummary = (playerWarRecords: any[], selectedPlayer: string) => {
-    if (!playerWarRecords.length) return null;
+export const calculatePlayerSummary = (playerWarRecords: any[], leagueWarRecords: any[], selectedPlayer: string) => {
+    const calculateSummary = (records: any[]) => {
+        let totalWars = 0;
+        let totalStars = 0;
+        let totalDestruction = 0;
+        let totalAttacks = 0;
+        let missedAttacks = 0;
 
-    let totalWars = 0;
-    let totalStars = 0;
-    let totalDestruction = 0;
-    let totalAttacks = 0;
-    let missedAttacks = 0;
+        records.forEach((record) => {
+            const playerData =
+                record.content.clan.members.find((member: any) => member.name === selectedPlayer) ||
+                record.content.opponent.members.find((member: any) => member.name === selectedPlayer);
 
-    playerWarRecords.forEach((record) => {
-        const playerData =
-            record.content.clan.members.find((member: any) => member.name === selectedPlayer) ||
-            record.content.opponent.members.find((member: any) => member.name === selectedPlayer);
+            if (playerData) {
+                totalWars++;
+                totalStars += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.stars, 0) || 0;
+                totalDestruction += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.destructionPercentage, 0) || 0;
+                totalAttacks += playerData.attacks?.length || 0;
+                missedAttacks += Math.max(0, record.content.attacksPerMember - (playerData.attacks?.length || 0));
+            }
+        });
 
-        if (playerData) {
-            totalWars++;
-            totalStars += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.stars, 0) || 0;
-            totalDestruction += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.destructionPercentage, 0) || 0;
-            totalAttacks += playerData.attacks?.length || 0;
-            missedAttacks += Math.max(0, record.content.attacksPerMember - (playerData.attacks?.length || 0));
-        }
-    });
+        const averageStars = totalAttacks > 0 ? (totalStars / totalAttacks).toFixed(2) : '0';
+        const averageDestruction = totalAttacks > 0 ? (totalDestruction / totalAttacks).toFixed(2) : '0';
 
-    const averageStars = totalAttacks > 0 ? (totalStars / totalAttacks).toFixed(2) : '0';
-    const averageDestruction = totalAttacks > 0 ? (totalDestruction / totalAttacks).toFixed(2) : '0';
+        return {
+            totalWars,
+            averageStars,
+            averageDestruction,
+            missedAttacks,
+        };
+    };
+
+    const normalWarSummary = calculateSummary(playerWarRecords);
+    const leagueWarSummary = calculateSummary(leagueWarRecords);
 
     return {
-        totalWars,
-        averageStars,
-        averageDestruction,
-        missedAttacks,
+        normalWarSummary,
+        leagueWarSummary,
+        combinedSummary: {
+            totalWars: normalWarSummary.totalWars + leagueWarSummary.totalWars,
+            averageStars: (
+                (parseFloat(normalWarSummary.averageStars) * normalWarSummary.totalWars +
+                    parseFloat(leagueWarSummary.averageStars) * leagueWarSummary.totalWars) /
+                (normalWarSummary.totalWars + leagueWarSummary.totalWars || 1)
+            ).toFixed(2),
+            averageDestruction: (
+                (parseFloat(normalWarSummary.averageDestruction) * normalWarSummary.totalWars +
+                    parseFloat(leagueWarSummary.averageDestruction) * leagueWarSummary.totalWars) /
+                (normalWarSummary.totalWars + leagueWarSummary.totalWars || 1)
+            ).toFixed(2),
+            missedAttacks: normalWarSummary.missedAttacks + leagueWarSummary.missedAttacks,
+        },
     };
 };
 

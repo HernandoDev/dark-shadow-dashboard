@@ -58,11 +58,11 @@ const AttackLog: React.FC = () => {
 
     const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
     const [warLeageSaves, setWarLeageSaves] = useState<any[]>([]); // State to store war saves
+    const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
 
     const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status for war saves
 
     const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
-  const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
 
     const [includeThreeStars, setIncludeThreeStars] = useState(true);
     const [includeTwoStars, setIncludeTwoStars] = useState(true);

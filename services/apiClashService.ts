@@ -1,7 +1,7 @@
 // services/apiClashService.ts
 
-const baseUrl = 'https://dark-shadows.ddns.net';
-// const baseUrl = 'http://localhost:3100';
+// const baseUrl = 'https://dark-shadows.ddns.net';
+const baseUrl = 'http://localhost:3100';
 const isAuthenticated = () => {
    return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
 };
