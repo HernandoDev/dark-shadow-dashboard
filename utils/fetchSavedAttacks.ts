@@ -3,7 +3,7 @@ import { APIClashService } from '../services/apiClashService';
 export const fetchSavedAttacks = async () => {
     try {
         let attacks = await APIClashService.getAttackLogs();
-        attacks = attacks[0].content;
+        attacks = attacks;
         return attacks
     } catch (error) {
         console.error('Error al obtener los ataques guardados:', error);

@@ -1,7 +1,7 @@
 // services/apiClashService.ts
 
-// const baseUrl = 'https://dark-shadows.ddns.net';
-const baseUrl = 'http://localhost:3100';
+const baseUrl = 'https://dark-shadows.ddns.net';
+// const baseUrl = 'http://localhost:3100';
 const isAuthenticated = () => {
    return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
 };
@@ -130,12 +130,16 @@ export const APIClashService = {
     const clanTag = getClanTag();
     if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
-    const res = await fetch(`${baseUrl}/attack-log/${encodeURIComponent(clanTag)}`); // Pass clanTag in the URL path
+
+    // Enviar clanTag como parámetro de consulta
+    const res = await fetch(`${baseUrl}/attack-log?clanTag=${encodeURIComponent(clanTag)}`);
+    
     if (!res.ok) {
         console.error('Error al obtener los ataques guardados');
+        throw new Error('Error al obtener los ataques guardados');
     }
     return res.json();
-  },
+},
 
   deleteAttack: async (attackId: string) => {
     const res = await fetch(`${baseUrl}/attack-log/delete`, {

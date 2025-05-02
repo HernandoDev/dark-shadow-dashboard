@@ -62,6 +62,7 @@ const AttackLog: React.FC = () => {
     const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status for war saves
 
     const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
+  const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
 
     const [includeThreeStars, setIncludeThreeStars] = useState(true);
     const [includeTwoStars, setIncludeTwoStars] = useState(true);
@@ -86,6 +87,13 @@ const AttackLog: React.FC = () => {
     const handleWarChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedFileName = event.target.value;
         const war = warSaves.find((w) => w.fileName === selectedFileName);
+        if (!war) {
+        
+
+            const liga_war = warLeageSaves.find((w) => w.fileName === selectedFileName);
+            setSelectedWar(liga_war);
+            return;
+        }
         setSelectedWar(war);
     };
 
@@ -93,9 +101,9 @@ const AttackLog: React.FC = () => {
         setLoadingWarSaves(true);
         try {
             const response = await APIClashService.getWarSaves();
-            
-            setWarLeageSaves(response.leagueWars); // Assuming response contains the league wars
-            setWarSaves(response.normalWars); // Assuming response contains the war saves
+            setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
+            setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
+            setWarSaves(response.normalWars || []); //
         } catch (error) {
             console.error('Error fetching war saves:', error);
         } finally {
@@ -106,14 +114,34 @@ const AttackLog: React.FC = () => {
     const formatWarDate = (fileName: string): string => {
         const cleanFileName = fileName.replace('.json', ''); // Remove .json extension
         const parts = cleanFileName.split('_');
-        const type = parts[0] === 'war' ? 'guerra' : 'liga'; // Determine type based on prefix
-        const datePart = parts[2].split('T')[0]; // Extract the date part
+    
+        // Determine the type based on the prefix
+        let type = '';
+        if (parts[0] === 'war') {
+            type = 'guerra';
+        } else if (parts[0] === 'liga' && parts[1] === 'war') {
+            type = 'liga';
+        } else {
+            return 'Formato de archivo no válido';
+        }
+    
+        // Handle different formats for the date part
+        let datePart = parts[parts.length - 1]; // The date is always the last part
+        if (datePart.includes('T')) {
+            datePart = datePart.split('T')[0]; // Extract the date part if it contains a timestamp
+        }
+    
         const [year, month, day] = datePart.split('-');
+        if (!year || !month || !day) {
+            return 'Fecha no válida';
+        }
+    
         const months = [
             'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
             'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
         ];
-        return `${parseInt(day)} de ${months[parseInt(month) - 1]} ${year} (${type})`;
+    
+        return `${parseInt(day)} de ${months[parseInt(month) - 1]} de ${year} (${type})`;
     };
 
     useEffect(() => {
@@ -251,23 +279,35 @@ const AttackLog: React.FC = () => {
             console.log('Por favor, complete todos los campos antes de guardar.');
             return;
         }
-
+    
         let memberThLevel = getMemberThLevel(selectedMember);
         if (!memberThLevel) {
             console.log('No se pudo determinar el TH del miembro seleccionado.');
             return;
         }
-
+    
         if (typeof memberThLevel === 'number') {
             memberThLevel = `TH${memberThLevel}`;
         } else if (!memberThLevel.startsWith('TH')) {
             memberThLevel = memberThLevel;
         }
-
-        const warTimestamp = selectedWar.fileName.split('_')[2];
-
+    
+        // Extract warTimestamp based on the file name structure
+        let warTimestamp = '';
+        const fileNameParts = selectedWar.fileName.split('_');
+        if (fileNameParts[0] === 'war') {
+            // Format: war_%232QL0GCQGQ_2025-04-30.json
+            warTimestamp = fileNameParts[2].replace('.json', '');
+        } else if (fileNameParts[0] === 'liga' && fileNameParts[1] === 'war') {
+            // Format: liga_war_%232RUU8RYCY_#8P99UYU8R_2025-05-02.json
+            warTimestamp = fileNameParts[4].replace('.json', '');
+        } else {
+            console.log('Formato de archivo no reconocido.');
+            return;
+        }
+    
         setIsSaving(true);
-
+        ;
         const attackData = {
             member: selectedMember,
             attack: selectedAttack,
@@ -277,9 +317,9 @@ const AttackLog: React.FC = () => {
             thRival,
             memberThLevel,
             clanTag: getClanTag(),
-            warTimestamp: warTimestamp.replace('.json', ''),
+            warTimestamp,
         };
-
+    
         try {
             await APIClashService.saveAttackLog(attackData);
             console.log('Ataque guardado exitosamente.');
@@ -287,7 +327,6 @@ const AttackLog: React.FC = () => {
             // Fetch saved attacks after saving
             fetchSavedAttacks()
                 .then((data) => {
-                    // console.log('Ataques guardados obtenidos:', data);
                     setSavedAttacks(data);
                 })
                 .catch((error) => {
@@ -346,6 +385,7 @@ const AttackLog: React.FC = () => {
             const summary = attackSummary[attack.attack];
             summary.players.add(attack.member);
             summary.usageCount++;
+            debugger
             const memberTH = parseInt(attack.memberThLevel.replace('TH', ''), 10);
             const rivalTH = parseInt(attack.thRival.replace('TH', ''), 10);
 

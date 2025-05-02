@@ -148,7 +148,7 @@ export const Content = () => {
       const fetchWarStatus = async () => {
          try {
             const warSaves = await APIClashService.getWarSaves();
-            debugger
+            
             if (warSaves.normalWars.length > 0) {
                const latestWar = warSaves.normalWars[0]; // Get the latest war save
                setWarStatus(latestWar.content); // Set the war status

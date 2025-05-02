@@ -4,7 +4,6 @@ import { Button } from '@nextui-org/react';
 import { FaStar, FaTrophy, FaTimesCircle } from 'react-icons/fa';
 import { Calendar, Info, Percent, Shield, Star, Target, User } from 'react-feather';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks';
-import { debug } from 'console';
 const heroTranslations = {
   "Barbarian King": "Rey Bárbaro",
   "Archer Queen": "Reina Arquera",
@@ -50,8 +49,18 @@ const evaluateWarResult = (selectedWar: any) => {
 };
 
 const extractTimestampFromFileName = (fileName: string): string => {
-  const parts = fileName.split('_');
-  return parts[2].replace('.json', ''); // Extract the timestamp part and remove the .json extension
+  debugger;
+  const parts = fileName.replace('.json', '').split('_'); // Remove .json and split by '_'
+
+  if (parts[0] === 'war') {
+    // Formato: war_%232QL0GCQGQ_2025-04-30
+    return parts[2]; // El timestamp está en la tercera posición
+  } else if (parts[0] === 'liga' && parts[1] === 'war') {
+    // Formato: liga_war_%232RUU8RYCY_#8P99UYU8R_2025-05-02
+    return parts[4]; // El timestamp está en la quinta posición
+  } else {
+    throw new Error('Formato de archivo no reconocido');
+  }
 };
 
 const getThColor = (memberThLevel: number, thRival: number): string => {
@@ -156,7 +165,7 @@ const copyToClipboard = (text: string) => {
 
 const deleteAttack = async (attackId: string) => {
   try {
-    const  result = await APIClashService.deleteAttack(attackId);
+    const result = await APIClashService.deleteAttack(attackId);
     if (result) {
       window.location.reload(); // Reload the page to reflect the changes
       console.log(`Attack with ID ${attackId} deleted successfully.`);
@@ -186,6 +195,9 @@ const WarInfoPage = () => {
   const [includeTwoMissingAttacks, setIncludeTwoMissingAttacks] = useState(false);
   const [filterPlayerName, setFilterPlayerName] = useState<string>(''); // State for filtering attacks by player name
   const [currentWarDetails, setcurrentWarDetails] = useState<any>({}); // State for filtering attacks by player name
+  const [warLeageSaves, setWarLeageSaves] = useState<any[]>([]); // State to store war saves
+
+  const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
 
   useEffect(() => {
     fetchSavedAttacks()
@@ -252,6 +264,8 @@ const WarInfoPage = () => {
       setLoadingWarSaves(true);
       try {
         const response = await APIClashService.getWarSaves();
+        setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
+        setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
         setWarSaves(response.normalWars || []); // Set the war saves to the state
       } catch (error) {
         console.error('Error fetching war saves:', error);
@@ -454,25 +468,51 @@ const WarInfoPage = () => {
     };
   };
 
-  const switchToMainClan = () => setClanTag('%232QL0GCQGQ');
-  const switchToSecondaryClan = () => setClanTag('%232RG9R9JVP');
-
+ 
   const formatWarDate = (fileName: string): string => {
+    ;
     const cleanFileName = fileName.replace('.json', ''); // Remove .json extension
     const parts = cleanFileName.split('_');
-    const type = parts[0] === 'war' ? 'guerra' : 'liga'; // Determine type based on prefix
-    const datePart = parts[2].split('T')[0]; // Extract the date part
-    const [year, month, day] = datePart.split('-');
+  
+    // Determine the type based on the prefix
+    let type = '';
+    if (parts[0] === 'war') {
+      type = 'guerra';
+    } else if (parts[0] === 'liga' && parts[1] === 'war') {
+      type = 'liga';
+    } else {
+      return 'Formato de archivo no válido';
+    }
+  
+    // Handle different formats for the date part
+    let datePart = parts[parts.length - 1]; // The date is always the last part
+    if (datePart.includes('T')) {
+      datePart = datePart.split('T')[0]; // Extract the date part if it contains a timestamp
+    }
+  
+    const dateParts = datePart.split('-');
+    const year = dateParts[0];
+    const month = dateParts[1];
+    const day = dateParts[2] || '01'; // Default to the first day of the month if no day is provided
+  
+    if (!year || !month) {
+      return 'Fecha no válida';
+    }
+  
     const months = [
       'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
       'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
     ];
-    return `${parseInt(day)} de ${months[parseInt(month) - 1]} ${year} (${type})`;
+  
+    return `${parseInt(day)} de ${months[parseInt(month) - 1]} de ${year} (${type})`;
   };
 
   const handleWarChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedFileName = event.target.value;
-    const war = warSaves.find((w) => w.fileName === selectedFileName);
+    let war = warSaves.find((w) => w.fileName === selectedFileName);
+    if(!war){
+      war = warLeageSaves.find((w) => w.fileName === selectedFileName);
+    }
     setSelectedWar(war);
   };
 
@@ -1044,7 +1084,13 @@ const WarInfoPage = () => {
               <option value="" disabled>
                 Seleccione una guerra
               </option>
+
               {warSaves.map((war, index) => (
+                <option key={index} value={war.fileName}>
+                  {formatWarDate(war.fileName)}
+                </option>
+              ))}
+              {warLeageSaves.map((war, index) => (
                 <option key={index} value={war.fileName}>
                   {formatWarDate(war.fileName)}
                 </option>
