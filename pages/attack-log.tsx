@@ -57,6 +57,8 @@ const AttackLog: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false); // New state to track saving status
 
     const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+    const [warLeageSaves, setWarLeageSaves] = useState<any[]>([]); // State to store war saves
+
     const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status for war saves
 
     const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
@@ -91,7 +93,8 @@ const AttackLog: React.FC = () => {
         setLoadingWarSaves(true);
         try {
             const response = await APIClashService.getWarSaves();
-            debugger
+            
+            setWarLeageSaves(response.leagueWars); // Assuming response contains the league wars
             setWarSaves(response.normalWars); // Assuming response contains the war saves
         } catch (error) {
             console.error('Error fetching war saves:', error);
@@ -1588,6 +1591,11 @@ const AttackLog: React.FC = () => {
                                             Seleccione una guerra
                                         </option>
                                         {warSaves.map((war, index) => (
+                                            <option key={index} value={war.fileName}>
+                                                {formatWarDate(war.fileName)}
+                                            </option>
+                                        ))}
+                                           {warLeageSaves.map((war, index) => (
                                             <option key={index} value={war.fileName}>
                                                 {formatWarDate(war.fileName)}
                                             </option>
