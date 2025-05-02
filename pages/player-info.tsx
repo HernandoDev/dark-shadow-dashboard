@@ -21,7 +21,7 @@ const PlayerInfo = () => {
     setLoadingWarSaves(true);
     try {
       const response = await APIClashService.getWarSaves();
-      setWarSaves(response);
+      setWarSaves(response.normalWars);
     } catch (error) {
       console.error('Error fetching war saves:', error);
     } finally {

@@ -91,7 +91,8 @@ const AttackLog: React.FC = () => {
         setLoadingWarSaves(true);
         try {
             const response = await APIClashService.getWarSaves();
-            setWarSaves(response);
+            debugger
+            setWarSaves(response.normalWars); // Assuming response contains the war saves
         } catch (error) {
             console.error('Error fetching war saves:', error);
         } finally {

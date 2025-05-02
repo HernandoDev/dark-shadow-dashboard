@@ -1,7 +1,7 @@
 // services/apiClashService.ts
 
-const baseUrl = 'https://dark-shadows.ddns.net';
-// const baseUrl = 'http://localhost:3100';
+// const baseUrl = 'https://dark-shadows.ddns.net';
+const baseUrl = 'http://localhost:3100';
 const isAuthenticated = () => {
    return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
 };
@@ -130,13 +130,12 @@ export const APIClashService = {
     const clanTag = getClanTag();
     if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
-    const res = await fetch(`${baseUrl}/attack-log?clanTag=${encodeURIComponent(clanTag)}`);
+    const res = await fetch(`${baseUrl}/attack-log/${encodeURIComponent(clanTag)}`); // Pass clanTag in the URL path
     if (!res.ok) {
-        throw new Error('Error al obtener los ataques guardados');
+        console.error('Error al obtener los ataques guardados');
     }
     return res.json();
   },
-
 
   deleteAttack: async (attackId: string) => {
     const res = await fetch(`${baseUrl}/attack-log/delete`, {
@@ -150,12 +149,11 @@ export const APIClashService = {
     return res.json();
   },
  
-
   getWarSaves: async () => {
     const clanTag = getClanTag();
     if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
-    const res = await fetch(`${baseUrl}/war-saves/${clanTag}`);
+    const res = await fetch(`${baseUrl}/war-saves/${encodeURIComponent(clanTag)}`); // Ensure clanTag is encoded
     if (!res.ok) {
       throw new Error('Error al obtener los registros de guerras');
     }
@@ -169,7 +167,7 @@ export const APIClashService = {
         body: JSON.stringify(reportData),
     });
     if (!res.ok) {
-        throw new Error('Error al guardar el reporte');
+        console.error('Error al guardar el reporte');
     }
     return res.json();
   },

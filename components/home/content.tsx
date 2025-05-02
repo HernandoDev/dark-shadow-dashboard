@@ -74,8 +74,8 @@ export const Content = () => {
 
    React.useEffect(() => {
       const fetchAttackLogs = async () => {
+
          let data = await APIClashService.getAttackLogs();
-         data = data[0].content
          setAttackLogs(data);
 
          // Define the type for playerStats
@@ -148,8 +148,9 @@ export const Content = () => {
       const fetchWarStatus = async () => {
          try {
             const warSaves = await APIClashService.getWarSaves();
-            if (warSaves.length > 0) {
-               const latestWar = warSaves[0]; // Get the latest war save
+            debugger
+            if (warSaves.normalWars.length > 0) {
+               const latestWar = warSaves.normalWars[0]; // Get the latest war save
                setWarStatus(latestWar.content); // Set the war status
             }
          } catch (error) {

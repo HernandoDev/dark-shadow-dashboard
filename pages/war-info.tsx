@@ -252,7 +252,7 @@ const WarInfoPage = () => {
       setLoadingWarSaves(true);
       try {
         const response = await APIClashService.getWarSaves();
-        setWarSaves(response);
+        setWarSaves(response.normalWars || []); // Set the war saves to the state
       } catch (error) {
         console.error('Error fetching war saves:', error);
       } finally {

@@ -268,7 +268,7 @@ export const TableWrapper = () => {
    const fetchWarSaves = async () => {
       try {
          const response = await APIClashService.getWarSaves();
-         setWarSaves(response);
+         setWarSaves(response.normalWars || []); // Use normalWars if available
          getMissinAttacks(response);
       } catch (error) {
          console.error('Error fetching war saves:', error);
