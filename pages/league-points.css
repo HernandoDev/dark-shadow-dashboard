@@ -52,3 +52,14 @@
        padding: 8px;
     }
  }
+ .sticky-header {
+   position: sticky;
+   top: 0;
+   background-color: #fff;
+   z-index: 2; /* Ensure it stays above other elements */
+}
+
+.table-container {
+   overflow: auto;
+   max-height: 500px; /* Adjust as needed */
+}

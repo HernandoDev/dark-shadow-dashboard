@@ -231,9 +231,9 @@ const LeaguePointsPage = () => {
 
          {/* Tab Content */}
          {activeTab === 'table' && (
-            <div className="table-container">
+            <div className="table-container" style={{ overflow: 'auto', maxHeight: '500px' }}>
                <table className="responsive-table">
-                  <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
+                  <thead className="sticky-header">
                      <tr>
                         <th>#</th>
                         <th>Nombre</th>
@@ -266,9 +266,9 @@ const LeaguePointsPage = () => {
          )}
 
          {activeTab === 'summary' && (
-            <div className="table-container">
+            <div className="table-container" style={{ overflow: 'auto', maxHeight: '500px' }}>
                <table className="responsive-table">
-                  <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
+                  <thead className="sticky-header">
                      <tr>
                         <th>#</th>
                         <th>Nombre</th>
