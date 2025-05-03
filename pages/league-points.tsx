@@ -211,7 +211,7 @@ const LeaguePointsPage = () => {
                className={`tabButton ${activeTab === 'table' ? 'active' : ''}`}
                onClick={() => setActiveTab('table')}
             >
-               <span>Tabla de Puntos</span>
+               <span>Clasificación de Liga actual</span>
                <div className="top"></div>
                <div className="left"></div>
                <div className="bottom"></div>
@@ -221,12 +221,20 @@ const LeaguePointsPage = () => {
                className={`tabButton ${activeTab === 'summary' ? 'active' : ''}`}
                onClick={() => setActiveTab('summary')}
             >
-               <span>Resumen de Ligas</span>
+               <span>Clasificación de Ligas global</span>
                <div className="top"></div>
                <div className="left"></div>
                <div className="bottom"></div>
                <div className="right"></div>
             </button>
+         </div>
+
+         {/* Explanatory Text */}
+         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            {activeTab === 'table' && <p>
+               En esta ventana se refleja la clasificacion de los jugadores en la Liga de Guerra actual!
+               </p>}
+            {activeTab === 'summary' && <p>En esta evntana se refleja una clasificacion global desde el 1 de mayo de 2025</p>}
          </div>
 
          {/* Tab Content */}
