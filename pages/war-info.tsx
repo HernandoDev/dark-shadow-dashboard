@@ -181,7 +181,7 @@ const deleteAttack = async (attackId: string) => {
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
-  const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('currentWar');
+  const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('warLogs');
   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
   const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
@@ -200,66 +200,71 @@ const WarInfoPage = () => {
   const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
 
   useEffect(() => {
+    if (activeTab === 'currentWar') {
+      const loadData = async () => {
+        try {
+          const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
+
+          if (clanWarLeagueGroupDetails?.clans) {
+            const fullDetails = await Promise.all(
+              clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
+                const membersWithDetails = await Promise.all(
+                  clan.members.map(async (member: { tag: string; }) => {
+                    const formattedTag = member.tag.replace('#', '%23');
+                    const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
+                    return { ...member, playerInfo };
+                  })
+                );
+                return { ...clan, members: membersWithDetails };
+              })
+            );
+            setFullWarDetails(fullDetails);
+          } else {
+            const currentWarDetails = await APIClashService.getClanCurrentWar();
+            setcurrentWarDetails(currentWarDetails);
+            const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
+            const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
+
+            const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
+            const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
+              console.error("Error al obtener el registro de guerra del clan");
+              return { items: [] };
+            });
+            const clanWarLogSummary = getWarSummary(opponentWarLog);
+            const fullDetails = [
+              { ...currentWarDetails.clan, members: clanDetails },
+              { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
+            ];
+
+            setFullWarDetails(fullDetails);
+          }
+        } catch (error) {
+          console.error('Error loading war data:', error);
+          setFullWarDetails(null);
+        }
+      };
+
+      const enrichMembersWithDetails = async (members: any[]): Promise<any[]> => {
+        return Promise.all(
+          members.map(async (member: any) => {
+            const formattedTag = member.tag.replace('#', '%23');
+            const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
+            return { ...member, playerInfo };
+          })
+        );
+      };
+
+      loadData();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
     fetchSavedAttacks()
       .then((data) => setSavedAttacks(Array.isArray(data) ? data : [])) // Ensure savedAttacks is always an array
       .catch((error) => {
         console.error('Error al obtener los ataques guardados:', error);
         console.log('Hubo un error al obtener los ataques guardados.');
       })
-    const loadData = async () => {
-      try {
-        const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
-
-        if (clanWarLeagueGroupDetails?.clans) {
-          const fullDetails = await Promise.all(
-            clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
-              const membersWithDetails = await Promise.all(
-                clan.members.map(async (member: { tag: string; }) => {
-                  const formattedTag = member.tag.replace('#', '%23');
-                  const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-                  return { ...member, playerInfo };
-                })
-              );
-              return { ...clan, members: membersWithDetails };
-            })
-          );
-          setFullWarDetails(fullDetails);
-        } else {
-          const currentWarDetails = await APIClashService.getClanCurrentWar();
-          setcurrentWarDetails(currentWarDetails);
-          const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
-          const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
-
-          const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
-          const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
-            console.error("Error al obtener el registro de guerra del clan");
-            return { items: [] };
-          });
-          const clanWarLogSummary = getWarSummary(opponentWarLog);
-          const fullDetails = [
-            { ...currentWarDetails.clan, members: clanDetails },
-            { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
-          ];
-
-          // console.log('Full War Details (Normal War):', fullDetails);
-          setFullWarDetails(fullDetails);
-        }
-      } catch (error) {
-        console.error('Error loading war data:', error);
-        setFullWarDetails(null);
-      }
-    };
-
-    const enrichMembersWithDetails = async (members: any[]): Promise<any[]> => {
-      return Promise.all(
-        members.map(async (member: any) => {
-          const formattedTag = member.tag.replace('#', '%23');
-          const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-          return { ...member, playerInfo };
-        })
-      );
-    };
-
     const fetchWarSaves = async () => {
       setLoadingWarSaves(true);
       try {
@@ -274,7 +279,6 @@ const WarInfoPage = () => {
       }
     };
 
-    loadData();
     fetchWarSaves();
   }, [clanTag]);
 
