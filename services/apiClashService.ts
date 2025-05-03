@@ -89,7 +89,15 @@ export const APIClashService = {
     const res = await fetch(`${baseUrl}/clans/${clanTag}/capitalraidseasons`);
     return res.json();
   },
-
+  getCapitalRaidsSaves: async () => {
+    const clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
+    const res = await fetch(`${baseUrl}/capital-raids/${encodeURIComponent(clanTag)}`);
+    if (!res.ok) {
+        throw new Error(`Error al obtener los datos de incursiones capitales para el clan ${clanTag}`);
+    }
+    return res.json();
+},
   getClanMembers: async () => {
     const clanTag = getClanTag();
     if (!clanTag) throw new Error('Clan tag not set');
