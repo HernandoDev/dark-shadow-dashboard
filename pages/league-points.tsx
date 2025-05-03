@@ -233,8 +233,9 @@ const LeaguePointsPage = () => {
          {activeTab === 'table' && (
             <div className="table-container">
                <table className="responsive-table">
-                  <thead>
+                  <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
                      <tr>
+                        <th>#</th>
                         <th>Nombre</th>
                         <th>Media de Destrucción (%)</th>
                         <th>Min Destrucción (%)</th>
@@ -248,6 +249,7 @@ const LeaguePointsPage = () => {
                   <tbody>
                      {processedResults.map((player, index) => (
                         <tr key={index}>
+                           <td>{index + 1}</td>
                            <td>{player.name || 'N/A'}</td>
                            <td>{player.avgDestruction.toFixed(2)}</td>
                            <td>{player.minDestruction.toFixed(2)}</td>
@@ -266,8 +268,9 @@ const LeaguePointsPage = () => {
          {activeTab === 'summary' && (
             <div className="table-container">
                <table className="responsive-table">
-                  <thead>
+                  <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1 }}>
                      <tr>
+                        <th>#</th>
                         <th>Nombre</th>
                         <th>Media de Destrucción (%)</th>
                         <th>Min Destrucción (%)</th>
@@ -281,6 +284,7 @@ const LeaguePointsPage = () => {
                   <tbody>
                      {leagueSummaryResults.map((player, index) => (
                         <tr key={index}>
+                           <td>{index + 1}</td>
                            <td>{player.name || 'N/A'}</td>
                            <td>{player.avgDestruction.toFixed(2)}</td>
                            <td>{player.minDestruction.toFixed(2)}</td>
