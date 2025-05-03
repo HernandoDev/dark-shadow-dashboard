@@ -40,7 +40,13 @@ export const NavbarWrapper = ({ children }: Props) => {
       return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
    };
 
-   const clanName = getClanTag() === '%232QL0GCQGQ' ? 'Dark Shadows' : getClanTag() === '%232RG9R9JVP' ? 'Dark Shadows II' : 'Unknown Clan';
+   const clanName = getClanTag() === '%232QL0GCQGQ' 
+      ? 'Dark Shadows' 
+      : getClanTag() === '%232RG9R9JVP' 
+      ? 'Dark Shadows II' 
+      : getClanTag() === '%232RUU8RYCY' 
+      ? 'Pollos Hermanos' 
+      : 'Unknown Clan';
 
    const collapseItems = [
       'Profile',
