@@ -13,7 +13,7 @@ export const SidebarWrapper = styled('div', {
    '&::-webkit-scrollbar': {
       display: 'none',
    },
-   'borderRight': '1px solid $border',
+   'borderRight': '1px solid violet',
    'flexDirection': 'column',
    'py': '$10',
    'px': '$6',
