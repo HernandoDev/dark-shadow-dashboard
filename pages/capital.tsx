@@ -102,10 +102,19 @@ const CapitalPage: React.FC = () => {
 
     const formatDate = (dateString: string) => {
         try {
-            // Format: "20250502T070000.000Z" to readable date
-            const date = new Date(dateString);
+            // Convert "20250505T070000.000Z" to "2025-05-05T07:00:00.000Z"
+            const formattedDateString = dateString.replace(
+                /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})\.(\d{3})Z$/,
+                "$1-$2-$3T$4:$5:$6.$7Z"
+            );
+            const date = new Date(formattedDateString);
+            if (isNaN(date.getTime())) {
+                throw new Error("Invalid date");
+            }
+    
             return date.toLocaleString();
         } catch (e) {
+            console.error("Error formatting date:", e);
             return dateString;
         }
     };
