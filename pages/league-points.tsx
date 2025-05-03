@@ -112,7 +112,7 @@ const LeaguePointsPage = () => {
       score: number;
       avgDestruction: number;
    };
-   
+
    const processResults = async (
       clanWarLeagueGroupDetails: ClanWarLeagueGroupDetails, // Updated type
       clanTag: string
@@ -201,7 +201,7 @@ const LeaguePointsPage = () => {
                      avgDestruction: 0,
                   };
                }
-            
+
             }
          }
       }
@@ -246,14 +246,14 @@ const LeaguePointsPage = () => {
 
          {/* Explanatory Text */}
          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            {activeTab === 'table' && <p><span style={{color:'violet'}}>
+            {activeTab === 'table' && <p><span style={{ color: 'violet' }}>
                En esta ventana se refleja la clasificacion de los jugadores en la Liga de Guerra actual! </span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
-Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
-Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.
-               </p>}
-            {activeTab === 'summary' && <p><span style={{color:'violet'}}>En esta ventana se refleja una clasificacion global desde el 1 de mayo de 2025</span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
-Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
-Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.</p>}
+               Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
+               Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.
+            </p>}
+            {activeTab === 'summary' && <p><span style={{ color: 'violet' }}>En esta ventana se refleja una clasificacion global desde el 1 de mayo de 2025</span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
+               Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
+               Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.</p>}
          </div>
 
          {/* Tab Content */}
