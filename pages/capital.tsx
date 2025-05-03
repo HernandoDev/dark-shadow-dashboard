@@ -332,36 +332,83 @@ const CapitalPage: React.FC = () => {
                 <div>
                     <h2>Histórico de Capital</h2>
                     {capitalRaidsSaves && (capitalRaidsSaves as RaidSeason[]).length > 0 ? (
-                        (capitalRaidsSaves as RaidSeason[]).map((raid: RaidSeason, index: number) => (
-                            <div key={index} className="raid-card">
-                                <div className="raid-header">
-                                    <h3>Incursión {index + 1}</h3>
-                                    <p><strong>Período:</strong> {formatDate(raid.startTime)} - {formatDate(raid.endTime)}</p>
-                                    <p><strong>Estado:</strong> {raid.state === 'ongoing' ? 'En Progreso' : 'Finalizado'}</p>
-                                </div>
-                                <div className="raid-stats">
-                                    <h4>Miembros</h4>
-                                    <table className="member-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Nombre</th>
-                                                <th>Ataques</th>
-                                                <th>Recursos Saqueados</th>
+                        <>
+                            {/* Summary Table */}
+                            <div className="summary-table">
+                                <h3>Resumen Total por Jugador</h3>
+                                <table className="member-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Jugador</th>
+                                            <th>Ataques Realizados</th>
+                                            <th>Ataques No Realizados</th>
+                                            <th>Media de Recursos Saqueados</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.values(
+                                            (capitalRaidsSaves as RaidSeason[]).reduce((acc: Record<string, any>, raid: RaidSeason) => {
+                                                raid.members?.forEach((member: Member) => {
+                                                    if (!acc[member.tag]) {
+                                                        acc[member.tag] = {
+                                                            name: member.name,
+                                                            totalAttacks: 0,
+                                                            totalAttackLimit: 0,
+                                                            totalLooted: 0,
+                                                            raidCount: 0,
+                                                        };
+                                                    }
+                                                    acc[member.tag].totalAttacks += member.attacks;
+                                                    acc[member.tag].totalAttackLimit += member.attackLimit + member.bonusAttackLimit;
+                                                    acc[member.tag].totalLooted += member.totalLooted;
+                                                    acc[member.tag].raidCount += 1;
+                                                    debugger
+                                                });
+                                                return acc;
+                                            }, {})
+                                        ).map((player, idx) => (
+                                            <tr key={idx}>
+                                                <td>{player.name}</td>
+                                                <td>{player.totalAttacks}</td>
+                                                <td>{player.totalAttackLimit - player.totalAttacks}</td>
+                                                <td>{Number((player.totalLooted / player.raidCount).toFixed(2)).toLocaleString('es-ES')}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {raid.members?.map((member: Member, idx: number) => (
-                                                <tr key={idx}>
-                                                    <td>{member.name}</td>
-                                                    <td>{member.attacks}/{member.attackLimit + member.bonusAttackLimit}</td>
-                                                    <td>{member.totalLooted}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
-                        ))
+
+                            {/* Individual Raids */}
+                            {(capitalRaidsSaves as RaidSeason[]).map((raid: RaidSeason, index: number) => (
+                                <div key={index} className="raid-card">
+                                    <div className="raid-header">
+                                        <h3>Incursión {index + 1}</h3>
+                                        <p><strong>Período:</strong> {formatDate(raid.startTime)} - {formatDate(raid.endTime)}</p>
+                                        <p><strong>Estado:</strong> {raid.state === 'ongoing' ? 'En Progreso' : 'Finalizado'}</p>
+                                    </div>
+                                    <div className="raid-stats">
+                                        <h4>Miembros</h4>
+                                        <table className="member-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nombre</th>
+                                                    <th>Ataques</th>
+                                                    <th>Recursos Saqueados</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {raid.members?.map((member: Member, idx: number) => (
+                                                    <tr key={idx}>
+                                                        <td>{member.name}</td>
+                                                        <td>{member.attacks}/{member.attackLimit + member.bonusAttackLimit}</td>
+                                                        <td>{(member.totalLooted ?? 0).toLocaleString('es-ES')}</td>                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ))}
+                        </>
                     ) : (
                         <p>No hay datos históricos disponibles.</p>
                     )}
