@@ -523,9 +523,27 @@ const WarInfoPage = () => {
   };
 
   const generateFilteredWarMessage = (warDetails: any) => {
-    const latestSave = currentWarDetails && Object.keys(currentWarDetails).length > 0 
-      ? currentWarDetails 
-      : warLeageSaves[warLeageSaves.length - 1]?.content;
+    let latestSave;
+  
+    // Obtener el último guardado considerando el estado "preparation"
+    if (currentWarDetails && Object.keys(currentWarDetails).length > 0) {
+      latestSave = currentWarDetails;
+    } else {
+      // Obtener el más reciente desde warLeageSaves
+      const lastSave = warLeageSaves[warLeageSaves.length - 1]?.content;
+  
+      // Si el estado es "preparation", buscar el archivo anterior
+      if (lastSave && lastSave.state === "preparation") {
+        const previousSave = warLeageSaves[warLeageSaves.length - 2]?.content;
+        if (previousSave) {
+          latestSave = previousSave;
+        } else {
+          latestSave = lastSave; // Si no hay un archivo anterior, usar el más reciente
+        }
+      } else {
+        latestSave = lastSave;
+      }
+    }
   
     if (!latestSave) {
       return "No hay información disponible para generar el mensaje.";
@@ -557,7 +575,7 @@ const WarInfoPage = () => {
   
       const mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
       const opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
-  debugger
+  
       if (mainClan.stars > opponentClan.stars) {
         additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\n\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else if (mainClan.stars < opponentClan.stars) {
