@@ -49,7 +49,7 @@ const evaluateWarResult = (selectedWar: any) => {
 };
 
 const extractTimestampFromFileName = (fileName: string): string => {
-  debugger;
+  ;
   const parts = fileName.replace('.json', '').split('_'); // Remove .json and split by '_'
 
   if (parts[0] === 'war') {

@@ -166,7 +166,7 @@ const LeaguePointsPage = () => {
             }
          }
       }
-      debugger
+      
 
       return Object.values(playersStats)
          .map((player) => ({
