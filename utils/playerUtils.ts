@@ -93,11 +93,7 @@ export const calculateAttackPerformance = (savedAttacks: any[], selectedPlayer: 
     });
 
     return Object.entries(attackPerformance).map(([attackType, data]) => {
-        console.log(`Debugging attackType: ${attackType}`, {
-            totalDestruction: data.totalDestruction,
-            count: data.count,
-            averageDestruction: data.totalDestruction / data.count,
-        });
+  
         
         return {
             attackType,
