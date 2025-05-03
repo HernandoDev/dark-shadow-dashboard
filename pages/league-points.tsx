@@ -128,7 +128,7 @@ const LeaguePointsPage = () => {
                   stars2: 0,
                   stars3: 0,
                   totalDestruction: 0,
-                  minDestruction: 100,
+                  minDestruction: 0,
                   score: 0,
                   avgDestruction: 0, // Initialize avgDestruction with 0
                };
@@ -186,11 +186,7 @@ const LeaguePointsPage = () => {
                      avgDestruction: 0,
                   };
                }
-               // Simulate attacks and stars for demonstration purposes
-               playersStats[member.tag].totalAttacks += 1; // Example: Increment attacks
-               playersStats[member.tag].stars3 += 1; // Example: Increment 3-star attacks
-               playersStats[member.tag].totalDestruction += 100; // Example: Add destruction percentage
-               playersStats[member.tag].score += 3; // Example: Add score for 3 stars
+            
             }
          }
       }
