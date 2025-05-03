@@ -151,8 +151,9 @@ const renderValidatedList = (
 };
 
 export const TableWrapper = () => {
-   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
-
+    const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+    const [warLeageSaves, setWarLeageSaves] = useState<any[]>([]); // State to store war saves
+    const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
    const [members, setMembers] = useState<Member[]>([]);
    const [loading, setLoading] = useState(true);
    const [attackLogs, setAttackLogs] = useState<AttackLog[]>([]); // Explicitly type attackLogs
@@ -269,6 +270,8 @@ export const TableWrapper = () => {
       try {
          const response = await APIClashService.getWarSaves();
          setWarSaves(response.normalWars || []); // Use normalWars if available
+         setWarLeageSaves(response.leagueWars || []);
+         setLeageGroupsSaves(response.leagueGroups || []);
          getMissinAttacks(response);
       } catch (error) {
          console.error('Error fetching war saves:', error);
@@ -557,7 +560,7 @@ export const TableWrapper = () => {
 
          {isMobile ? (
             <div>
-               <h1 style={{ color: 'greenyellow', fontSize: '24px',marginTop:'20px' }}>Miembros que cumplen los requisitos mínimos</h1>
+               <h1 style={{ color: 'greenyellow', fontSize: '24px',marginTop:'25px' }}>Miembros que cumplen los requisitos mínimos</h1>
                {sortedMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
                   const missingMember = missing45Days?.find((missing) => missing.tag === member.tag); // Find member in missing45Days
@@ -618,7 +621,7 @@ export const TableWrapper = () => {
             </div>
          ) : (
             <>
-               <h1 style={{ color: 'greenyellow', fontSize: '32px' }}>Miembros que cumplen los requisitos mínimos</h1>
+               <h1 style={{ color: 'greenyellow', fontSize: '32px',marginTop:'30px' }}>Miembros que cumplen los requisitos mínimos</h1>
                <Table
                   aria-label="Members meeting requirements"
                   css={{ height: 'auto', minWidth: '100%' }}
