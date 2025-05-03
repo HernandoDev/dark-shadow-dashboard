@@ -1,0 +1,54 @@
+.league-points-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+ }
+ 
+ .neonText {
+    text-align: center;
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    margin-bottom: 20px;
+ }
+ 
+ .table-container {
+    overflow-x: auto; /* Hacer la tabla desplazable horizontalmente */
+    margin: 0 auto;
+    max-width: 100%;
+ }
+ 
+ .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background-color: #1e1e2f;
+    color: #ffffff;
+    border: 1px solid #444;
+ }
+ 
+ .responsive-table th,
+ .responsive-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #444;
+ }
+ 
+ .responsive-table th {
+    background-color: #2a2a3d;
+    font-weight: bold;
+ }
+ 
+ .responsive-table tr:nth-child(even) {
+    background-color: #2e2e40;
+ }
+ 
+ .responsive-table tr:hover {
+    background-color: #3a3a50;
+ }
+ 
+ @media (max-width: 768px) {
+    .responsive-table th,
+    .responsive-table td {
+       font-size: 12px;
+       padding: 8px;
+    }
+ }

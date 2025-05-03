@@ -21,44 +21,26 @@ const LeaguePointsPage = () => {
       const loadData = async () => {
          try {
             const data = await APIClashService.getClanWarLeagueGroupDetails();
+
+            const leagueSaves = await APIClashService.getLeagueGroupSaves();
+            if (leagueSaves && leagueSaves.leagueSaves) {
+               console.log('League Saves:', leagueSaves.leagueSaves); // Debugging output
+            }
+
             if (data) {
                const results = await processResults(data, clanTag);
                setProcessedResults(results);
             }
          } catch (error) {
-            console.error('Error fetching Clan War League Group Details:', error);
+            console.error('Error fetching data:', error);
          }
       };
 
       loadData();
    }, []);
 
-   interface Attack {
-      destructionPercentage: number;
-      stars: number;
-   }
-
-   interface Member {
-      tag: string;
-      name: string;
-      attacks?: Attack[];
-   }
-
-   interface Clan {
-      tag: string;
-      members: Member[];
-   }
-
-   interface War {
-      clan: Clan;
-      opponent: Clan;
-   }
-
-   interface ClanWarLeagueGroupDetails {
-      matchingWars: War[];
-   }
-
-   interface PlayerStats {
+   // Define the PlayerStats type
+   type PlayerStats = {
       name: string;
       totalAttacks: number;
       stars1: number;
@@ -67,9 +49,9 @@ const LeaguePointsPage = () => {
       totalDestruction: number;
       minDestruction: number;
       score: number;
-      avgDestruction: number; // Changed from optional to required
-   }
-
+      avgDestruction: number;
+   };
+   
    const processResults = async (
       clanWarLeagueGroupDetails: ClanWarLeagueGroupDetails,
       clanTag: string
@@ -125,36 +107,38 @@ const LeaguePointsPage = () => {
    };
 
    return (
-      <div>
-         <h1 style={{textAlign:'center'}} className='neonText'>Puntos de Liga</h1>
-         <table>
-            <thead>
-               <tr>
-                  <th>Nombre</th>
-                  <th>Media de Destrucción (%)</th>
-                  <th>Min Destrucción (%)</th>
-                  <th>1 Estrella</th>
-                  <th>2 Estrellas</th>
-                  <th>3 Estrellas</th>
-                  <th>Ataques Totales</th>
-                  <th>Puntuación Total</th>
-               </tr>
-            </thead>
-            <tbody>
-               {processedResults.map((player, index) => (
-                  <tr key={index}>
-                     <td>{player.name || 'N/A'}</td>
-                     <td>{player.avgDestruction.toFixed(2)}</td>
-                     <td>{player.minDestruction.toFixed(2)}</td>
-                     <td>{player.stars1}</td>
-                     <td>{player.stars2}</td>
-                     <td>{player.stars3}</td>
-                     <td>{player.totalAttacks}</td>
-                     <td>{player.score}</td>
+      <div className="league-points-container">
+         <h1 className="neonText">Puntos de Liga</h1>
+         <div className="table-container">
+            <table className="responsive-table">
+               <thead>
+                  <tr>
+                     <th>Nombre</th>
+                     <th>Media de Destrucción (%)</th>
+                     <th>Min Destrucción (%)</th>
+                     <th>1 Estrella</th>
+                     <th>2 Estrellas</th>
+                     <th>3 Estrellas</th>
+                     <th>Ataques Totales</th>
+                     <th>Puntuación Total</th>
                   </tr>
-               ))}
-            </tbody>
-         </table>
+               </thead>
+               <tbody>
+                  {processedResults.map((player, index) => (
+                     <tr key={index}>
+                        <td>{player.name || 'N/A'}</td>
+                        <td>{player.avgDestruction.toFixed(2)}</td>
+                        <td>{player.minDestruction.toFixed(2)}</td>
+                        <td>{player.stars1}</td>
+                        <td>{player.stars2}</td>
+                        <td>{player.stars3}</td>
+                        <td>{player.totalAttacks}</td>
+                        <td>{player.score}</td>
+                     </tr>
+                  ))}
+               </tbody>
+            </table>
+         </div>
       </div>
    );
 };

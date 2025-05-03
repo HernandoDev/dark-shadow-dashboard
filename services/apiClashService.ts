@@ -1,7 +1,7 @@
 // services/apiClashService.ts
 
-const baseUrl = 'https://dark-shadows.ddns.net';
-// const baseUrl = 'http://localhost:3100';
+// const baseUrl = 'https://dark-shadows.ddns.net';
+const baseUrl = 'http://localhost:3100';
 const isAuthenticated = () => {
    return typeof window !== 'undefined' && localStorage.getItem('isAuthenticated') === 'true';
 };
@@ -160,6 +160,19 @@ export const APIClashService = {
     const res = await fetch(`${baseUrl}/war-saves/${encodeURIComponent(clanTag)}`); // Ensure clanTag is encoded
     if (!res.ok) {
       throw new Error('Error al obtener los registros de guerras');
+    }
+    return res.json();
+  },
+
+  getLeagueGroupSaves: async () => {
+    let clanTag = getClanTag();
+    if (!clanTag) throw new Error('Clan tag not set');
+    if (!isAuthenticated()) throw new Error('User not authenticated');
+    clanTag = clanTag.replace("#", "%23"); // Reemplazar # por %23
+
+    const res = await fetch(`${baseUrl}/clans/${encodeURIComponent(clanTag)}/leaguegroup/saves`);
+    if (!res.ok) {
+      throw new Error('Error al obtener los archivos de clasificación de liga');
     }
     return res.json();
   },

@@ -9,6 +9,7 @@ import '../styles/button-tabs-animate.css'; // Import the new loader styles
 import '../styles/button-neon-animate.css'; // Import the new loader styles
 import '../styles/button-switch.css'
 import '../styles/custom-input.css'; // Add this line
+import './league-points.css'; // Importamos el archivo CSS
 
 import type { AppProps } from 'next/app';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
