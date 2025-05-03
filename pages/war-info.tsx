@@ -642,7 +642,7 @@ const WarInfoPage = () => {
           className={`tabButton ${activeTab === 'currentWar' ? 'active' : ''}`}
           onClick={() => setActiveTab('currentWar')}
         >
-          <span>Comparaciones de clanes</span>
+          <span>Comparar clanes</span>
           <div className="top"></div>
           <div className="left"></div>
           <div className="bottom"></div>
