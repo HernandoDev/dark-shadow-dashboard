@@ -179,7 +179,7 @@ const deleteAttack = async (attackId: string) => {
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
-  const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('warLogs');
+  const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('MensajeGuerra');
   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
   const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
@@ -624,7 +624,7 @@ const WarInfoPage = () => {
           className={`tabButton ${activeTab === 'currentWar' ? 'active' : ''}`}
           onClick={() => setActiveTab('currentWar')}
         >
-          <span>Estado de Guerra Actual</span>
+          <span>Comparaciones de clanes</span>
           <div className="top"></div>
           <div className="left"></div>
           <div className="bottom"></div>
