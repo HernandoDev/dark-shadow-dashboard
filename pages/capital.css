@@ -1,0 +1,133 @@
+.capital-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+
+.raid-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    text-align: center;
+    color: #ffcc00;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.raid-card {
+    background-color: #1e1e2f;
+    color: #ffffff;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.raid-card.ongoing {
+    border-left: 5px solid #00ffcc;
+}
+
+.raid-card.ended {
+    border-left: 5px solid #ffcc00;
+}
+
+.raid-header h3 {
+    margin: 0;
+    color: #ffcc00;
+}
+
+.raid-header p {
+    margin: 5px 0;
+}
+
+.status-ongoing {
+    color: #00ffcc;
+    font-weight: bold;
+}
+
+.raid-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    flex: 1 1 calc(50% - 15px);
+    text-align: center;
+    background-color: #2a2a3d;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.stat-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #cccccc;
+}
+
+.member-participation {
+    margin-top: 20px;
+}
+
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #1e1e2f;
+    color: #ffffff;
+}
+
+.member-table th,
+.member-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #444;
+}
+
+.member-table th {
+    background-color: #2a2a3d;
+    font-weight: bold;
+}
+
+.member-table tr:nth-child(even) {
+    background-color: #2e2e40;
+}
+
+.member-table tr:hover {
+    background-color: #3a3a50;
+}
+
+.attack-log {
+    margin-top: 20px;
+}
+
+.opponent-info {
+    background-color: #2a2a3d;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.opponent-info p {
+    margin: 5px 0;
+    color: #cccccc;
+}
+
+@media (max-width: 768px) {
+    .stat-item {
+        flex: 1 1 100%;
+    }
+
+    .member-table th,
+    .member-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
