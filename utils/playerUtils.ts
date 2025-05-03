@@ -14,7 +14,7 @@ export const calculatePlayerSummary = (playerWarRecords: any[], leagueWarRecords
             if (playerData) {
                 totalWars++;
                 totalStars += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.stars, 0) || 0;
-                totalDestruction += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.destructionPercentage, 0) || 0;
+                totalDestruction += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.percentage, 0) || 0;
                 totalAttacks += playerData.attacks?.length || 0;
                 missedAttacks += Math.max(0, record.content.attacksPerMember - (playerData.attacks?.length || 0));
             }
@@ -82,8 +82,7 @@ export const calculateAttackPerformance = (savedAttacks: any[], selectedPlayer: 
 
         attackPerformance[attack.attack].count++;
         attackPerformance[attack.attack].totalStars += attack.stars;
-        attackPerformance[attack.attack].totalDestruction += attack.destructionPercentage;
-
+        attackPerformance[attack.attack].totalDestruction += attack.percentage;
         if (attack.thLevel > attack.targetThLevel) {
             attackPerformance[attack.attack].higherThCount++;
         } else if (attack.thLevel === attack.targetThLevel) {
@@ -93,10 +92,18 @@ export const calculateAttackPerformance = (savedAttacks: any[], selectedPlayer: 
         }
     });
 
-    return Object.entries(attackPerformance).map(([attackType, data]) => ({
-        attackType,
-        ...data,
-        averageStars: (data.totalStars / data.count).toFixed(2),
-        averageDestruction: (data.totalDestruction / data.count).toFixed(2),
-    }));
+    return Object.entries(attackPerformance).map(([attackType, data]) => {
+        console.log(`Debugging attackType: ${attackType}`, {
+            totalDestruction: data.totalDestruction,
+            count: data.count,
+            averageDestruction: data.totalDestruction / data.count,
+        });
+        
+        return {
+            attackType,
+            ...data,
+            averageStars: (data.totalStars / data.count).toFixed(2),
+            averageDestruction: (data.totalDestruction / data.count).toFixed(2),
+        };
+    });
 };

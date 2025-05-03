@@ -81,7 +81,7 @@ const PlayerInfo = () => {
 
     const playerSummary = calculatePlayerSummary(playerWarRecords, leagueWarRecords, selectedPlayer);
     const attackPerformance = calculateAttackPerformance(savedAttacks, selectedPlayer);
-
+    
     return (
         <div style={{ padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <h1 className="animate__animated animate__backInDown neonText" style={{ textAlign: 'center', marginBottom: '20px' }}>
