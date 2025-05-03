@@ -296,11 +296,11 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {topPlayers.slice(-3).map((player, index) => (
+                     {topPlayers.slice(-3).reverse().map((player, index) => (
                         <CardBalance1 
                            key={index} 
                            player={player} 
-                           position={topPlayers.length - index} 
+                           position={topPlayers.length - 2 + index} 
                         />
                      ))}
                   </Flex>
