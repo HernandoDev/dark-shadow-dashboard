@@ -226,9 +226,9 @@ const CapitalPage: React.FC = () => {
                                             <table className="member-table">
                                                 <thead>
                                                     <tr>
-                                                        <th onClick={() => handleSort('name')}>Nombre</th>
-                                                        <th onClick={() => handleSort('attacks')}>Ataques</th>
-                                                        <th onClick={() => handleSort('capitalResourcesLooted')}>Recursos Saqueados</th>
+                                                        <th onClick={() => handleSort('name')}>Nombre <i className="bi bi-sort-up"></i></th>
+                                                        <th onClick={() => handleSort('attacks')}>Ataques <i className="bi bi-sort-up"></i></th>
+                                                        <th onClick={() => handleSort('capitalResourcesLooted')}>Recursos Saqueados <i className="bi bi-sort-up"></i></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -245,14 +245,14 @@ const CapitalPage: React.FC = () => {
                             )}
 
                             {getNonAttackingMembers(season).length > 0 && (
-                                        <div className="non-attacking-members" style={{ padding: '10px', borderRadius: '5px' }}>
+                                        <div className="non-attacking-members" style={{ padding: '10px', borderRadius: '5px' ,marginTop:'40px'}}>
                                             <h4 style={{ color: 'red' }}>Miembros Sin Ataques</h4>
                                             <table className="member-table">
                                                 <thead>
                                                     <tr>
-                                                        <th onClick={() => handleSort('name')}>Nombre</th>
-                                                        <th onClick={() => handleSort('attacks')}>Ataques Realizados</th>
-                                                        <th onClick={() => handleSort('attackLimit')}>Límite de Ataques</th>
+                                                        <th onClick={() => handleSort('name')}>Nombre <i className="bi bi-sort-up"></i></th>
+                                                        <th onClick={() => handleSort('attacks')}>Ataques Realizados <i className="bi bi-sort-up"></i></th>
+                                                        <th onClick={() => handleSort('attackLimit')}>Límite de Ataques <i className="bi bi-sort-up"></i></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -278,6 +278,44 @@ const CapitalPage: React.FC = () => {
             {raidSeasons.length === 0 && !error && (
                 <p>Cargando datos de las temporadas de incursión...</p>
             )}
+            <style>
+                {`
+                    .member-table {
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+
+                    .member-table thead th {
+                        position: sticky;
+                        top: 0;
+                        z-index: 2;
+                        text-align: left;
+                        padding: 8px;
+                        border-bottom: 2px solid #ddd;
+                    }
+
+                    .member-table tbody tr:nth-child(even) {
+                    }
+
+                    .member-table tbody tr:hover {
+                    }
+
+                    .member-table tbody td {
+                        padding: 8px;
+                        border-bottom: 1px solid #ddd;
+                    }
+
+                    .non-attacking-members {
+                        max-height: 800px; /* Set a max height for scrollable content */
+                        overflow-y: auto;
+                    }
+
+                    .member-participation {
+                        max-height: 300px; /* Set a max height for scrollable content */
+                        overflow-y: auto;
+                    }
+                `}
+            </style>
         </div>
     );
 };
