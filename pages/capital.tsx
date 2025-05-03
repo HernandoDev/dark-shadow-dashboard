@@ -159,7 +159,7 @@ const CapitalPage: React.FC = () => {
 
         return [...season.members]
             .sort((a, b) => b.capitalResourcesLooted - a.capitalResourcesLooted)
-            .slice(0, 5);
+            .slice(0, 10);
     };
 
     const getParticipationRate = (season: RaidSeason) => {
