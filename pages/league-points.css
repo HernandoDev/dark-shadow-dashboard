@@ -3,12 +3,12 @@
     font-family: Arial, sans-serif;
  }
  
- .neonText {
+ /* .neonText {
     text-align: center;
     color: #00ffcc;
-    text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    text-shadow: 0 0 5px #c770ff, 0 0 10px #c770ff, 0 0 20px #00ffcc;
     margin-bottom: 20px;
- }
+ } */
  
  .table-container {
     overflow-x: auto; /* Hacer la tabla desplazable horizontalmente */

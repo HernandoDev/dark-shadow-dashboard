@@ -1,6 +1,8 @@
 /* From Uiverse.io by PhantomVail */ 
 .neonText {
+  text-align: center;
   color: #fff;
+  padding-bottom: 20px;
   text-shadow:
     0 0 1px #fff,
     0 0 2px #fff,
