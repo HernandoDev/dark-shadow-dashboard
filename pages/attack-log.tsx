@@ -1587,6 +1587,13 @@ const AttackLog: React.FC = () => {
                                 <option value="" disabled>
                                     Seleccione TH Rival
                                 </option>
+                                <option value="TH8">TH8</option>
+                                <option value="TH9">TH9</option>
+                                <option value="TH10">TH10</option>
+
+                                <option value="TH11">TH11</option>
+                                <option value="TH12">TH12</option>
+
                                 <option value="TH13">TH13</option>
                                 <option value="TH14">TH14</option>
                                 <option value="TH15">TH15</option>
