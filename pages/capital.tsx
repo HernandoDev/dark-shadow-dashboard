@@ -78,6 +78,7 @@ const CapitalPage: React.FC = () => {
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
     const [capitalRaidsSaves, setCapitalRaids] = useState<any>(null); // Estado para los datos de incursiones capitales
     const [activeTab, setActiveTab] = useState<'capitalActual' | 'historicoCapital'>('capitalActual'); // State for active tab
+    const [searchQuery, setSearchQuery] = useState<string>(''); // Add state for search query
 
     useEffect(() => {
         const fetchCapitalRaids = async () => {
@@ -137,6 +138,11 @@ const CapitalPage: React.FC = () => {
             if (a[key] > b[key]) return sortConfig.direction === 'asc' ? 1 : -1;
             return 0;
         });
+    };
+
+    const filteredData = (data: any[]) => {
+        if (!searchQuery) return data;
+        return data.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
     };
 
     const handleSort = (key: string) => {
@@ -270,6 +276,14 @@ const CapitalPage: React.FC = () => {
                                     {season.members && season.members.length > 0 && (
                                                 <div className="member-participation">
                                                     <h4 style={{color:'violet'}}>Principales Contribuyentes</h4>
+                                                    <input
+                                                    className='input'
+                                                        type="text"
+                                                        placeholder="Buscar jugador..."
+                                                        value={searchQuery}
+                                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                                        style={{ marginBottom: '10px', padding: '5px', width: '100%' }}
+                                                    />
                                                     <table className="member-table">
                                                         <thead>
                                                             <tr>
@@ -279,7 +293,7 @@ const CapitalPage: React.FC = () => {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {sortedData(getTopContributors(season), sortConfig?.key || '').map((member, idx) => (
+                                                            {sortedData(filteredData(getTopContributors(season)), sortConfig?.key || '').map((member, idx) => (
                                                                 <tr key={idx}>
                                                                     <td>{member.name}</td>
                                                                     <td>{member.attacks}/{member.attackLimit + member.bonusAttackLimit}</td>
@@ -294,6 +308,14 @@ const CapitalPage: React.FC = () => {
                                     {getNonAttackingMembers(season).length > 0 && (
                                                 <div className="non-attacking-members" style={{ padding: '10px', borderRadius: '5px' ,marginTop:'40px'}}>
                                                     <h4 style={{ color: 'red' }}>Miembros Sin Ataques</h4>
+                                                    <input
+                                                        type="text"
+                                                        className='input'
+                                                        placeholder="Buscar jugador..."
+                                                        value={searchQuery}
+                                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                                        style={{ marginBottom: '10px', padding: '5px', width: '100%' }}
+                                                    />
                                                     <table className="member-table">
                                                         <thead>
                                                             <tr>
@@ -303,7 +325,7 @@ const CapitalPage: React.FC = () => {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {sortedData(getNonAttackingMembers(season), sortConfig?.key || '').map((member, idx) => (
+                                                            {sortedData(filteredData(getNonAttackingMembers(season)), sortConfig?.key || '').map((member, idx) => (
                                                                 <tr key={idx} style={{ color: 'red' }}>
                                                                     <td>{member.name}</td>
                                                                     <td>{member.attacks}</td>
@@ -336,6 +358,15 @@ const CapitalPage: React.FC = () => {
                             {/* Summary Table */}
                             <div className="summary-table">
                                 <h3>Resumen Total por Jugador</h3>
+                                <input
+                                    type="text"
+                                    className='input'
+
+                                    placeholder="Buscar jugador..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ marginBottom: '10px', padding: '5px', width: '100%' }}
+                                />
                                 <table className="member-table">
                                     <thead>
                                         <tr>
@@ -347,25 +378,27 @@ const CapitalPage: React.FC = () => {
                                     </thead>
                                     <tbody>
                                         {sortedData(
-                                            Object.values(
-                                                (capitalRaidsSaves as RaidSeason[]).reduce((acc: Record<string, any>, raid: RaidSeason) => {
-                                                    raid.members?.forEach((member: Member) => {
-                                                        if (!acc[member.tag]) {
-                                                            acc[member.tag] = {
-                                                                name: member.name,
-                                                                totalAttacks: 0,
-                                                                totalAttackLimit: 0,
-                                                                totalLooted: 0,
-                                                                raidCount: 0,
-                                                            };
-                                                        }
-                                                        acc[member.tag].totalAttacks += member.attacks;
-                                                        acc[member.tag].totalAttackLimit += member.attackLimit + member.bonusAttackLimit;
-                                                        acc[member.tag].totalLooted += member.totalLooted;
-                                                        acc[member.tag].raidCount += 1;
-                                                    });
-                                                    return acc;
-                                                }, {})
+                                            filteredData(
+                                                Object.values(
+                                                    (capitalRaidsSaves as RaidSeason[]).reduce((acc: Record<string, any>, raid: RaidSeason) => {
+                                                        raid.members?.forEach((member: Member) => {
+                                                            if (!acc[member.tag]) {
+                                                                acc[member.tag] = {
+                                                                    name: member.name,
+                                                                    totalAttacks: 0,
+                                                                    totalAttackLimit: 0,
+                                                                    totalLooted: 0,
+                                                                    raidCount: 0,
+                                                                };
+                                                            }
+                                                            acc[member.tag].totalAttacks += member.attacks;
+                                                            acc[member.tag].totalAttackLimit += member.attackLimit + member.bonusAttackLimit;
+                                                            acc[member.tag].totalLooted += member.totalLooted;
+                                                            acc[member.tag].raidCount += 1;
+                                                        });
+                                                        return acc;
+                                                    }, {})
+                                                )
                                             ),
                                             sortConfig?.key || ''
                                         ).map((player, idx) => (
@@ -390,6 +423,15 @@ const CapitalPage: React.FC = () => {
                                     </div>
                                     <div className="raid-stats">
                                         <h4>Miembros</h4>
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar jugador..."
+                                            className='input'
+
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            style={{ marginBottom: '10px', padding: '5px', width: '100%' }}
+                                        />
                                         <table className="member-table">
                                             <thead>
                                                 <tr>
@@ -399,7 +441,7 @@ const CapitalPage: React.FC = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {sortedData(raid.members || [], sortConfig?.key || '').map((member: Member, idx: number) => (
+                                                {sortedData(filteredData(raid.members || []), sortConfig?.key || '').map((member: Member, idx: number) => (
                                                     <tr key={idx}>
                                                         <td>{member.name}</td>
                                                         <td>{member.attacks}/{member.attackLimit + member.bonusAttackLimit}</td>
