@@ -21,6 +21,7 @@ import { FilterIcon } from '../icons/sidebar/filter-icon';
 import { useSidebarContext } from '../layout/layout-context';
 import { ChangeLogIcon } from '../icons/sidebar/changelog-icon';
 import { useRouter } from 'next/router';
+import { CapitalIcon } from '../icons/sidebar/capital-icon'; // Import the new icon
 
 export const SidebarWrapper = () => {
    const router = useRouter();
@@ -116,6 +117,12 @@ export const SidebarWrapper = () => {
                         title="Perfiles de Jugadores"
                         icon={<CustomersIcon />}
                         href="player-info"
+                     />
+                       <SidebarItem
+                        isActive={router.pathname === '/capital'}
+                        title="Capital del Clan"
+                        icon={<CapitalIcon />} // Use the new icon
+                        href="capital"
                      />
                   </SidebarMenu>
                   <h6>Selecionar Clan</h6>
