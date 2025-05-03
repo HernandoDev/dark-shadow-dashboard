@@ -125,7 +125,7 @@ const ReportesPage = () => {
                 ) : (
                     <ul style={{ listStyle: 'none', padding: 0 }}>
                         {filteredReports.map((report, index) => (
-                            <div className="bgblue">
+                            <div style={{marginTop:'25px'}} className="bgblue">
                                 <div className="card">
                                     <li
                                         key={index}
