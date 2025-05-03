@@ -62,7 +62,32 @@ export const SidebarWrapper = () => {
                css={{ height: '100%' }}
             >
                <Sidebar.Body className="body sidebar">
-
+                  <select
+                     className='input'
+                     value={clanTag}
+                     onChange={handleClanChange}
+                     style={{
+                        width: '100%',
+                        padding: '8px',
+                        marginBottom: '10px',
+                        color: '#ffffff', // White text
+                        border: '1px solid #4b5563', // Gray border
+                        borderRadius: '8px', // Rounded corners
+                        fontSize: '14px', // Adjust font size
+                        outline: 'none', // Remove outline
+                        appearance: 'none', // Remove default dropdown arrow
+                        cursor: 'pointer', // Pointer cursor
+                     }}
+                  >
+                     <option value="" disabled>
+                        Selecciona un Clan
+                     </option>
+                     <option value="%232QL0GCQGQ">Dark Shadows</option>
+                     <option value="%232RG9R9JVP">Dark Shadows II</option>
+                     {typeof window !== 'undefined' && localStorage.getItem('username') === 'nandods' && (
+                        <option value="%232RUU8RYCY">Pollos Hermanos</option>
+                     )}
+                  </select>
                   <SidebarMenu title="Main Menu">
                      <SidebarItem
                         isActive={router.pathname === '/'}
@@ -125,33 +150,7 @@ export const SidebarWrapper = () => {
                         href="capital"
                      />
                   </SidebarMenu>
-                  <h6>Selecionar Clan</h6>
-                  <select
-                     className='input'
-                     value={clanTag}
-                     onChange={handleClanChange}
-                     style={{
-                        width: '100%',
-                        padding: '8px',
-                        marginBottom: '10px',
-                        color: '#ffffff', // White text
-                        border: '1px solid #4b5563', // Gray border
-                        borderRadius: '8px', // Rounded corners
-                        fontSize: '14px', // Adjust font size
-                        outline: 'none', // Remove outline
-                        appearance: 'none', // Remove default dropdown arrow
-                        cursor: 'pointer', // Pointer cursor
-                     }}
-                  >
-                     <option value="" disabled>
-                        Selecciona un Clan
-                     </option>
-                     <option value="%232QL0GCQGQ">Dark Shadows</option>
-                     <option value="%232RG9R9JVP">Dark Shadows II</option>
-                     {typeof window !== 'undefined' && localStorage.getItem('username') === 'nandods' && (
-                        <option value="%232RUU8RYCY">Pollos Hermanos</option>
-                     )}
-                  </select>
+       
                </Sidebar.Body>
 
             </Flex>
