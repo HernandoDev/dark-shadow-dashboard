@@ -21,9 +21,10 @@ interface CardProps {
   borderColor?: string; // Add borderColor prop
   tag: string; // Add tag prop
   missingAttacks?: number; // Add missingAttacks prop
+  leagueAverageStars?: string; // Add leagueAverageStars prop
 }
 
-const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, onViewDetails, minLevels, position, topArmies, borderColor, tag, missingAttacks }) => {
+const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, onViewDetails, minLevels, position, topArmies, borderColor, tag, missingAttacks, leagueAverageStars }) => {
   const openInGameProfile = () => {
     const url = `https://link.clashofclans.com/es?action=OpenPlayerProfile&tag=${encodeURIComponent(tag)}`;
     window.open(url, '_blank');
@@ -72,6 +73,11 @@ const Card: React.FC<CardProps> = ({ name, townHallLevel, heroes, averageStars, 
             {averageStars && (
               <div style={{ textAlign: 'center', marginTop: '10px', color: 'white', fontSize: '15px' }}>
                 Promedio de estrellas: {averageStars}
+              </div>
+            )}
+            {leagueAverageStars && (
+              <div style={{ textAlign: 'center', marginTop: '10px', color: 'white', fontSize: '15px' }}>
+                Media de estrellas ligas: {leagueAverageStars}
               </div>
             )}
             {missingAttacks !== null && missingAttacks !== undefined && missingAttacks > 0 && (

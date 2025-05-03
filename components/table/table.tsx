@@ -440,6 +440,36 @@ export const TableWrapper = () => {
 
    };
 
+   const calculateLeagueAverageStars = (memberTag: string) => {
+      let totalStars = 0;
+      let totalAttacks = 0;
+   
+      warLeageSaves.forEach((save) => {
+         const leagueGroupData = save.content?.leagueGroupData;
+         if (leagueGroupData?.clans) {
+            leagueGroupData.clans.forEach((clan: { members: { tag: string }[] }) => {
+               clan.members.forEach((member: { tag: string }) => {
+                 if (member.tag === memberTag) {
+                   const matchingWar = save.content.matchingWars.find(
+                     (war: { clan: { members: { tag: string }[] } }) =>
+                        war.clan.members.some((m: { tag: string }) => m.tag === memberTag)
+                   );
+                   if (matchingWar) {
+                     const clanMember = matchingWar.clan.members.find((m: { tag: string; stars?: number; opponentAttacks?: number }) => m.tag === memberTag);
+                     if (clanMember) {
+                        totalStars += clanMember.stars || 0;
+                        totalAttacks += clanMember.opponentAttacks || 0;
+                     }
+                   }
+                 }
+               });
+            });
+         }
+      });
+   
+      return totalAttacks > 0 ? (totalStars / totalAttacks).toFixed(2) : 'N/A';
+   };
+
    const getMissingAttacksForMember = (memberTag: string) => {
       const missingMember = missing45Days?.find((missing) => missing.tag === memberTag);
       return missingMember ? missingMember.missingAttacks : 0;
@@ -564,6 +594,7 @@ export const TableWrapper = () => {
                {sortedMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
                   const missingMember = missing45Days?.find((missing) => missing.tag === member.tag); // Find member in missing45Days
+                  const leagueAverageStars = calculateLeagueAverageStars(member.tag); // Calculate league average stars
                   return (
                      <div className="animate__animated animate__backInLeft" style={{ padding: '15px' }} key={member.tag}>
                         <Card
@@ -583,6 +614,7 @@ export const TableWrapper = () => {
                            topArmies={topArmies}
                            tag={member.tag}
                            averageStars={calculateAverageStars(member.name)}
+                           leagueAverageStars={leagueAverageStars} // Pass league average stars
                            missingAttacks={missingMember?.missingAttacks || 0} // Pass missing attacks
                         />
                      </div>
@@ -593,6 +625,7 @@ export const TableWrapper = () => {
                {sortedNotMeetingRequirements.map((member, index) => {
                   const topArmies = getTopUsedArmies(member.name);
                   const missingMember = missing45Days?.find((missing) => missing.tag === member.tag); // Find member in missing45Days
+                  const leagueAverageStars = calculateLeagueAverageStars(member.tag); // Calculate league average stars
                   return (
                      <div style={{ padding: '15px' }} key={member.tag}>
                         <Card
@@ -613,6 +646,7 @@ export const TableWrapper = () => {
                            tag={member.tag}
                            borderColor="#dc2626"
                            averageStars={calculateAverageStars(member.name)}
+                           leagueAverageStars={leagueAverageStars} // Pass league average stars
                            missingAttacks={missingMember?.missingAttacks || 0} // Pass missing attacks
                         />
                      </div>
@@ -646,6 +680,7 @@ export const TableWrapper = () => {
                         const averageStars = calculateAverageStars(member.name) || 'N/A';
                         const missingMember = missing45Days?.find((missing) => missing.tag === member.tag);
                         const noAttacksIn45Days = (missingMember?.missingAttacks ?? 0) > 0 ? 'Sí' : 'No';
+                        const leagueAverageStars = calculateLeagueAverageStars(member.tag); // Calculate league average stars
                         return (
                            <Table.Row key={member.tag}>
                               <Table.Cell>{index + 1}</Table.Cell>
@@ -695,6 +730,7 @@ export const TableWrapper = () => {
                         const averageStars = calculateAverageStars(member.name) || 'N/A';
                         const missingMember = missing45Days?.find((missing) => missing.tag === member.tag);
                         const noAttacksIn45Days = (missingMember?.missingAttacks ?? 0) > 0 ? 'Sí' : 'No';
+                        const leagueAverageStars = calculateLeagueAverageStars(member.tag); // Calculate league average stars
                         return (
                            <Table.Row key={member.tag}>
                               <Table.Cell>{index + 1}</Table.Cell>
