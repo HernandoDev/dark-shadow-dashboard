@@ -9,9 +9,11 @@ type ClanWarLeagueGroupDetails = {
          members: {
             tag: string;
             name: string;
+            townhallLevel: number;
             attacks?: {
                stars: number;
                destructionPercentage: number;
+               defenderTag: string;
             }[];
          }[];
       };
@@ -19,9 +21,11 @@ type ClanWarLeagueGroupDetails = {
          members: {
             tag: string;
             name: string;
+            townhallLevel: number;
             attacks?: {
                stars: number;
                destructionPercentage: number;
+               defenderTag: string;
             }[];
          }[];
       };
@@ -118,6 +122,7 @@ const LeaguePointsPage = () => {
       for (const war of clanWarLeagueGroupDetails.matchingWars) {
          const isClan = war.clan.tag === clanTag.replace('%23', '#');
          const members = isClan ? war.clan.members : war.opponent.members;
+         const enemies = isClan ? war.opponent.members : war.clan.members; // New variable for enemy members
 
          for (const member of members) {
             if (!playersStats[member.tag]) {
@@ -145,13 +150,23 @@ const LeaguePointsPage = () => {
 
                   if (attack.stars === 1) playersStats[member.tag].stars1++;
                   if (attack.stars === 2) playersStats[member.tag].stars2++;
-                  if (attack.stars === 3) playersStats[member.tag].stars3++;
+                  if (attack.stars === 3) {
+                     playersStats[member.tag].stars3++;
+                     playersStats[member.tag].score += 3; // Add 3 points for 3 stars
 
-                  playersStats[member.tag].score += attack.stars; // Simplified score calculation
+                     // Check if the enemy's townhallLevel is higher
+                     const enemy = enemies.find((e) => e.tag === attack.defenderTag);
+                     if (enemy && enemy.townhallLevel > member.townhallLevel) {
+                        playersStats[member.tag].score += 0.25; // Add 0.25 points for attacking a higher-level townhall
+                     }
+                  } else {
+                     playersStats[member.tag].score += attack.stars; // Add stars to score
+                  }
                }
             }
          }
       }
+      debugger
 
       return Object.values(playersStats)
          .map((player) => ({
@@ -231,10 +246,14 @@ const LeaguePointsPage = () => {
 
          {/* Explanatory Text */}
          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            {activeTab === 'table' && <p>
-               En esta ventana se refleja la clasificacion de los jugadores en la Liga de Guerra actual!
+            {activeTab === 'table' && <p><span style={{color:'violet'}}>
+               En esta ventana se refleja la clasificacion de los jugadores en la Liga de Guerra actual! </span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
+Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
+Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.
                </p>}
-            {activeTab === 'summary' && <p>En esta evntana se refleja una clasificacion global desde el 1 de mayo de 2025</p>}
+            {activeTab === 'summary' && <p><span style={{color:'violet'}}>En esta ventana se refleja una clasificacion global desde el 1 de mayo de 2025</span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
+Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
+Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.</p>}
          </div>
 
          {/* Tab Content */}
