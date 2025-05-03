@@ -33,7 +33,8 @@ const AttackLog: React.FC = () => {
         'Tropa de Eventos',
         'Super Montapuercos',
         'Spam terrestre + bola de fuego',
-        'Dragones Electricos'
+        'Dragones Electricos',
+        'Super Barbaros  + Blimp/Super Arqueras / Magos',
     ]);
     const [filteredAttacks, setFilteredAttacks] = useState<string[]>(attacks);
     const [attackSearchTerm, setAttackSearchTerm] = useState('');
