@@ -49,7 +49,7 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                      Destrucción %:
                   </Text>
                   <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
-                     {player.percentage}%
+                     {player.percentage.toFixed(2)}%
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
