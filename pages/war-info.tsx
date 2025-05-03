@@ -89,9 +89,10 @@ const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksP
 const generateWarMessage = (warDetails: any) => {
   if (!warDetails) return '';
 
-
   const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
-  const myClan = warDetails.clan
+  const myClan = warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent; // Determine your clan
+  const targetClan = warDetails.clan.tag === clanTag ? warDetails.opponent : warDetails.clan; // Determine the opponent clan
+
   if (!myClan) return 'No se encontró información de tu clan.';
 
   const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
@@ -103,7 +104,6 @@ const generateWarMessage = (warDetails: any) => {
         const stars = (attack.stars || 0) as 1 | 2 | 3;
 
         // Find the target clan and member by searching for the defenderTag
-        const targetClan = warDetails.opponent
         const targetClanName = targetClan ? targetClan.name : 'Desconocido';
         const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
 
@@ -121,22 +121,20 @@ const generateWarMessage = (warDetails: any) => {
           const message = `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
 
           starsGroup[stars]?.push(message);
-
-          console.log(starsGroup);
-
         }
       });
       if (member.attacks.length === 1) {
-        const attacksPerMember = warDetails.attacksPerMember || 2; // Default to 2 attacks per member if not provided
+        const attacksPerMember = warDetails.attacksPerMember || 1 // Default to 2 attacks per member if not provided
         const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
         if (attacksMissing > 0) {
-          noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s))`);
+          noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s)`);
         }
       }
     } else {
-      const attacksPerMember = warDetails.attacksPerMember || 2; // Default to 2 attacks per member if not provided
+      debugger
+      const attacksPerMember = warDetails.attacksPerMember || 1; // Default to 2 attacks per member if not provided
       const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-      noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s))`);
+      noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s)`);
     }
   });
 
@@ -525,15 +523,19 @@ const WarInfoPage = () => {
   };
 
   const generateFilteredWarMessage = (warDetails: any) => {
-    console.log(currentWarDetails);
-
-    // Get the latest save
-    const latestSave = currentWarDetails;
+    const latestSave = currentWarDetails && Object.keys(currentWarDetails).length > 0 
+      ? currentWarDetails 
+      : warLeageSaves[warLeageSaves.length - 1]?.content;
+  
+    if (!latestSave) {
+      return "No hay información disponible para generar el mensaje.";
+    }
+  
     const state = latestSave.state;
     const now = new Date();
-
+  
     let additionalInfo = '';
-
+  
     if (state === "preparation") {
       const preparationEndTime = new Date(
         `${latestSave.startTime.substring(0, 4)}-${latestSave.startTime.substring(4, 6)}-${latestSave.startTime.substring(6, 8)}T${latestSave.startTime.substring(9, 11)}:${latestSave.startTime.substring(11, 13)}:${latestSave.startTime.substring(13, 15)}.000Z`
@@ -543,20 +545,19 @@ const WarInfoPage = () => {
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
       additionalInfo = `La guerra está en preparación. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
     } else if (state === "inWar") {
-
       const battleEndTime = new Date(
         `${latestSave.endTime.substring(0, 4)}-${latestSave.endTime.substring(4, 6)}-${latestSave.endTime.substring(6, 8)}T${latestSave.endTime.substring(9, 11)}:${latestSave.endTime.substring(11, 13)}:${latestSave.endTime.substring(13, 15)}.000Z`
       );
       const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
       const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-
+  
       const clanTag = getClanTag().replace('%23', '#');
       const isMainClan = latestSave.clan.tag === clanTag;
-
+  
       const mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
       const opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
-
+  debugger
       if (mainClan.stars > opponentClan.stars) {
         additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\n\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else if (mainClan.stars < opponentClan.stars) {
@@ -571,15 +572,15 @@ const WarInfoPage = () => {
         }
       }
     }
-
-    const fullMessage = generateWarMessage(currentWarDetails);
+  
+    const fullMessage = generateWarMessage(latestSave);
     const sections = fullMessage.split('🌟🌟🌟');
-
+  
     const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
     const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
     const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
     const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
-
+  
     let filteredMissingAttacksSection = missingAttacksSection;
     if (includeOneMissingAttack) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
@@ -587,20 +588,20 @@ const WarInfoPage = () => {
         .filter((line) => line.includes('Faltan 1 ataque'))
         .join('\n');
     }
-
+  
     if (includeTwoMissingAttacks) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
         .filter((line) => line.includes('Faltan 2 ataque'))
         .join('\n');
     }
-
+  
     const totalMissingAttacks = (filteredMissingAttacksSection.match(/Faltan \d+ ataque/g) || [])
       .map((line) => parseInt(line.match(/\d+/)?.[0] || '0'))
       .reduce((sum, count) => sum + count, 0);
-
+  
     const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
-
+  
     return `
   ${additionalInfo}
   
