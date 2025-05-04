@@ -176,6 +176,20 @@ const deleteAttack = async (attackId: string) => {
   }
 };
 
+interface ClanMember {
+  tag: string;
+  name: string;
+  townhallLevel: number;
+  mapPosition: number;
+  attacks?: Attack[];
+}
+
+interface Attack {
+  stars: number;
+  destructionPercentage: number;
+  defenderTag: string;
+}
+
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
@@ -197,6 +211,7 @@ const WarInfoPage = () => {
 
   const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
   const [showSavedAttacks, setShowSavedAttacks] = useState(false); // State for collapsible saved attacks section
+  const [showWarMap, setShowWarMap] = useState(false); // State for collapsible war map section
 
   useEffect(() => {
     if (activeTab === 'currentWar') {
@@ -1139,10 +1154,80 @@ const WarInfoPage = () => {
                 Resultado: {evaluateWarResult(selectedWar)}
               </p>
 
+              {/* Collapsible War Map Section */}
+              <div style={{ marginTop: '20px' }}>
+                <h3 onClick={() => setShowWarMap(!showWarMap)} style={{ cursor: 'pointer' }}>
+                 Ataques resumidos {showWarMap ? '▲' : '▼'}
+                </h3>
+                {showWarMap && (
+                  <div>
+                    {(() => {
+                      const clanTag = getClanTag().replace('%23', '#');
+                      const isMainClan = selectedWar.content.clan.tag === clanTag;
+                      const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
+                      const opponentClan = isMainClan ? selectedWar.content.opponent : selectedWar.content.clan;
+
+                      return mainClan.attacks > 0 ? (
+                        <div>
+                          {mainClan.members.map((member: ClanMember, index: number) => (
+                            <div key={index} className="bgblue" style={{ marginBottom: '10px' }}>
+                              <div className="card">
+                                <h4 style={{ color: '#4caf50', marginBottom: '10px' }}>
+                                  {member.mapPosition}. {member.name} (TH{member.townhallLevel})
+                                </h4>
+                                {member.attacks && member.attacks.length > 0 ? (
+                                  <ul style={{ listStyle: 'none', padding: 0 }}>
+                                    {member.attacks.map((attack: Attack, attackIndex: number) => (
+                                      <li key={attackIndex} style={{ marginBottom: '10px' }}>
+                                        <p>
+                                          <strong>Defensor:</strong>{' '}
+                                          {opponentClan.members.find((opponent: ClanMember) => opponent.tag === attack.defenderTag)?.name || 'Desconocido'}
+                                        </p>
+                                        <p>
+                                          <strong>Estrellas:</strong>{' '}
+                                          <span style={{ color: attack.stars === 3 ? 'green' : attack.stars === 2 ? 'orange' : 'red' }}>
+                                            {attack.stars}
+                                          </span>
+                                        </p>
+                                        <p>
+                                          <strong>Porcentaje:</strong> {attack.destructionPercentage}%
+                                        </p>
+                                        <p>
+                                          <strong>TH Rival:</strong>{' '}
+                                          <span
+                                            style={{
+                                              color:
+                                                member.townhallLevel <
+                                                opponentClan.members.find((opponent: ClanMember) => opponent.tag === attack.defenderTag)?.townhallLevel
+                                                  ? 'red'
+                                                  : 'green',
+                                            }}
+                                          >
+                                            {opponentClan.members.find((opponent: ClanMember) => opponent.tag === attack.defenderTag)?.townhallLevel || 'Desconocido'}
+                                          </span>
+                                        </p>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p style={{ color: 'red' }}>No realizó ataques.</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p>No hay combates aún.</p>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
               {/* Collapsible Saved Attacks Section */}
               <div style={{ marginTop: '20px' }}>
                 <h3 onClick={() => setShowSavedAttacks(!showSavedAttacks)} style={{ cursor: 'pointer' }}>
-                  Ataques Guardados {showSavedAttacks ? '▲' : '▼'}
+                  Ataques Guardados con Ejercito y observaciones {showSavedAttacks ? '▲' : '▼'}
                 </h3>
                 {showSavedAttacks && (
                   <div>
