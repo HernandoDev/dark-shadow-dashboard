@@ -1161,6 +1161,41 @@ const WarInfoPage = () => {
                 </h3>
                 {showWarMap && (
                   <div>
+                    <div style={{ marginBottom: '10px' }}>
+                      <button
+                        onClick={() => {
+                          const clanTag = getClanTag().replace('%23', '#');
+                          const isMainClan = selectedWar.content.clan.tag === clanTag;
+                          const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
+                            mainClan.members.sort((a: ClanMember, b: ClanMember) => {
+                            const aStars: number = a.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
+                            const bStars: number = b.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
+                            return bStars - aStars; // Sort by best attacks
+                            });
+                          setShowWarMap(false); // Force re-render
+                          setTimeout(() => setShowWarMap(true), 0);
+                        }}
+                        style={{ marginRight: '10px' }}
+                      >
+                        Ordenar por mejores ataques
+                      </button>
+                      <button
+                        onClick={() => {
+                          const clanTag = getClanTag().replace('%23', '#');
+                          const isMainClan = selectedWar.content.clan.tag === clanTag;
+                          const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
+                            mainClan.members.sort((a: ClanMember, b: ClanMember) => {
+                            const aStars: number = a.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
+                            const bStars: number = b.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
+                            return aStars - bStars; // Sort by worst attacks
+                            });
+                          setShowWarMap(false); // Force re-render
+                          setTimeout(() => setShowWarMap(true), 0);
+                        }}
+                      >
+                        Ordenar por peores ataques
+                      </button>
+                    </div>
                     {(() => {
                       const clanTag = getClanTag().replace('%23', '#');
                       const isMainClan = selectedWar.content.clan.tag === clanTag;
