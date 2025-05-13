@@ -35,6 +35,8 @@ const AttackLog: React.FC = () => {
         'Spam terrestre + bola de fuego',
         'Dragones Electricos',
         'Super Barbaros  + Blimp/Super Arqueras / Magos',
+        'Spam Super Yetis',
+        'Spam Aereo + Blimp Super Yetis',
     ]);
     const [filteredAttacks, setFilteredAttacks] = useState<string[]>(attacks);
     const [attackSearchTerm, setAttackSearchTerm] = useState('');
