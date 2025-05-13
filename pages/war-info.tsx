@@ -131,7 +131,7 @@ const generateWarMessage = (warDetails: any) => {
         }
       }
     } else {
-      debugger
+
       const attacksPerMember = warDetails.attacksPerMember || 1; // Default to 2 attacks per member if not provided
       const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
       noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s)`);
@@ -214,28 +214,29 @@ const WarInfoPage = () => {
   const [showWarMap, setShowWarMap] = useState(false); // State for collapsible war map section
 
   useEffect(() => {
-    if (activeTab === 'currentWar') {
       const loadData = async () => {
         try {
-          const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
-
-          if (clanWarLeagueGroupDetails?.clans) {
-            const fullDetails = await Promise.all(
-              clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
-                const membersWithDetails = await Promise.all(
-                  clan.members.map(async (member: { tag: string; }) => {
-                    const formattedTag = member.tag.replace('#', '%23');
-                    const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-                    return { ...member, playerInfo };
-                  })
-                );
-                return { ...clan, members: membersWithDetails };
-              })
-            );
-            setFullWarDetails(fullDetails);
+          if (activeTab === 'currentWar') {
+            const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
+            if (clanWarLeagueGroupDetails?.clans) {
+              const fullDetails = await Promise.all(
+                clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
+                  const membersWithDetails = await Promise.all(
+                    clan.members.map(async (member: { tag: string; }) => {
+                      const formattedTag = member.tag.replace('#', '%23');
+                      const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
+                      return { ...member, playerInfo };
+                    })
+                  );
+                  return { ...clan, members: membersWithDetails };
+                })
+              );
+              setFullWarDetails(fullDetails);
+            }
           } else {
             const currentWarDetails = await APIClashService.getClanCurrentWar();
             setcurrentWarDetails(currentWarDetails);
+            debugger
             const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
             const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
 
@@ -269,7 +270,6 @@ const WarInfoPage = () => {
       };
 
       loadData();
-    }
   }, [activeTab]);
 
   useEffect(() => {
@@ -486,12 +486,12 @@ const WarInfoPage = () => {
     };
   };
 
- 
+
   const formatWarDate = (fileName: string): string => {
     ;
     const cleanFileName = fileName.replace('.json', ''); // Remove .json extension
     const parts = cleanFileName.split('_');
-  
+
     // Determine the type based on the prefix
     let type = '';
     if (parts[0] === 'war') {
@@ -501,34 +501,34 @@ const WarInfoPage = () => {
     } else {
       return 'Formato de archivo no válido';
     }
-  
+
     // Handle different formats for the date part
     let datePart = parts[parts.length - 1]; // The date is always the last part
     if (datePart.includes('T')) {
       datePart = datePart.split('T')[0]; // Extract the date part if it contains a timestamp
     }
-  
+
     const dateParts = datePart.split('-');
     const year = dateParts[0];
     const month = dateParts[1];
     const day = dateParts[2] || '01'; // Default to the first day of the month if no day is provided
-  
+
     if (!year || !month) {
       return 'Fecha no válida';
     }
-  
+
     const months = [
       'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
       'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
     ];
-  
+
     return `${parseInt(day)} de ${months[parseInt(month) - 1]} de ${year} (${type})`;
   };
 
   const handleWarChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedFileName = event.target.value;
     let war = warSaves.find((w) => w.fileName === selectedFileName);
-    if(!war){
+    if (!war) {
       war = warLeageSaves.find((w) => w.fileName === selectedFileName);
     }
     setSelectedWar(war);
@@ -540,14 +540,13 @@ const WarInfoPage = () => {
 
   const generateFilteredWarMessage = (warDetails: any) => {
     let latestSave;
-  
     // Obtener el último guardado considerando el estado "preparation"
     if (currentWarDetails && Object.keys(currentWarDetails).length > 0) {
       latestSave = currentWarDetails;
     } else {
       // Obtener el más reciente desde warLeageSaves
       const lastSave = warLeageSaves[warLeageSaves.length - 1]?.content;
-  
+
       // Si el estado es "preparation", buscar el archivo anterior
       if (lastSave && lastSave.state === "preparation") {
         const previousSave = warLeageSaves[warLeageSaves.length - 2]?.content;
@@ -560,16 +559,16 @@ const WarInfoPage = () => {
         latestSave = lastSave;
       }
     }
-  
+
     if (!latestSave) {
       return "No hay información disponible para generar el mensaje.";
     }
-  
+
     const state = latestSave.state;
     const now = new Date();
-  
+
     let additionalInfo = '';
-  
+
     if (state === "preparation") {
       const preparationEndTime = new Date(
         `${latestSave.startTime.substring(0, 4)}-${latestSave.startTime.substring(4, 6)}-${latestSave.startTime.substring(6, 8)}T${latestSave.startTime.substring(9, 11)}:${latestSave.startTime.substring(11, 13)}:${latestSave.startTime.substring(13, 15)}.000Z`
@@ -585,13 +584,13 @@ const WarInfoPage = () => {
       const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
       const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-  
+
       const clanTag = getClanTag().replace('%23', '#');
       const isMainClan = latestSave.clan.tag === clanTag;
-  
+
       const mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
       const opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
-  
+
       if (mainClan.stars > opponentClan.stars) {
         additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\n\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
       } else if (mainClan.stars < opponentClan.stars) {
@@ -606,15 +605,15 @@ const WarInfoPage = () => {
         }
       }
     }
-  
+
     const fullMessage = generateWarMessage(latestSave);
     const sections = fullMessage.split('🌟🌟🌟');
-  
+
     const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
     const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
     const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
     const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
-  
+
     let filteredMissingAttacksSection = missingAttacksSection;
     if (includeOneMissingAttack) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
@@ -622,20 +621,20 @@ const WarInfoPage = () => {
         .filter((line) => line.includes('Faltan 1 ataque'))
         .join('\n');
     }
-  
+
     if (includeTwoMissingAttacks) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
         .filter((line) => line.includes('Faltan 2 ataque'))
         .join('\n');
     }
-  
+
     const totalMissingAttacks = (filteredMissingAttacksSection.match(/Faltan \d+ ataque/g) || [])
       .map((line) => parseInt(line.match(/\d+/)?.[0] || '0'))
       .reduce((sum, count) => sum + count, 0);
-  
+
     const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
-  
+
     return `
   ${additionalInfo}
   
@@ -1157,7 +1156,7 @@ const WarInfoPage = () => {
               {/* Collapsible War Map Section */}
               <div style={{ marginTop: '20px' }}>
                 <h3 onClick={() => setShowWarMap(!showWarMap)} style={{ cursor: 'pointer' }}>
-                 Ataques resumidos {showWarMap ? '▲' : '▼'}
+                  Ataques resumidos {showWarMap ? '▲' : '▼'}
                 </h3>
                 {showWarMap && (
                   <div>
@@ -1167,11 +1166,11 @@ const WarInfoPage = () => {
                           const clanTag = getClanTag().replace('%23', '#');
                           const isMainClan = selectedWar.content.clan.tag === clanTag;
                           const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
-                            mainClan.members.sort((a: ClanMember, b: ClanMember) => {
+                          mainClan.members.sort((a: ClanMember, b: ClanMember) => {
                             const aStars: number = a.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
                             const bStars: number = b.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
                             return bStars - aStars; // Sort by best attacks
-                            });
+                          });
                           setShowWarMap(false); // Force re-render
                           setTimeout(() => setShowWarMap(true), 0);
                         }}
@@ -1184,11 +1183,11 @@ const WarInfoPage = () => {
                           const clanTag = getClanTag().replace('%23', '#');
                           const isMainClan = selectedWar.content.clan.tag === clanTag;
                           const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
-                            mainClan.members.sort((a: ClanMember, b: ClanMember) => {
+                          mainClan.members.sort((a: ClanMember, b: ClanMember) => {
                             const aStars: number = a.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
                             const bStars: number = b.attacks?.reduce((sum: number, attack: Attack) => sum + attack.stars, 0) || 0;
                             return aStars - bStars; // Sort by worst attacks
-                            });
+                          });
                           setShowWarMap(false); // Force re-render
                           setTimeout(() => setShowWarMap(true), 0);
                         }}
@@ -1233,7 +1232,7 @@ const WarInfoPage = () => {
                                             style={{
                                               color:
                                                 member.townhallLevel <
-                                                opponentClan.members.find((opponent: ClanMember) => opponent.tag === attack.defenderTag)?.townhallLevel
+                                                  opponentClan.members.find((opponent: ClanMember) => opponent.tag === attack.defenderTag)?.townhallLevel
                                                   ? 'red'
                                                   : 'green',
                                             }}
