@@ -58,7 +58,12 @@ const PlayerInfo = () => {
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const filterText = event.target.value.toLowerCase();
-        setFilteredMembers(clanMembers.map((member) => member.name).filter((name) => name.toLowerCase().includes(filterText)));
+        const filtered = clanMembers.map((member) => member.name).filter((name) => name.toLowerCase().includes(filterText));
+        setFilteredMembers(filtered);
+
+        if (filtered.length === 1) {
+            handlePlayerSelection(filtered[0]); // Automatically select the player
+        }
     };
 
     const handlePlayerSelection = (playerName: string) => {
