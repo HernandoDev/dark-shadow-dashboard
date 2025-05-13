@@ -12,9 +12,10 @@ export const calculatePlayerSummary = (playerWarRecords: any[], leagueWarRecords
                 record.content.opponent.members.find((member: any) => member.name === selectedPlayer);
 
             if (playerData) {
+                debugger
                 totalWars++;
                 totalStars += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.stars, 0) || 0;
-                totalDestruction += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.percentage, 0) || 0;
+                totalDestruction += playerData.attacks?.reduce((sum: number, attack: any) => sum + attack.destructionPercentage, 0) || 0;
                 totalAttacks += playerData.attacks?.length || 0;
                 missedAttacks += Math.max(0, record.content.attacksPerMember - (playerData.attacks?.length || 0));
             }

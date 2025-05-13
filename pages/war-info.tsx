@@ -236,7 +236,7 @@ const WarInfoPage = () => {
           } else {
             const currentWarDetails = await APIClashService.getClanCurrentWar();
             setcurrentWarDetails(currentWarDetails);
-            debugger
+            
             const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
             const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
 
