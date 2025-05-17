@@ -47,6 +47,10 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
     const [playerReports, setPlayerReports] = useState<any[]>([]);
     const [playerInfo, setPlayerInfo] = useState<PlayerInfo | null>(null); // Use PlayerInfo interface
 
+    // Estados para raids de capital y error
+    const [capitalRaids, setCapitalRaids] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
+
     // States for collapsible sections
     const [showTroops, setShowTroops] = useState(false);
     const [showHeroes, setShowHeroes] = useState(false);
@@ -234,10 +238,22 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
             }
         };
 
+        // Nueva función para obtener raids de capital
+        const fetchCapitalRaids = async () => {
+            try {
+                const data = await APIClashService.getCapitalRaidsSaves();
+                setCapitalRaids(data); 
+                debugger
+            } catch (err: any) {
+                setError(err.message || 'Error fetching capital raids data');
+            }
+        };
+
         if (selectedPlayer) {
             fetchPlayerDonations();
             fetchPlayerReports();
             fetchPlayerInfo();
+            fetchCapitalRaids(); // Llamar a la nueva función
         }
     }, [selectedPlayer, selectedPlayerTag]);
 
@@ -260,7 +276,87 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
     return (
         <div>
             <div className="bgblue">
-                <div className="card">RESUMEN DE CAPITAL EN PROGRESO</div>
+                <div className="card">
+                    RESUMEN DE CAPITAL EN PROGRESO
+                    {/* Mostrar resumen de raids de capital */}
+                    {error && <div style={{ color: 'red' }}>{error}</div>}
+                    {capitalRaids && playerInfo && (
+                        <div style={{ marginTop: '10px', fontSize: '14px' }}>
+                            {/* Filtrar los raids donde el jugador participó */}
+                            {(() => {
+                                const raids = Array.isArray(capitalRaids) ? capitalRaids : [];
+                                const playerTag = playerInfo.tag;
+                                // Buscar participaciones del jugador en raids
+                                const playerRaids = raids.map((raid) => {
+                                    const member = raid.members.find((m: any) => m.tag === playerTag);
+                                    return member
+                                        ? {
+                                            ...member,
+                                            raid,
+                                            raidStart: raid.startTime,
+                                            raidEnd: raid.endTime,
+                                        }
+                                        : null;
+                                }).filter(Boolean);
+
+                                if (playerRaids.length === 0) {
+                                    return <div>No hay registros de participación del jugador en raids de capital.</div>;
+                                }
+
+                                // Calcular media de totalLooted
+                                const avgLoot = Math.round(
+                                    playerRaids.reduce((sum: number, m: any) => sum + m.totalLooted, 0) / playerRaids.length
+                                );
+
+                                // Revisar ataques realizados vs requeridos
+                                const missedRaids = playerRaids
+                                    .filter((m: any) => m.attacks < 6)
+                                    .map((m: any) => ({
+                                        raidStart: m.raidStart,
+                                        raidEnd: m.raidEnd,
+                                        attacks: m.attacks,
+                                        missed: 6 - m.attacks,
+                                    }));
+
+                                return (
+                                    <div>
+                                        <div>
+                                            <strong>Participaciones en Raids de Capital:</strong> {playerRaids.length}
+                                        </div>
+                                        <div>
+                                            <strong>Media de botín obtenido:</strong> {avgLoot}
+                                        </div>
+                                        <div>
+                                            <strong>¿Cumple con ataques?</strong>{" "}
+                                            {missedRaids.length === 0 ? (
+                                                <span style={{ color: 'green' }}>Sí, siempre realiza sus 6 ataques</span>
+                                            ) : (
+                                                <span style={{ color: 'red' }}>
+                                                    No, faltó ataques en {missedRaids.length} raid(s)
+                                                </span>
+                                            )}
+                                        </div>
+                                        {missedRaids.length > 0 && (
+                                            <div style={{ marginTop: 8 }}>
+                                                <strong>Detalles de raids con ataques faltantes:</strong>
+                                                <ul style={{ paddingLeft: 18 }}>
+                                                    {missedRaids.map((r, idx) => (
+                                                        <li key={idx}>
+                                                            <span>
+                                                                Raid del <b>{r.raidStart?.slice(0,8)}</b>:
+                                                                hizo <b>{r.attacks}</b> ataques, faltaron <b>{r.missed}</b>
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="bgblue" style={{ width: '100%', margin: '0 auto', marginTop: '10px' }}>
                 <div className="card animate__animated animate__backInLeft">

@@ -86,12 +86,14 @@ export const calculatePlayerSummary = (
 export const filterWarRecords = (warSaves: any[], playerName: string) => {
   return warSaves.filter(
     (war) =>
-      war.content.clan.members.some(
-        (member: any) => member.name === playerName
-      ) ||
-      war.content.opponent.members.some(
-        (member: any) => member.name === playerName
-      )
+      Array.isArray(war.content?.clan?.members) &&
+        war.content.clan.members.some(
+          (member: any) => member.name === playerName
+        ) ||
+      Array.isArray(war.content?.opponent?.members) &&
+        war.content.opponent.members.some(
+          (member: any) => member.name === playerName
+        )
   );
 };
 
