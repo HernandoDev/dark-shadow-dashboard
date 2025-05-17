@@ -613,19 +613,18 @@ const WarInfoPage = () => {
     const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
     const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
     const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
-
     let filteredMissingAttacksSection = missingAttacksSection;
     if (includeOneMissingAttack) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
-        .filter((line) => line.includes('Faltan 1 ataque'))
+        .filter((line) => line.includes('1 ataque(s)'))
         .join('\n');
     }
 
     if (includeTwoMissingAttacks) {
       filteredMissingAttacksSection = filteredMissingAttacksSection
         .split('\n')
-        .filter((line) => line.includes('Faltan 2 ataque'))
+        .filter((line) => line.includes('2 ataque(s)'))
         .join('\n');
     }
 
