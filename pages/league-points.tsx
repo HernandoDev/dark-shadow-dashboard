@@ -180,7 +180,6 @@ const LeaguePointsPage = () => {
 
    const processLeagueSummaryResults = async (leagueSaves: any[], clanTag: string) => {
       const playersStats: Record<string, PlayerStats> = {};
-
       for (const save of leagueSaves) {
          const clan = save.content.leagueGroupData.clans.find(
             (clan: any) => clan.tag === clanTag.replace('%23', '#')
@@ -189,6 +188,7 @@ const LeaguePointsPage = () => {
          if (clan) {
             for (const member of clan.members) {
                if (!playersStats[member.tag]) {
+                  debugger
                   playersStats[member.tag] = {
                      name: member.name,
                      totalAttacks: 0,
@@ -232,7 +232,7 @@ const LeaguePointsPage = () => {
                <div className="bottom"></div>
                <div className="right"></div>
             </button>
-            <button
+            {/* <button
                className={`tabButton ${activeTab === 'summary' ? 'active' : ''}`}
                onClick={() => setActiveTab('summary')}
             >
@@ -241,7 +241,7 @@ const LeaguePointsPage = () => {
                <div className="left"></div>
                <div className="bottom"></div>
                <div className="right"></div>
-            </button>
+            </button> */}
          </div>
 
          {/* Explanatory Text */}
