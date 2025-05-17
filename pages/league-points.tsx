@@ -59,17 +59,22 @@ const LeaguePointsPage = () => {
          avgDestruction: number;
       }[]
    >([]);
+   // Nuevo estado para guardar los saves
+   const [leagueSaves, setLeagueSaves] = useState<any[]>([]);
+   // Estado para el save seleccionado en el tab de ligas pasadas
+   const [selectedPastSaveIndex, setSelectedPastSaveIndex] = useState<number>(0);
    const clanTag = '%232QL0GCQGQ';
-   const [activeTab, setActiveTab] = useState<'table' | 'summary'>('table'); // State for active tab
+   const [activeTab, setActiveTab] = useState<'table' | 'summary' | 'past'>('table'); // State for active tab
 
    useEffect(() => {
       const loadData = async () => {
          try {
             const data = await APIClashService.getClanWarLeagueGroupDetails();
 
-            const leagueSaves = await APIClashService.getLeagueGroupSaves();
-            if (leagueSaves && leagueSaves.leagueSaves) {
-               console.log('League Saves:', leagueSaves.leagueSaves); // Debugging output
+            const leagueSavesResp = await APIClashService.getLeagueGroupSaves();
+            if (leagueSavesResp && leagueSavesResp.leagueSaves) {
+               console.log('League Saves:', leagueSavesResp.leagueSaves); // Debugging output
+               setLeagueSaves(leagueSavesResp.leagueSaves); // Guardar en estado
             }
 
             if (data) {
@@ -87,9 +92,10 @@ const LeaguePointsPage = () => {
    useEffect(() => {
       const loadLeagueSummary = async () => {
          try {
-            const leagueSaves = await APIClashService.getLeagueGroupSaves();
-            if (leagueSaves && leagueSaves.leagueSaves) {
-               const results = await processLeagueSummaryResults(leagueSaves.leagueSaves, clanTag);
+            const leagueSavesResp = await APIClashService.getLeagueGroupSaves();
+            if (leagueSavesResp && leagueSavesResp.leagueSaves) {
+               setLeagueSaves(leagueSavesResp.leagueSaves); // Guardar en estado
+               const results = await processLeagueSummaryResults(leagueSavesResp.leagueSaves, clanTag);
                setLeagueSummaryResults(results);
             }
          } catch (error) {
@@ -166,7 +172,7 @@ const LeaguePointsPage = () => {
             }
          }
       }
-      
+
 
       return Object.values(playersStats)
          .map((player) => ({
@@ -272,6 +278,17 @@ const LeaguePointsPage = () => {
                <div className="bottom"></div>
                <div className="right"></div>
             </button>
+            {/* Nuevo tab */}
+            <button
+               className={`tabButton ${activeTab === 'past' ? 'active' : ''}`}
+               onClick={() => setActiveTab('past')}
+            >
+               <span>Ligas pasadas</span>
+               <div className="top"></div>
+               <div className="left"></div>
+               <div className="bottom"></div>
+               <div className="right"></div>
+            </button>
          </div>
 
          {/* Explanatory Text */}
@@ -284,6 +301,7 @@ const LeaguePointsPage = () => {
             {activeTab === 'summary' && <p><span style={{ color: 'violet' }}>En esta ventana se refleja una clasificacion global desde el 1 de mayo de 2025</span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
                Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
                Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.</p>}
+            {activeTab === 'past' && <p><span style={{ color: 'violet' }}>Selecciona una temporada pasada para ver su información.</span></p>}
          </div>
 
          {/* Tab Content */}
@@ -344,7 +362,7 @@ const LeaguePointsPage = () => {
                            <td>{index + 1}</td>
                            <td>{player.name || 'N/A'}</td>
                            <td>{player.avgDestruction.toFixed(2)}</td>
-                           <td>{player.minDestruction.toFixed(2)}</td>
+                           <td>{player.minDestrucción.toFixed(2)}</td>
                            <td>{player.stars1}</td>
                            <td>{player.stars2}</td>
                            <td>{player.stars3}</td>
@@ -354,6 +372,128 @@ const LeaguePointsPage = () => {
                      ))}
                   </tbody>
                </table>
+            </div>
+         )}
+
+         {/* Nuevo tab: Ligas pasadas */}
+         {activeTab === 'past' && (
+            <div style={{ textAlign: 'center' }}>
+               <div style={{ marginBottom: '20px' }}>
+                  <label htmlFor="season-select" style={{ marginRight: 8 }}>Temporada:</label>
+                  <select
+                     className="input"
+                     id="season-select"
+                     value={selectedPastSaveIndex}
+                     onChange={e => setSelectedPastSaveIndex(Number(e.target.value))}
+                  >
+                     {leagueSaves.map((save, idx) => (
+                        <option key={save.content?.season || idx} value={idx}>
+                           Liga de {save.content?.season || save.fileName || `Save ${idx + 1}`}
+                        </option>
+                     ))}
+                  </select>
+               </div>
+               {/* Renderiza la tabla de la temporada seleccionada */}
+               {leagueSaves[selectedPastSaveIndex] && leagueSaves[selectedPastSaveIndex].content && leagueSaves[selectedPastSaveIndex].content.matchingWars ? (
+                  (() => {
+                     // Procesar los datos del save seleccionado para mostrar la tabla
+                     const processPastSeason = (save: any) => {
+                        const playersStats: Record<string, PlayerStats> = {};
+                        const clanTag = '%232QL0GCQGQ';
+                        const matchingWars = save.content.matchingWars || [];
+                        for (const war of matchingWars) {
+                           const isClan = war.clan && war.clan.tag === clanTag.replace('%23', '#');
+                           const clanSide = isClan ? war.clan : war.opponent;
+                           const enemySide = isClan ? war.opponent : war.clan;
+                           if (!clanSide || !clanSide.members) continue;
+                           for (const member of clanSide.members) {
+                              if (!playersStats[member.tag]) {
+                                 playersStats[member.tag] = {
+                                    name: member.name,
+                                    totalAttacks: 0,
+                                    stars1: 0,
+                                    stars2: 0,
+                                    stars3: 0,
+                                    totalDestruction: 0,
+                                    minDestruction: 100,
+                                    score: 0,
+                                    avgDestruction: 0,
+                                 };
+                              }
+                              if (member.attacks) {
+                                 for (const attack of member.attacks) {
+                                    playersStats[member.tag].totalAttacks++;
+                                    playersStats[member.tag].totalDestruction += attack.destructionPercentage;
+                                    playersStats[member.tag].minDestruction = Math.min(
+                                       playersStats[member.tag].minDestruction,
+                                       attack.destructionPercentage
+                                    );
+                                    if (attack.stars === 1) playersStats[member.tag].stars1++;
+                                    if (attack.stars === 2) playersStats[member.tag].stars2++;
+                                    if (attack.stars === 3) {
+                                       playersStats[member.tag].stars3++;
+                                       playersStats[member.tag].score += 3;
+                                       const enemy = enemySide && enemySide.members
+                                          ? enemySide.members.find((e: any) => e.tag === attack.defenderTag)
+                                          : undefined;
+                                       if (enemy && enemy.townhallLevel > member.townhallLevel) {
+                                          playersStats[member.tag].score += 0.25;
+                                       }
+                                    } else {
+                                       playersStats[member.tag].score += attack.stars;
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                        return Object.values(playersStats)
+                           .map((player) => ({
+                              ...player,
+                              avgDestruction: player.totalAttacks
+                                 ? player.totalDestruction / player.totalAttacks
+                                 : 0,
+                           }))
+                           .sort((a, b) => b.score - a.score);
+                     };
+                     const pastResults = processPastSeason(leagueSaves[selectedPastSaveIndex]);
+                     return (
+                        <div className="table-container" style={{ overflow: 'auto', maxHeight: '500px' }}>
+                           <table className="responsive-table">
+                              <thead className="sticky-header">
+                                 <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Media de Destrucción (%)</th>
+                                    <th>Min Destrucción (%)</th>
+                                    <th>1 Estrella</th>
+                                    <th>2 Estrellas</th>
+                                    <th>3 Estrellas</th>
+                                    <th>Ataques Totales</th>
+                                    <th>Puntuación Total</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 {pastResults.map((player, index) => (
+                                    <tr key={index}>
+                                       <td>{index + 1}</td>
+                                       <td>{player.name || 'N/A'}</td>
+                                       <td>{player.avgDestruction.toFixed(2)}</td>
+                                       <td>{player.minDestruction.toFixed(2)}</td>
+                                       <td>{player.stars1}</td>
+                                       <td>{player.stars2}</td>
+                                       <td>{player.stars3}</td>
+                                       <td>{player.totalAttacks}</td>
+                                       <td>{player.score}</td>
+                                    </tr>
+                                 ))}
+                              </tbody>
+                           </table>
+                        </div>
+                     );
+                  })()
+               ) : (
+                  !leagueSaves.length ? <div>No hay saves disponibles.</div> : <div>No hay datos de guerras en este save.</div>
+               )}
             </div>
          )}
       </div>
