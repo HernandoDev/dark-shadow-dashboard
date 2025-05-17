@@ -180,15 +180,19 @@ const LeaguePointsPage = () => {
 
    const processLeagueSummaryResults = async (leagueSaves: any[], clanTag: string) => {
       const playersStats: Record<string, PlayerStats> = {};
-      for (const save of leagueSaves) {
-         const clan = save.content.leagueGroupData.clans.find(
-            (clan: any) => clan.tag === clanTag.replace('%23', '#')
-         );
 
-         if (clan) {
-            for (const member of clan.members) {
+      for (const save of leagueSaves) {
+         const matchingWars = save.content.matchingWars || [];
+         for (const war of matchingWars) {
+            // Determinar si el clan es el nuestro o el oponente
+            const isClan = war.clan && war.clan.tag === clanTag.replace('%23', '#');
+            const clanSide = isClan ? war.clan : war.opponent;
+            const enemySide = isClan ? war.opponent : war.clan;
+
+            if (!clanSide || !clanSide.members) continue;
+
+            for (const member of clanSide.members) {
                if (!playersStats[member.tag]) {
-                  debugger
                   playersStats[member.tag] = {
                      name: member.name,
                      totalAttacks: 0,
@@ -202,6 +206,32 @@ const LeaguePointsPage = () => {
                   };
                }
 
+               if (member.attacks) {
+                  for (const attack of member.attacks) {
+                     playersStats[member.tag].totalAttacks++;
+                     playersStats[member.tag].totalDestruction += attack.destructionPercentage;
+                     playersStats[member.tag].minDestruction = Math.min(
+                        playersStats[member.tag].minDestruction,
+                        attack.destructionPercentage
+                     );
+
+                     if (attack.stars === 1) playersStats[member.tag].stars1++;
+                     if (attack.stars === 2) playersStats[member.tag].stars2++;
+                     if (attack.stars === 3) {
+                        playersStats[member.tag].stars3++;
+                        playersStats[member.tag].score += 3;
+                        // Buscar el enemigo atacado para bonificación
+                        const enemy = enemySide && enemySide.members
+                           ? enemySide.members.find((e: any) => e.tag === attack.defenderTag)
+                           : undefined;
+                        if (enemy && enemy.townhallLevel > member.townhallLevel) {
+                           playersStats[member.tag].score += 0.25;
+                        }
+                     } else {
+                        playersStats[member.tag].score += attack.stars;
+                     }
+                  }
+               }
             }
          }
       }
@@ -232,7 +262,7 @@ const LeaguePointsPage = () => {
                <div className="bottom"></div>
                <div className="right"></div>
             </button>
-            {/* <button
+            <button
                className={`tabButton ${activeTab === 'summary' ? 'active' : ''}`}
                onClick={() => setActiveTab('summary')}
             >
@@ -241,7 +271,7 @@ const LeaguePointsPage = () => {
                <div className="left"></div>
                <div className="bottom"></div>
                <div className="right"></div>
-            </button> */}
+            </button>
          </div>
 
          {/* Explanatory Text */}
