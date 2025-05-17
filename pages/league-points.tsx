@@ -65,6 +65,7 @@ const LeaguePointsPage = () => {
    const [selectedPastSaveIndex, setSelectedPastSaveIndex] = useState<number>(0);
    const clanTag = '%232QL0GCQGQ';
    const [activeTab, setActiveTab] = useState<'table' | 'summary' | 'past'>('table'); // State for active tab
+   const [hasCurrentLeagueData, setHasCurrentLeagueData] = useState(true); // Nuevo estado
 
    useEffect(() => {
       const loadData = async () => {
@@ -80,8 +81,14 @@ const LeaguePointsPage = () => {
             if (data) {
                const results = await processResults(data, clanTag);
                setProcessedResults(results);
+               setHasCurrentLeagueData(true);
+            } else {
+               setHasCurrentLeagueData(false);
+               setActiveTab('summary'); // Cambia la pestaña activa si no hay datos
             }
          } catch (error) {
+            setHasCurrentLeagueData(false);
+            setActiveTab('summary');
             console.error('Error fetching data:', error);
          }
       };
@@ -258,16 +265,18 @@ const LeaguePointsPage = () => {
 
          {/* Tabs */}
          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', justifyContent: 'center' }}>
-            <button
-               className={`tabButton ${activeTab === 'table' ? 'active' : ''}`}
-               onClick={() => setActiveTab('table')}
-            >
-               <span>Clasificación de Liga actual</span>
-               <div className="top"></div>
-               <div className="left"></div>
-               <div className="bottom"></div>
-               <div className="right"></div>
-            </button>
+            {hasCurrentLeagueData && (
+               <button
+                  className={`tabButton ${activeTab === 'table' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('table')}
+               >
+                  <span>Clasificación de Liga actual</span>
+                  <div className="top"></div>
+                  <div className="left"></div>
+                  <div className="bottom"></div>
+                  <div className="right"></div>
+               </button>
+            )}
             <button
                className={`tabButton ${activeTab === 'summary' ? 'active' : ''}`}
                onClick={() => setActiveTab('summary')}
@@ -293,7 +302,7 @@ const LeaguePointsPage = () => {
 
          {/* Explanatory Text */}
          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            {activeTab === 'table' && <p><span style={{ color: 'violet' }}>
+            {activeTab === 'table' && hasCurrentLeagueData && <p><span style={{ color: 'violet' }}>
                En esta ventana se refleja la clasificacion de los jugadores en la Liga de Guerra actual! </span><br /><br /> Los puntos se calculan según las estrellas que gana cada jugador en sus ataques durante las guerras de clanes. Cada estrella vale 1 punto.
                Si un jugador hace un ataque perfecto (3 estrellas) contra alguien con un ayuntamiento de nivel más alto, gana 0.25 puntos extra.
                Esto premia a los que atacan a enemigos más difíciles y los anima a ser más estratégicos.
@@ -305,7 +314,7 @@ const LeaguePointsPage = () => {
          </div>
 
          {/* Tab Content */}
-         {activeTab === 'table' && (
+         {activeTab === 'table' && hasCurrentLeagueData && (
             <div className="table-container" style={{ overflow: 'auto', maxHeight: '500px' }}>
                <table className="responsive-table">
                   <thead className="sticky-header">
@@ -362,7 +371,7 @@ const LeaguePointsPage = () => {
                            <td>{index + 1}</td>
                            <td>{player.name || 'N/A'}</td>
                            <td>{player.avgDestruction.toFixed(2)}</td>
-                           <td>{player.minDestrucción.toFixed(2)}</td>
+                           <td>{player.minDestruction.toFixed(2)}</td>
                            <td>{player.stars1}</td>
                            <td>{player.stars2}</td>
                            <td>{player.stars3}</td>
