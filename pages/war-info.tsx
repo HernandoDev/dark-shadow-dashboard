@@ -321,17 +321,17 @@ const WarInfoPage = () => {
 
       if (hoursRemaining > 12) {
         // Select all checkboxes
-        setIncludeThreeStars(true);
-        setIncludeTwoStars(true);
-        setIncludeOneStar(true);
+        setIncludeThreeStars(false);
+        setIncludeTwoStars(false);
+        setIncludeOneStar(false);
         setIncludeMissingAttacks(true);
         setIncludeTwoMissingAttacks(true);
         setIncludeOneMissingAttack(false);
       } else {
         // Select all except "Incluir jugadores con 2 ataques faltantes"
-        setIncludeThreeStars(true);
-        setIncludeTwoStars(true);
-        setIncludeOneStar(true);
+        setIncludeThreeStars(false);
+        setIncludeTwoStars(false);
+        setIncludeOneStar(false);
         setIncludeMissingAttacks(true);
         setIncludeOneMissingAttack(false);
         setIncludeTwoMissingAttacks(false);
