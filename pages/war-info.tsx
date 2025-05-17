@@ -214,62 +214,62 @@ const WarInfoPage = () => {
   const [showWarMap, setShowWarMap] = useState(false); // State for collapsible war map section
 
   useEffect(() => {
-      const loadData = async () => {
-        try {
-          if (activeTab === 'currentWar') {
-            const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
-            if (clanWarLeagueGroupDetails?.clans) {
-              const fullDetails = await Promise.all(
-                clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
-                  const membersWithDetails = await Promise.all(
-                    clan.members.map(async (member: { tag: string; }) => {
-                      const formattedTag = member.tag.replace('#', '%23');
-                      const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-                      return { ...member, playerInfo };
-                    })
-                  );
-                  return { ...clan, members: membersWithDetails };
-                })
-              );
-              setFullWarDetails(fullDetails);
-            }
-          } else {
-            const currentWarDetails = await APIClashService.getClanCurrentWar();
-            setcurrentWarDetails(currentWarDetails);
-            
-            const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
-            const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
-
-            const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
-            const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
-              console.error("Error al obtener el registro de guerra del clan");
-              return { items: [] };
-            });
-            const clanWarLogSummary = getWarSummary(opponentWarLog);
-            const fullDetails = [
-              { ...currentWarDetails.clan, members: clanDetails },
-              { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
-            ];
-
+    const loadData = async () => {
+      try {
+        if (activeTab === 'currentWar') {
+          const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
+          if (clanWarLeagueGroupDetails?.clans) {
+            const fullDetails = await Promise.all(
+              clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
+                const membersWithDetails = await Promise.all(
+                  clan.members.map(async (member: { tag: string; }) => {
+                    const formattedTag = member.tag.replace('#', '%23');
+                    const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
+                    return { ...member, playerInfo };
+                  })
+                );
+                return { ...clan, members: membersWithDetails };
+              })
+            );
             setFullWarDetails(fullDetails);
           }
-        } catch (error) {
-          console.error('Error loading war data:', error);
-          setFullWarDetails(null);
+        } else {
+          const currentWarDetails = await APIClashService.getClanCurrentWar();
+          setcurrentWarDetails(currentWarDetails);
+
+          const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
+          const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
+
+          const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
+          const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
+            console.error("Error al obtener el registro de guerra del clan");
+            return { items: [] };
+          });
+          const clanWarLogSummary = getWarSummary(opponentWarLog);
+          const fullDetails = [
+            { ...currentWarDetails.clan, members: clanDetails },
+            { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
+          ];
+
+          setFullWarDetails(fullDetails);
         }
-      };
+      } catch (error) {
+        console.error('Error loading war data:', error);
+        setFullWarDetails(null);
+      }
+    };
 
-      const enrichMembersWithDetails = async (members: any[]): Promise<any[]> => {
-        return Promise.all(
-          members.map(async (member: any) => {
-            const formattedTag = member.tag.replace('#', '%23');
-            const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-            return { ...member, playerInfo };
-          })
-        );
-      };
+    const enrichMembersWithDetails = async (members: any[]): Promise<any[]> => {
+      return Promise.all(
+        members.map(async (member: any) => {
+          const formattedTag = member.tag.replace('#', '%23');
+          const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
+          return { ...member, playerInfo };
+        })
+      );
+    };
 
-      loadData();
+    loadData();
   }, [activeTab]);
 
   useEffect(() => {
@@ -1105,9 +1105,8 @@ const WarInfoPage = () => {
             <p>Cargando registros de guerras...</p>
           ) : (
             <select
-              id="war-select"
               className='input'
-
+              id="war-select"
               value={selectedWar?.fileName || ''}
               onChange={handleWarChange}
               style={{
@@ -1121,17 +1120,24 @@ const WarInfoPage = () => {
               <option value="" disabled>
                 Seleccione una guerra
               </option>
-
-              {warSaves.map((war, index) => (
-                <option key={index} value={war.fileName}>
-                  {formatWarDate(war.fileName)}
-                </option>
-              ))}
-              {warLeageSaves.map((war, index) => (
-                <option key={index} value={war.fileName}>
-                  {formatWarDate(war.fileName)}
-                </option>
-              ))}
+              {warSaves
+                .filter(war => war.content?.state !== 'preparation' && war.content?.state !== 'warEnded')
+                .slice(-10)
+                .reverse()
+                .map((war, index) => (
+                  <option key={index} value={war.fileName}>
+                    {formatWarDate(war.fileName)}
+                  </option>
+                ))}
+              {warLeageSaves
+                .filter(war => war.content?.state !== 'preparation')
+                .slice(-15)
+                .reverse()
+                .map((war, index) => (
+                  <option key={index} value={war.fileName}>
+                    {formatWarDate(war.fileName)} - {war.content?.state}
+                  </option>
+                ))}
             </select>
           )}
           {selectedWar && (
