@@ -79,6 +79,7 @@ const CapitalPage: React.FC = () => {
     const [capitalRaidsSaves, setCapitalRaids] = useState<any>(null); // Estado para los datos de incursiones capitales
     const [activeTab, setActiveTab] = useState<'capitalActual' | 'historicoCapital'>('capitalActual'); // State for active tab
     const [searchQuery, setSearchQuery] = useState<string>(''); // Add state for search query
+    const [openRaids, setOpenRaids] = useState<number[]>([]); // Estado para raids abiertas
 
     useEffect(() => {
         const fetchCapitalRaids = async () => {
@@ -152,6 +153,14 @@ const CapitalPage: React.FC = () => {
             }
             return { key, direction: 'asc' };
         });
+    };
+
+    const toggleRaid = (index: number) => {
+        setOpenRaids(prev =>
+            prev.includes(index)
+                ? prev.filter(i => i !== index)
+                : [...prev, index]
+        );
     };
 
     const getTopContributors = (season: RaidSeason) => {
@@ -247,7 +256,7 @@ const CapitalPage: React.FC = () => {
                                     <div className="raid-header">
                                         <h3>Incursión Capital Actual</h3>
                                         <p><strong>Período:</strong> {formatDate(season.startTime)} - {formatDate(season.endTime)}</p>
-                                        <p><strong>Estado:</strong> <span className="status-ongoing">En Progreso</span></p>
+                                        <p><strong>Estado:</strong> </p>
                                     </div>
 
                                     <div className="raid-stats">
@@ -414,45 +423,76 @@ const CapitalPage: React.FC = () => {
                             </div>
 
                             {/* Individual Raids */}
-                            {(capitalRaidsSaves as RaidSeason[]).map((raid: RaidSeason, index: number) => (
-                                <div key={index} className="raid-card">
-                                    <div className="raid-header">
-                                        <h3>Incursión {index + 1}</h3>
-                                        <p><strong>Período:</strong> {formatDate(raid.startTime)} - {formatDate(raid.endTime)}</p>
-                                        <p><strong>Estado:</strong> {raid.state === 'ongoing' ? 'En Progreso' : 'Finalizado'}</p>
-                                    </div>
-                                    <div className="raid-stats">
-                                        <h4>Miembros</h4>
-                                        <input
-                                            type="text"
-                                            placeholder="Buscar jugador..."
-                                            className='input'
-
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            style={{ marginBottom: '10px', padding: '5px', width: '100%' }}
-                                        />
-                                        <table className="member-table">
-                                            <thead>
-                                                <tr>
-                                                    <th onClick={() => handleSort('name')}>Nombre <i className="bi bi-sort-up"></i></th>
-                                                    <th onClick={() => handleSort('attacks')}>Ataques <i className="bi bi-sort-up"></i></th>
-                                                    <th onClick={() => handleSort('totalLooted')}>Recursos Saqueados <i className="bi bi-sort-up"></i></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {sortedData(filteredData(raid.members || []), sortConfig?.key || '').map((member: Member, idx: number) => (
-                                                    <tr key={idx}>
-                                                        <td>{member.name}</td>
-                                                        <td>{member.attacks}/{member.attackLimit + member.bonusAttackLimit}</td>
-                                                        <td>{(member.totalLooted ?? 0).toLocaleString('es-ES')}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                            {[...(capitalRaidsSaves as RaidSeason[])]
+    .slice() // make a shallow copy
+    .reverse()
+    .map((raid: RaidSeason, index: number) => (
+        <div key={index} className="raid-card" style={{ marginBottom: '10px' }}>
+            <div
+                className="raid-header"
+                style={{
+                    cursor: 'pointer',
+                    background: '#222',
+                    borderRadius: '6px',
+                    padding: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}
+                onClick={() => toggleRaid(index)}
+            >
+                <div>
+                    <h3 style={{ display: 'inline', marginRight: 16 }}>Incursión {index + 1}</h3>
+                    <span style={{ fontSize: 14, color: '#aaa' }}>
+                        {formatDate(raid.startTime)} - {formatDate(raid.endTime)}
+                    </span>
+                    <span style={{
+                        marginLeft: 16,
+                        color: raid.state === 'ongoing' ? 'orange' : 'lime'
+                    }}>
+                    </span>
+                </div>
+                <span style={{
+                    fontSize: 22,
+                    transform: openRaids.includes(index) ? 'rotate(90deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s'
+                }}>
+                    ▶
+                </span>
+            </div>
+            {openRaids.includes(index) && (
+                <div className="raid-stats" style={{ padding: '16px 0' }}>
+                    <h4>Miembros</h4>
+                    <input
+                        type="text"
+                        placeholder="Buscar jugador..."
+                        className='input'
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{ marginBottom: '10px', padding: '5px', width: '100%' }}
+                    />
+                    <table className="member-table">
+                        <thead>
+                            <tr>
+                                <th onClick={() => handleSort('name')}>Nombre <i className="bi bi-sort-up"></i></th>
+                                <th onClick={() => handleSort('attacks')}>Ataques <i className="bi bi-sort-up"></i></th>
+                                <th onClick={() => handleSort('totalLooted')}>Recursos Saqueados <i className="bi bi-sort-up"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortedData(filteredData(raid.members || []), sortConfig?.key || '').map((member: Member, idx: number) => (
+                                <tr key={idx}>
+                                    <td>{member.name}</td>
+                                    <td>{member.attacks}/{member.attackLimit + member.bonusAttackLimit}</td>
+                                    <td>{(member.totalLooted ?? 0).toLocaleString('es-ES')}</td>
+                                </tr>
                             ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    ))}
                         </>
                     ) : (
                         <p>No hay datos históricos disponibles.</p>
