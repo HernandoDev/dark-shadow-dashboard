@@ -56,7 +56,7 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                      ))}
                   </Flex>
                )}
-               <br />
+               <hr style={{ width: '100%', borderColor: 'yellow', opacity: 0.6 }} />
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
                      Media Estrellas:
@@ -89,6 +89,8 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                      {player.score?.toFixed(2)}
                   </Text>
                </Flex>
+                              <hr style={{ width: '100%', borderColor: 'yellow', opacity: 0.6 }} />
+
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
                      Estrellas Liga:
@@ -105,6 +107,8 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                      {player.totalAttacksLiga}
                   </Text>
                </Flex>
+                              <hr style={{ width: '100%', borderColor: 'yellow', opacity: 0.6 }} />
+
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
                      Estrellas Guerra:
@@ -121,6 +125,9 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                      {player.totalAttacksWar}
                   </Text>
                </Flex>
+                             <hr style={{ width: '100%', borderColor: 'yellow', opacity: 0.6 }} />
+
+
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
                      TH:

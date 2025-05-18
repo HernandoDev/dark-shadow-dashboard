@@ -326,7 +326,7 @@ export const Content = () => {
       if ((!summaryLiga.length && !summaryWar.length) || !members.length) return;
 
       const memberTags = new Set(members);
-      const LIGA_FACTOR = 1.5;
+      const LIGA_FACTOR =2;
 
       // Map para obtener los 3 ejércitos más usados por jugador
       const armyMap: Record<string, string[]> = {};
@@ -404,7 +404,7 @@ export const Content = () => {
          }
          combinedMap[p.tag].totalStars += p.avgStars * p.totalAttacks * LIGA_FACTOR;
          combinedMap[p.tag].totalDestruction += p.avgDestruction * p.totalAttacks * LIGA_FACTOR;
-         combinedMap[p.tag].totalAttacks += p.totalAttacks * LIGA_FACTOR;
+         combinedMap[p.tag].totalAttacks += p.totalAttacks ;
          combinedMap[p.tag].totalStarsLiga = p.avgStars * p.totalAttacks;
          combinedMap[p.tag].totalDestructionLiga = p.avgDestruction * p.totalAttacks;
          combinedMap[p.tag].totalAttacksLiga = p.totalAttacks;
