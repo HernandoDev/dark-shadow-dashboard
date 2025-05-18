@@ -48,9 +48,9 @@ export const Content = () => {
       let points = stars;
 
       if (memberLevel > rivalLevel) {
-         points -= 0.5; // Subtract 0.5 points if attacking a lower TH
+         points -= 0.4; // Subtract 0.4 points if attacking a lower TH
       } else if (memberLevel < rivalLevel) {
-         points += stars === 3 ? 0.5 : 0.25; // Add 0.5 for 3 stars, 0.25 otherwise
+         points += stars === 3 ? 0.4 : 0.25; // Add 0.4 for 3 stars, 0.25 otherwise
       }
 
       return points;
@@ -460,7 +460,7 @@ export const Content = () => {
          <Flex
             css={{
                'gap': '$8',
-               'pt': '$5',
+               'pt': '$4',
                'height': 'fit-content',
                'flexWrap': 'wrap',
                '@lg': {
@@ -538,24 +538,52 @@ export const Content = () => {
                </Box>
                {/* Card Section Top */}
                <Box>
-                  <Text
-                     css={{
-                        'textAlign': 'center',
-                        'mb': '$6',
-                        'color': '$accents8',
-                        'fontSize': '1rem',
-                        'margin': '0 auto',
-                     }}
-                  >
-                     El ranking de jugadores se obtiene combinando el rendimiento de cada miembro del clan en guerras normales y guerras de liga. Solo se consideran los jugadores que actualmente permanecen en el clan.
-                     <br /><br />
-                     <b>Guerras normales:</b> Se suman todos los ataques realizados por cada jugador, calculando su media de estrellas y destrucción.<br />
-                     <b>Guerras de liga:</b> Se realiza el mismo cálculo, pero los resultados de liga tienen un peso mayor  en el ranking combinado.<br />
-                     <b>Ranking combinado:</b> Se suman los resultados de ambas modalidades, ponderando la liga, y se calcula un "score" que tiene en cuenta la media de estrellas y el número de ataques realizados.<br />
-                     <b>Top y Peores jugadores:</b> Se muestran los 5 mejores y 5 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(10 veces mayor).<br />
-                     <b>Ejércitos más usados:</b> Para cada jugador, también se muestran los 3 ejércitos que más ha utilizado en sus ataques recientes.<br /><br />
-                     Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
-                  </Text>
+                  {/* Desplegable de explicación */}
+                  {(() => {
+                     const [showInfo, setShowInfo] = React.useState(false);
+                     return (
+                        <Box>
+                           <button
+                              style={{
+                                 display: 'block',
+                                 margin: '0 auto 1rem auto',
+                                 background: '#f5f5f5',
+                                 border: '1px solid #ccc',
+                                 borderRadius: '8px',
+                                 padding: '0.5rem 1.2rem',
+                                 cursor: 'pointer',
+                                 fontWeight: 600,
+                                 fontSize: '1rem',
+                                 color: '#333',
+                                 transition: 'background 0.2s',
+                              }}
+                              onClick={() => setShowInfo((v) => !v)}
+                           >
+                              {showInfo ? 'Ocultar explicación ▲' : 'Mostrar explicación ▼'}
+                           </button>
+                           {showInfo && (
+                              <Text
+                                 css={{
+                                    'textAlign': 'center',
+                                    'mb': '$6',
+                                    'color': '$accents8',
+                                    'fontSize': '1rem',
+                                    'margin': '0 auto',
+                                 }}
+                              >
+                                 El ranking de jugadores se obtiene combinando el rendimiento de cada miembro del clan en guerras normales y guerras de liga. Solo se consideran los jugadores que actualmente permanecen en el clan.
+                                 <br /><br />
+                                 <b>Guerras normales:</b> Se suman todos los ataques realizados por cada jugador, calculando su media de estrellas y destrucción.<br />
+                                 <b>Guerras de liga:</b> Se realiza el mismo cálculo, pero los resultados de liga tienen un peso mayor  en el ranking combinado.<br />
+                                 <b>Ranking combinado:</b> Se suman los resultados de ambas modalidades, ponderando la liga, y se calcula un "score" que tiene en cuenta la media de estrellas y el número de ataques realizados.<br />
+                                 <b>Top y Peores jugadores:</b> Se muestran los 4 mejores y 4 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(10 veces mayor).<br />
+                                 <b>Ejércitos más usados:</b> Para cada jugador, también se muestran los 3 ejércitos que más ha utilizado en sus ataques recientes.<br /><br />
+                                 Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
+                              </Text>
+                           )}
+                        </Box>
+                     );
+                  })()}
                   <Text
                      h3
                      css={{
@@ -565,7 +593,7 @@ export const Content = () => {
                         },
                      }}
                   >
-                     Top 5 Jugadores Combinados
+                     Top 4 Jugadores Combinados
                   </Text>
                   <Flex
                      css={{
@@ -578,7 +606,7 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {summaryCombined.slice(0, 5).map((player, index) => (
+                     {summaryCombined.slice(0, 4).map((player, index) => (
                         <CardBalance1 key={player.tag} player={player} position={index + 1} />
                      ))}
                   </Flex>
@@ -595,7 +623,7 @@ export const Content = () => {
                         },
                      }}
                   >
-                     Peores 5 Jugadores 
+                     Peores 4 Jugadores 
                   </Text>
                   <Flex
                      css={{
@@ -608,7 +636,7 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {summaryCombined.slice(-5).reverse().map((player, index) => (
+                     {summaryCombined.slice(-4).reverse().map((player, index) => (
                         <CardBalance1
                            key={player.tag}
                            player={player}
