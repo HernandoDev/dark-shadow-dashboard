@@ -14,6 +14,7 @@ type PlayerCombined = {
    totalAttacksLiga: number;
    totalStarsWar: number;
    totalAttacksWar: number;
+   topArmies?: string[];
 };
 
 type CardBalance1Props = {
@@ -42,6 +43,20 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
                <Text span css={{color: bgColor, textAlign: 'center'}} weight={'bold'} size={'$lg'}>
                   #{position} - {player.name}
                </Text>
+               {/* Mostrar topArmies si existen */}
+               {player.topArmies && player.topArmies.length > 0 && (
+                  <Flex direction={'column'} css={{width: '100%', gap: '$1'}}>
+                     <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
+                        Ejércitos más usados:
+                     </Text>
+                     {player.topArmies.map((army, idx) => (
+                        <Text key={idx} span css={{color: 'white'}} size={'$sm'}>
+                           {idx + 1}. {army}
+                        </Text>
+                     ))}
+                  </Flex>
+               )}
+               <br />
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
                      Media Estrellas:

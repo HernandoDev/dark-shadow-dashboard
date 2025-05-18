@@ -87,6 +87,7 @@ export const Content = () => {
          setLeageGroupsSaves(response.leagueGroups);
          let data = await APIClashService.getAttackLogs();
          setAttackLogs(data);
+         
          const response2 = await APIClashService.getClanMembers(); // Clan Principal
          const memberNames = response2.items.map((member: { tag: string }) => member.tag);
          // Define the type for playerStats
@@ -327,6 +328,27 @@ export const Content = () => {
       const memberTags = new Set(members);
       const LIGA_FACTOR = 1.5;
 
+      // Map para obtener los 3 ejércitos más usados por jugador
+      const armyMap: Record<string, string[]> = {};
+      if (attackLogs && Array.isArray(attackLogs)) {
+         // Contar ataques por tipo de ejército para cada jugador (por nombre)
+         const armyCount: Record<string, Record<string, number>> = {};
+         attackLogs.forEach((log: any) => {
+            if (!armyCount[log.member]) armyCount[log.member] = {};
+            if (log.attack) {
+               armyCount[log.member][log.attack] = (armyCount[log.member][log.attack] || 0) + 1;
+            }
+         });
+         // Obtener top 3 ejércitos para cada jugador
+         Object.entries(armyCount).forEach(([member, armies]) => {
+            const sorted = Object.entries(armies)
+               .sort((a, b) => b[1] - a[1])
+               .slice(0, 3)
+               .map(([army]) => army);
+            armyMap[member] = sorted;
+         });
+      }
+
       const combinedMap: Record<string, {
          tag: string;
          name: string;
@@ -340,6 +362,7 @@ export const Content = () => {
          totalStarsWar: number;
          totalDestructionWar: number;
          totalAttacksWar: number;
+         topArmies?: string[];
       }> = {};
 
       summaryWar.forEach((p: any) => {
@@ -357,6 +380,7 @@ export const Content = () => {
             totalStarsWar: p.avgStars * p.totalAttacks,
             totalDestructionWar: p.avgDestruction * p.totalAttacks,
             totalAttacksWar: p.totalAttacks,
+            // topArmies se agrega después
          };
       });
 
@@ -386,6 +410,13 @@ export const Content = () => {
          combinedMap[p.tag].totalAttacksLiga = p.totalAttacks;
       });
 
+      // Asignar topArmies por nombre (name)
+      Object.values(combinedMap).forEach((p: any) => {
+         if (armyMap[p.name]) {
+            p.topArmies = armyMap[p.name];
+         }
+      });
+
       const combinedArr = Object.values(combinedMap)
          .filter(p => p.totalAttacks > 0)
          .map(p => {
@@ -404,6 +435,7 @@ export const Content = () => {
                totalAttacksLiga: p.totalAttacksLiga,
                totalStarsWar: p.totalStarsWar,
                totalAttacksWar: p.totalAttacksWar,
+               topArmies: p.topArmies,
             };
          })
          .sort((a, b) =>
@@ -412,7 +444,7 @@ export const Content = () => {
          );
 
       setSummaryCombined(combinedArr);
-   }, [summaryLiga, summaryWar, members]);
+   }, [summaryLiga, summaryWar, members, attackLogs]);
 
    return (
       <Box css={{ overflow: 'hidden', height: '100%' }}>
