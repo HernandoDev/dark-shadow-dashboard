@@ -324,10 +324,8 @@ export const Content = () => {
    // Nuevo useEffect para calcular el resumen combinado
    React.useEffect(() => {
       if ((!summaryLiga.length && !summaryWar.length) || !members.length) return;
-
       const memberTags = new Set(members);
-      const LIGA_FACTOR =2;
-
+      const LIGA_FACTOR = 10;
       // Map para obtener los 3 ejércitos más usados por jugador
       const armyMap: Record<string, string[]> = {};
       if (attackLogs && Array.isArray(attackLogs)) {
@@ -362,11 +360,16 @@ export const Content = () => {
          totalStarsWar: number;
          totalDestructionWar: number;
          totalAttacksWar: number;
+         scoreWar?: number;
+         scoreLiga?: number;
          topArmies?: string[];
       }> = {};
 
       summaryWar.forEach((p: any) => {
          if (!memberTags.has(p.tag)) return;
+         const avgStars = p.avgStars;
+         const totalAttacks = p.totalAttacks;
+         const score = avgStars * (1 + Math.log(totalAttacks));
          combinedMap[p.tag] = {
             tag: p.tag,
             name: p.name,
@@ -380,12 +383,17 @@ export const Content = () => {
             totalStarsWar: p.avgStars * p.totalAttacks,
             totalDestructionWar: p.avgDestruction * p.totalAttacks,
             totalAttacksWar: p.totalAttacks,
+            scoreWar: score,
+            scoreLiga: 0,
             // topArmies se agrega después
          };
       });
 
       summaryLiga.forEach((p: any) => {
          if (!memberTags.has(p.tag)) return;
+         const avgStars = p.avgStars;
+         const totalAttacks = p.totalAttacks;
+         const score = avgStars * (1 + Math.log(totalAttacks));
          if (!combinedMap[p.tag]) {
             combinedMap[p.tag] = {
                tag: p.tag,
@@ -400,14 +408,17 @@ export const Content = () => {
                totalStarsWar: 0,
                totalDestructionWar: 0,
                totalAttacksWar: 0,
+               scoreWar: 0,
+               scoreLiga: 0,
             };
          }
-         combinedMap[p.tag].totalStars += p.avgStars * p.totalAttacks * LIGA_FACTOR;
-         combinedMap[p.tag].totalDestruction += p.avgDestruction * p.totalAttacks * LIGA_FACTOR;
-         combinedMap[p.tag].totalAttacks += p.totalAttacks ;
+         combinedMap[p.tag].totalStars += p.avgStars * p.totalAttacks;
+         combinedMap[p.tag].totalDestruction += p.avgDestruction * p.totalAttacks;
+         combinedMap[p.tag].totalAttacks += p.totalAttacks;
          combinedMap[p.tag].totalStarsLiga = p.avgStars * p.totalAttacks;
          combinedMap[p.tag].totalDestructionLiga = p.avgDestruction * p.totalAttacks;
          combinedMap[p.tag].totalAttacksLiga = p.totalAttacks;
+         combinedMap[p.tag].scoreLiga = score * LIGA_FACTOR;
       });
 
       // Asignar topArmies por nombre (name)
@@ -420,9 +431,10 @@ export const Content = () => {
       const combinedArr = Object.values(combinedMap)
          .filter(p => p.totalAttacks > 0)
          .map(p => {
+            // Score combinado: scoreWar + scoreLiga
+            const score = (p.scoreWar || 0) + (p.scoreLiga || 0);
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-            const score = avgStars * (1 + Math.log(p.totalAttacks));
             return {
                tag: p.tag,
                name: p.name,
@@ -438,10 +450,7 @@ export const Content = () => {
                topArmies: p.topArmies,
             };
          })
-         .sort((a, b) =>
-            b.score - a.score ||
-            b.avgDestruction - a.avgDestruction
-         );
+         .sort((a, b) => b.score - a.score); // Ordenar estrictamente por score descendente
 
       setSummaryCombined(combinedArr);
    }, [summaryLiga, summaryWar, members, attackLogs]);
@@ -530,6 +539,24 @@ export const Content = () => {
                {/* Card Section Top */}
                <Box>
                   <Text
+                     css={{
+                        'textAlign': 'center',
+                        'mb': '$6',
+                        'color': '$accents8',
+                        'fontSize': '1rem',
+                        'margin': '0 auto',
+                     }}
+                  >
+                     El ranking de jugadores se obtiene combinando el rendimiento de cada miembro del clan en guerras normales y guerras de liga. Solo se consideran los jugadores que actualmente permanecen en el clan.
+                     <br /><br />
+                     <b>Guerras normales:</b> Se suman todos los ataques realizados por cada jugador, calculando su media de estrellas y destrucción.<br />
+                     <b>Guerras de liga:</b> Se realiza el mismo cálculo, pero los resultados de liga tienen un peso mayor  en el ranking combinado.<br />
+                     <b>Ranking combinado:</b> Se suman los resultados de ambas modalidades, ponderando la liga, y se calcula un "score" que tiene en cuenta la media de estrellas y el número de ataques realizados.<br />
+                     <b>Top y Peores jugadores:</b> Se muestran los 5 mejores y 5 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(10 veces mayor).<br />
+                     <b>Ejércitos más usados:</b> Para cada jugador, también se muestran los 3 ejércitos que más ha utilizado en sus ataques recientes.<br /><br />
+                     Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
+                  </Text>
+                  <Text
                      h3
                      css={{
                         'textAlign': 'center',
@@ -568,7 +595,7 @@ export const Content = () => {
                         },
                      }}
                   >
-                     Peores 5 Jugadores Combinados
+                     Peores 5 Jugadores 
                   </Text>
                   <Flex
                      css={{

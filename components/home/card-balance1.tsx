@@ -30,16 +30,42 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
       <Card 
          className="animate__animated animate__backInLeft card"
          css={{
-            mw: '320px',
+            maxWidth: '100%',
+            minWidth: '220px',
+            width: '320px',
             bg: bgColor,
             border: '1px solid '+bgColor,
             borderRadius: '$xl',
             px: '$6',
             py: '$4',
+            display: 'flex',
+            flexWrap: 'wrap',
+            boxSizing: 'border-box',
          }}
       >
-         <Card.Body style={{color: 'white'}}>
-            <Flex direction={'column'} align={'center'} css={{gap: '$4'}}>
+         <Card.Body
+            style={{
+               color: 'white',
+               display: 'flex',
+               flexWrap: 'wrap',
+               flexDirection: 'column',
+               alignItems: 'center',
+               width: '100%',
+               boxSizing: 'border-box',
+               overflow: 'hidden',
+            }}
+         >
+            <Flex
+               direction={'column'}
+               align={'center'}
+               css={{
+                  gap: '$4',
+                  flexWrap: 'wrap',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden',
+               }}
+            >
                <Text span css={{color: bgColor, textAlign: 'center'}} weight={'bold'} size={'$lg'}>
                   #{position} - {player.name}
                </Text>
