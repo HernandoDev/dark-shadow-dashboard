@@ -2,28 +2,34 @@ import {Card, Text} from '@nextui-org/react';
 import React from 'react';
 import {Flex} from '../styles/flex';
 
-type Player = {
-   member: string;
-   stars: number;
-   percentage: number;
-   army: string; // Add army property
-   points: number; // Add points property
+type PlayerCombined = {
+   tag: string;
+   name: string;
+   townhallLevel: number;
+   avgStars: number;
+   avgDestruction: number;
+   totalAttacks: number;
+   score: number;
+   totalStarsLiga: number;
+   totalAttacksLiga: number;
+   totalStarsWar: number;
+   totalAttacksWar: number;
 };
 
 type CardBalance1Props = {
-   player: Player;
+   player: PlayerCombined;
    position: number;
 };
 
 export const CardBalance1 = ({player, position}: CardBalance1Props) => {
-   const backgroundColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
+   const backgroundColors = ['#FFD700', '#C0C0C0', '#CD7F32', '#4B9CD3', '#7CFC00'];
    const bgColor = backgroundColors[position - 1] || '#fc4503';
 
    return (
       <Card 
-      className="animate__animated animate__backInLeft card"
+         className="animate__animated animate__backInLeft card"
          css={{
-            mw: '300px', // Reduced width from 375px to 300px
+            mw: '320px',
             bg: bgColor,
             border: '1px solid '+bgColor,
             borderRadius: '$xl',
@@ -34,38 +40,78 @@ export const CardBalance1 = ({player, position}: CardBalance1Props) => {
          <Card.Body style={{color: 'white'}}>
             <Flex direction={'column'} align={'center'} css={{gap: '$4'}}>
                <Text span css={{color: bgColor, textAlign: 'center'}} weight={'bold'} size={'$lg'}>
-                  #{position} - {player.member}
+                  #{position} - {player.name}
                </Text>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
-                     Estrellas:
+                     Media Estrellas:
                   </Text>
                   <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
-                     {player.stars}
+                     {player.avgStars?.toFixed(2)}
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
-                     Destrucción %:
+                     Media Destrucción:
                   </Text>
                   <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
-                     {player.percentage.toFixed(2)}%
+                     {player.avgDestruction?.toFixed(2)}%
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
-                     Ejército:
+                     Ataques Totales:
                   </Text>
                   <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
-                     {player.army}
+                     {player.totalAttacks}
                   </Text>
                </Flex>
                <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
                   <Text span css={{color: 'white'}} size={'$md'}>
-                     Puntos:
+                     Score:
                   </Text>
                   <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
-                     {player.points.toFixed(2)}
+                     {player.score?.toFixed(2)}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
+                     Estrellas Liga:
+                  </Text>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
+                     {player.totalStarsLiga?.toFixed(2)}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
+                     Ataques Liga:
+                  </Text>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
+                     {player.totalAttacksLiga}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
+                     Estrellas Guerra:
+                  </Text>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
+                     {player.totalStarsWar?.toFixed(2)}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
+                     Ataques Guerra:
+                  </Text>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
+                     {player.totalAttacksWar}
+                  </Text>
+               </Flex>
+               <Flex direction={'row'} justify={'between'} css={{width: '100%', gap: '$2'}}>
+                  <Text span css={{color: 'white'}} size={'$md'}>
+                     TH:
+                  </Text>
+                  <Text span css={{color: 'white'}} size={'$md'} weight={'bold'}>
+                     {player.townhallLevel}
                   </Text>
                </Flex>
             </Flex>

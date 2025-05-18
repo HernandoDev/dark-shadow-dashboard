@@ -250,7 +250,6 @@ const WarInfoPage = () => {
             { ...currentWarDetails.clan, members: clanDetails },
             { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
           ];
-
           setFullWarDetails(fullDetails);
         }
       } catch (error) {
@@ -1080,20 +1079,6 @@ const WarInfoPage = () => {
               </button>
             </div>
           </div>
-          {/* <Button
-            className="cyber-button"
-            onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))}
-            style={{
-              marginTop: '10px',
-              backgroundColor: '#007bff',
-              color: '#fff',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            Copiar Mensaje
-          </Button> */}
         </div>
       )}
 

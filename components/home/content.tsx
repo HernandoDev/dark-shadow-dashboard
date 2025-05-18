@@ -1,17 +1,17 @@
-import React from 'react';
-import {Text, Link} from '@nextui-org/react';
-import {Box} from '../styles/box';
+import React, { useState } from 'react';
+import { Text, Link } from '@nextui-org/react';
+import { Box } from '../styles/box';
 import dynamic from 'next/dynamic';
-import {Flex} from '../styles/flex';
-import {TableWrapper} from '../table/table';
+import { Flex } from '../styles/flex';
+import { TableWrapper } from '../table/table';
 import NextLink from 'next/link';
-import {CardBalance1} from './card-balance1';
-import {CardBalance2} from './card-balance2';
-import {CardBalance3} from './card-balance3';
-import {CardAgents} from './card-agents';
+import { CardBalance1 } from './card-balance1';
+import { CardBalance2 } from './card-balance2';
+import { CardBalance3 } from './card-balance3';
+import { CardAgents } from './card-agents';
 import { APIClashService } from '../../services/apiClashService';
 
-import {CardTransactions} from './card-transactions';
+import { CardTransactions } from './card-transactions';
 import { Star } from 'react-feather';
 
 const Chart = dynamic(
@@ -32,8 +32,15 @@ type Player = {
 export const Content = () => {
    const [attackLogs, setAttackLogs] = React.useState<any[] | null>(null);
    const [topPlayers, setTopPlayers] = React.useState<Player[]>([]);
-   const [chartData, setChartData] = React.useState<{attack: string; stars: number}[]>([]);
+   const [chartData, setChartData] = React.useState<{ attack: string; stars: number }[]>([]);
    const [warStatus, setWarStatus] = React.useState<any | null>(null); // State to store the latest war status
+   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+   const [warLeageSaves, setWarLeageSaves] = useState<any[]>([]); // State to store war saves
+   const [LeageGroupsSaves, setLeageGroupsSaves] = useState<any[]>([]); // State to store war saves
+   const [summaryLiga, setSummaryLiga] = useState<any[]>([]); // Nuevo estado para el resumen de liga
+   const [summaryWar, setSummaryWar] = useState<any[]>([]); // Nuevo estado para resumen de guerra normal
+   const [summaryCombined, setSummaryCombined] = useState<any[]>([]); // Nuevo estado para resumen combinado
+   const [members, setMembers] = useState<any[]>([]); // Store members for later use
 
    const calculatePoints = (stars: number, memberThLevel: string, thRival: string): number => {
       const memberLevel = parseInt(memberThLevel.replace('TH', ''), 10);
@@ -74,31 +81,36 @@ export const Content = () => {
 
    React.useEffect(() => {
       const fetchAttackLogs = async () => {
-
+         const response = await APIClashService.getWarSaves();
+         setWarSaves(response.normalWars);
+         setWarLeageSaves(response.leagueWars);
+         setLeageGroupsSaves(response.leagueGroups);
          let data = await APIClashService.getAttackLogs();
          setAttackLogs(data);
-
+         const response2 = await APIClashService.getClanMembers(); // Clan Principal
+         const memberNames = response2.items.map((member: { tag: string }) => member.tag);
          // Define the type for playerStats
+         setMembers(memberNames); 
 
          // Group attacks by player and calculate total stars, average percentage, and most used army
-          interface Attack {
+         interface Attack {
             member: string;
             stars: number;
             percentage: number;
             attack: string;
             memberThLevel: string;
             thRival: string;
-          }
+         }
 
-          interface PlayerStats {
+         interface PlayerStats {
             stars: number;
             percentage: number;
             attacks: number;
             army: string;
             points: number;
-          }
+         }
 
-          const playerStats: Record<string, PlayerStats> = data.reduce((acc: Record<string, PlayerStats>, attack: Attack) => {
+         const playerStats: Record<string, PlayerStats> = data.reduce((acc: Record<string, PlayerStats>, attack: Attack) => {
             if (!acc[attack.member]) {
                acc[attack.member] = { stars: 0, percentage: 0, attacks: 0, army: attack.attack, points: 0 };
             }
@@ -107,7 +119,7 @@ export const Content = () => {
             acc[attack.member].attacks += 1;
             acc[attack.member].points += calculatePoints(attack.stars, attack.memberThLevel, attack.thRival); // Calculate points
             return acc;
-          }, {} as Record<string, PlayerStats>);
+         }, {} as Record<string, PlayerStats>);
 
          // Calculate average percentage and sort players by total points, stars, and average percentage
          const sortedPlayers = Object.entries(playerStats)
@@ -148,7 +160,7 @@ export const Content = () => {
       const fetchWarStatus = async () => {
          try {
             const warSaves = await APIClashService.getWarSaves();
-            
+
             if (warSaves.normalWars.length > 0) {
                const latestWar = warSaves.normalWars[0]; // Get the latest war save
                setWarStatus(latestWar.content); // Set the war status
@@ -161,8 +173,249 @@ export const Content = () => {
       fetchWarStatus();
    }, []);
 
+   // Helper para obtener el clanTag seleccionado
+   const getClanTag = () => {
+      if (typeof window === 'undefined') return '';
+      return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
+   };
+
+   // Nuevo useEffect para calcular el resumen de liga
+   React.useEffect(() => {
+      
+      if (!warLeageSaves || warLeageSaves.length === 0 || !members.length) return;
+
+      const clanTag = getClanTag().replace('%23', '#');
+      const memberTags = new Set(members);
+      const playerMap: Record<string, {
+         tag: string;
+         name: string;
+         townhallLevel: number;
+         totalStars: number;
+         totalDestruction: number;
+         totalAttacks: number;
+      }> = {};
+
+      warLeageSaves.forEach((war: any) => {
+         let warMembers: any[] = [];
+         if (war.content?.clan?.tag === clanTag) {
+            warMembers = war.content.clan.members || [];
+         } else if (war.content?.opponent?.tag === clanTag) {
+            warMembers = war.content.opponent.members || [];
+         }
+
+         warMembers.forEach((member: any) => {
+            if (!memberTags.has(member.tag)) return; // Solo miembros actuales
+
+            if (Array.isArray(member.attacks)) {
+               member.attacks.forEach((attack: any) => {
+                  if (!playerMap[member.tag]) {
+                     playerMap[member.tag] = {
+                        tag: member.tag,
+                        name: member.name,
+                        townhallLevel: member.townhallLevel,
+                        totalStars: 0,
+                        totalDestruction: 0,
+                        totalAttacks: 0,
+                     };
+                  }
+                  playerMap[member.tag].totalStars += attack.stars;
+                  playerMap[member.tag].totalDestruction += attack.destructionPercentage;
+                  playerMap[member.tag].totalAttacks += 1;
+               });
+            }
+         });
+      });
+
+      const summaryArr = Object.values(playerMap)
+         .filter(p => p.totalAttacks > 0)
+         .map(p => {
+            const avgStars = p.totalStars / p.totalAttacks;
+            const avgDestruction = p.totalDestruction / p.totalAttacks;
+            const score = avgStars * (1 + Math.log(p.totalAttacks));
+            return {
+               tag: p.tag,
+               name: p.name,
+               townhallLevel: p.townhallLevel,
+               avgStars,
+               avgDestruction,
+               totalAttacks: p.totalAttacks,
+               score,
+            };
+         })
+         .sort((a, b) =>
+            b.score - a.score ||
+            b.avgDestruction - a.avgDestruction
+         );
+
+      setSummaryLiga(summaryArr);
+
+   }, [warLeageSaves, members]);
+
+   // Nuevo useEffect para calcular el resumen de guerras normales
+   React.useEffect(() => {
+      if (!warSaves || warSaves.length === 0 || !members.length) return;
+
+      const clanTag = getClanTag().replace('%23', '#');
+      const memberTags = new Set(members);
+
+      const playerMap: Record<string, {
+         tag: string;
+         name: string;
+         townhallLevel: number;
+         totalStars: number;
+         totalDestruction: number;
+         totalAttacks: number;
+      }> = {};
+
+      warSaves.forEach((war: any) => {
+         let warMembers: any[] = [];
+         if (war.content?.clan?.tag === clanTag) {
+            warMembers = war.content.clan.members || [];
+         } else if (war.content?.opponent?.tag === clanTag) {
+            warMembers = war.content.opponent.members || [];
+         }
+         warMembers.forEach((member: any) => {
+            if (!memberTags.has(member.tag)) return; // Solo miembros actuales
+            if (Array.isArray(member.attacks)) {
+               member.attacks.forEach((attack: any) => {
+                  if (!playerMap[member.tag]) {
+                     playerMap[member.tag] = {
+                        tag: member.tag,
+                        name: member.name,
+                        townhallLevel: member.townhallLevel,
+                        totalStars: 0,
+                        totalDestruction: 0,
+                        totalAttacks: 0,
+                     };
+                  }
+                  playerMap[member.tag].totalStars += attack.stars;
+                  playerMap[member.tag].totalDestruction += attack.destructionPercentage;
+                  playerMap[member.tag].totalAttacks += 1;
+               });
+            }
+         });
+      });
+
+      const summaryArr = Object.values(playerMap)
+         .filter(p => p.totalAttacks > 0)
+         .map(p => {
+            const avgStars = p.totalStars / p.totalAttacks;
+            const avgDestruction = p.totalDestruction / p.totalAttacks;
+            const score = avgStars * (1 + Math.log(p.totalAttacks));
+            return {
+               tag: p.tag,
+               name: p.name,
+               townhallLevel: p.townhallLevel,
+               avgStars,
+               avgDestruction,
+               totalAttacks: p.totalAttacks,
+               score,
+            };
+         })
+         .sort((a, b) =>
+            b.score - a.score ||
+            b.avgDestruction - a.avgDestruction
+         );
+
+      setSummaryWar(summaryArr);
+   }, [warSaves, members]);
+
+   // Nuevo useEffect para calcular el resumen combinado
+   React.useEffect(() => {
+      if ((!summaryLiga.length && !summaryWar.length) || !members.length) return;
+
+      const memberTags = new Set(members);
+      const LIGA_FACTOR = 1.5;
+
+      const combinedMap: Record<string, {
+         tag: string;
+         name: string;
+         townhallLevel: number;
+         totalStars: number;
+         totalDestruction: number;
+         totalAttacks: number;
+         totalStarsLiga: number;
+         totalDestructionLiga: number;
+         totalAttacksLiga: number;
+         totalStarsWar: number;
+         totalDestructionWar: number;
+         totalAttacksWar: number;
+      }> = {};
+
+      summaryWar.forEach((p: any) => {
+         if (!memberTags.has(p.tag)) return;
+         combinedMap[p.tag] = {
+            tag: p.tag,
+            name: p.name,
+            townhallLevel: p.townhallLevel,
+            totalStars: p.avgStars * p.totalAttacks,
+            totalDestruction: p.avgDestruction * p.totalAttacks,
+            totalAttacks: p.totalAttacks,
+            totalStarsLiga: 0,
+            totalDestructionLiga: 0,
+            totalAttacksLiga: 0,
+            totalStarsWar: p.avgStars * p.totalAttacks,
+            totalDestructionWar: p.avgDestruction * p.totalAttacks,
+            totalAttacksWar: p.totalAttacks,
+         };
+      });
+
+      summaryLiga.forEach((p: any) => {
+         if (!memberTags.has(p.tag)) return;
+         if (!combinedMap[p.tag]) {
+            combinedMap[p.tag] = {
+               tag: p.tag,
+               name: p.name,
+               townhallLevel: p.townhallLevel,
+               totalStars: 0,
+               totalDestruction: 0,
+               totalAttacks: 0,
+               totalStarsLiga: 0,
+               totalDestructionLiga: 0,
+               totalAttacksLiga: 0,
+               totalStarsWar: 0,
+               totalDestructionWar: 0,
+               totalAttacksWar: 0,
+            };
+         }
+         combinedMap[p.tag].totalStars += p.avgStars * p.totalAttacks * LIGA_FACTOR;
+         combinedMap[p.tag].totalDestruction += p.avgDestruction * p.totalAttacks * LIGA_FACTOR;
+         combinedMap[p.tag].totalAttacks += p.totalAttacks * LIGA_FACTOR;
+         combinedMap[p.tag].totalStarsLiga = p.avgStars * p.totalAttacks;
+         combinedMap[p.tag].totalDestructionLiga = p.avgDestruction * p.totalAttacks;
+         combinedMap[p.tag].totalAttacksLiga = p.totalAttacks;
+      });
+
+      const combinedArr = Object.values(combinedMap)
+         .filter(p => p.totalAttacks > 0)
+         .map(p => {
+            const avgStars = p.totalStars / p.totalAttacks;
+            const avgDestruction = p.totalDestruction / p.totalAttacks;
+            const score = avgStars * (1 + Math.log(p.totalAttacks));
+            return {
+               tag: p.tag,
+               name: p.name,
+               townhallLevel: p.townhallLevel,
+               avgStars,
+               avgDestruction,
+               totalAttacks: p.totalAttacks,
+               score,
+               totalStarsLiga: p.totalStarsLiga,
+               totalAttacksLiga: p.totalAttacksLiga,
+               totalStarsWar: p.totalStarsWar,
+               totalAttacksWar: p.totalAttacksWar,
+            };
+         })
+         .sort((a, b) =>
+            b.score - a.score ||
+            b.avgDestruction - a.avgDestruction
+         );
+
+      setSummaryCombined(combinedArr);
+   }, [summaryLiga, summaryWar, members]);
+
    return (
-      <Box css={{overflow: 'hidden', height: '100%'}}>
+      <Box css={{ overflow: 'hidden', height: '100%' }}>
          <Flex
             css={{
                'gap': '$8',
@@ -182,12 +435,12 @@ export const Content = () => {
                css={{
                   'px': '$12',
                   'mt': '$8',
-                  '@xsMax': {px: '$10'},
+                  '@xsMax': { px: '$10' },
                   'gap': '$12',
                }}
                direction={'column'}
             >
-                    <Box className='animate__animated animate__backInRight card'>
+               <Box className='animate__animated animate__backInRight card'>
                   <Text
                      h3
                      css={{
@@ -201,7 +454,7 @@ export const Content = () => {
                   </Text>
                   {warStatus ? (
                      <Box
-                       
+
                      >
                         <Text>
                            <strong>Fecha:</strong> {formatDate(warStatus.startTime)}
@@ -213,8 +466,8 @@ export const Content = () => {
                            css={{
                               color:
                                  warStatus.clan.stars > warStatus.opponent.stars ||
-                                 (warStatus.clan.stars === warStatus.opponent.stars &&
-                                    warStatus.clan.destructionPercentage > warStatus.opponent.destructionPercentage)
+                                    (warStatus.clan.stars === warStatus.opponent.stars &&
+                                       warStatus.clan.destructionPercentage > warStatus.opponent.destructionPercentage)
                                     ? 'green'
                                     : 'red',
                            }}
@@ -226,8 +479,8 @@ export const Content = () => {
                            css={{
                               color:
                                  warStatus.opponent.stars > warStatus.clan.stars ||
-                                 (warStatus.opponent.stars === warStatus.clan.stars &&
-                                    warStatus.opponent.destructionPercentage > warStatus.clan.destructionPercentage)
+                                    (warStatus.opponent.stars === warStatus.clan.stars &&
+                                       warStatus.opponent.destructionPercentage > warStatus.clan.destructionPercentage)
                                     ? 'green'
                                     : 'red',
                            }}
@@ -253,7 +506,7 @@ export const Content = () => {
                         },
                      }}
                   >
-                     Top Jugadores de Guerra 
+                     Top 5 Jugadores Combinados
                   </Text>
                   <Flex
                      css={{
@@ -266,8 +519,8 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {topPlayers.slice(0, 3).map((player, index) => (
-                        <CardBalance1 key={index} player={player} position={index + 1} />
+                     {summaryCombined.slice(0, 5).map((player, index) => (
+                        <CardBalance1 key={player.tag} player={player} position={index + 1} />
                      ))}
                   </Flex>
                </Box>
@@ -277,13 +530,13 @@ export const Content = () => {
                      h3
                      css={{
                         'textAlign': 'center',
-                        'color': 'red', // Red color for the title
+                        'color': 'red',
                         '@sm': {
                            textAlign: 'inherit',
                         },
                      }}
                   >
-                     Peores Jugadores de Guerra
+                     Peores 5 Jugadores Combinados
                   </Text>
                   <Flex
                      css={{
@@ -296,21 +549,21 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {topPlayers.slice(-3).reverse().map((player, index) => (
-                        <CardBalance1 
-                           key={index} 
-                           player={player} 
-                           position={topPlayers.length - 2 + index} 
+                     {summaryCombined.slice(-5).reverse().map((player, index) => (
+                        <CardBalance1
+                           key={player.tag}
+                           player={player}
+                           position={summaryCombined.length - 4 + index}
                         />
                      ))}
                   </Flex>
                </Box>
 
-          
+
 
                {/* Chart */}
                <Box>
-              
+
                </Box>
 
                <Box>
@@ -346,7 +599,7 @@ export const Content = () => {
                   'px': '$12',
                   'mt': '$8',
                   'height': 'fit-content',
-                  '@xsMax': {px: '$10'},
+                  '@xsMax': { px: '$10' },
                   'gap': '$6',
                   'overflow': 'hidden',
                }}
@@ -379,7 +632,7 @@ export const Content = () => {
                   }}
                >
                   {/* <CardAgents /> */}
-                <CardTransactions filterType="bad" />
+                  <CardTransactions filterType="bad" />
                </Flex>
             </Box>
          </Flex>
@@ -393,13 +646,13 @@ export const Content = () => {
                'py': '$10',
                'px': '$10',
                'mt': '$8',
-               '@sm': {px: '$20'},
+               '@sm': { px: '$20' },
             }}
          >
-           
+
          </Flex>
 
-   
+
       </Box>
    );
 };
