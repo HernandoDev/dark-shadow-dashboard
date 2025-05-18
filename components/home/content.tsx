@@ -48,9 +48,9 @@ export const Content = () => {
       let points = stars;
 
       if (memberLevel > rivalLevel) {
-         points -= 0.4; // Subtract 0.4 points if attacking a lower TH
+         points -= 0.5; // Subtract 0.5 points if attacking a lower TH
       } else if (memberLevel < rivalLevel) {
-         points += stars === 3 ? 0.4 : 0.25; // Add 0.4 for 3 stars, 0.25 otherwise
+         points += stars === 3 ? 0.5 : 0.25; // Add 0.5 for 3 stars, 0.25 otherwise
       }
 
       return points;
@@ -60,8 +60,8 @@ export const Content = () => {
       const date = new Date(isoDate);
       if (isNaN(date.getTime())) {
          // Handle custom date format like "20250427T210544.000Z"
-         const year = isoDate.substring(0, 4);
-         const month = parseInt(isoDate.substring(4, 6), 10) - 1; // Months are 0-indexed
+         const year = isoDate.substring(0, 5);
+         const month = parseInt(isoDate.substring(5, 6), 10) - 1; // Months are 0-indexed
          const day = parseInt(isoDate.substring(6, 8), 10);
          const months = [
             'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
@@ -460,7 +460,7 @@ export const Content = () => {
          <Flex
             css={{
                'gap': '$8',
-               'pt': '$4',
+               'pt': '$5',
                'height': 'fit-content',
                'flexWrap': 'wrap',
                '@lg': {
@@ -481,7 +481,7 @@ export const Content = () => {
                }}
                direction={'column'}
             >
-               <Box className='animate__animated animate__backInRight card'>
+               {/* <Box className='animate__animated animate__backInRight card'>
                   <Text
                      h3
                      css={{
@@ -535,7 +535,7 @@ export const Content = () => {
                         No se encontró información sobre la guerra.
                      </Text>
                   )}
-               </Box>
+               </Box> */}
                {/* Card Section Top */}
                <Box>
                   {/* Desplegable de explicación */}
@@ -544,22 +544,20 @@ export const Content = () => {
                      return (
                         <Box>
                            <button
+                              className='animate__animated animate__backInRight input '
                               style={{
                                  display: 'block',
                                  margin: '0 auto 1rem auto',
-                                 background: '#f5f5f5',
-                                 border: '1px solid #ccc',
                                  borderRadius: '8px',
                                  padding: '0.5rem 1.2rem',
                                  cursor: 'pointer',
                                  fontWeight: 600,
                                  fontSize: '1rem',
-                                 color: '#333',
                                  transition: 'background 0.2s',
                               }}
                               onClick={() => setShowInfo((v) => !v)}
                            >
-                              {showInfo ? 'Ocultar explicación ▲' : 'Mostrar explicación ▼'}
+                              {showInfo ? 'Ocultar Reglas de Clasificación ▲' : 'Mostrar Reglas de Clasificación ▼'}
                            </button>
                            {showInfo && (
                               <Text
@@ -576,7 +574,7 @@ export const Content = () => {
                                  <b>Guerras normales:</b> Se suman todos los ataques realizados por cada jugador, calculando su media de estrellas y destrucción.<br />
                                  <b>Guerras de liga:</b> Se realiza el mismo cálculo, pero los resultados de liga tienen un peso mayor  en el ranking combinado.<br />
                                  <b>Ranking combinado:</b> Se suman los resultados de ambas modalidades, ponderando la liga, y se calcula un "score" que tiene en cuenta la media de estrellas y el número de ataques realizados.<br />
-                                 <b>Top y Peores jugadores:</b> Se muestran los 4 mejores y 4 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(10 veces mayor).<br />
+                                 <b>Top y Peores jugadores:</b> Se muestran los 5 mejores y 5 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(10 veces mayor).<br />
                                  <b>Ejércitos más usados:</b> Para cada jugador, también se muestran los 3 ejércitos que más ha utilizado en sus ataques recientes.<br /><br />
                                  Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
                               </Text>
@@ -593,20 +591,19 @@ export const Content = () => {
                         },
                      }}
                   >
-                     Top 4 Jugadores Combinados
+                     Top 5 Jugadores Combinados
                   </Text>
                   <Flex
                      css={{
                         'gap': '$10',
                         'flexWrap': 'wrap',
                         'justifyContent': 'center',
-                        '@sm': {
-                           flexWrap: 'nowrap',
-                        },
+                        'maxWidth': '100dvw',
+                      
                      }}
                      direction={'row'}
                   >
-                     {summaryCombined.slice(0, 4).map((player, index) => (
+                     {summaryCombined.slice(0, 5).map((player, index) => (
                         <CardBalance1 key={player.tag} player={player} position={index + 1} />
                      ))}
                   </Flex>
@@ -623,7 +620,7 @@ export const Content = () => {
                         },
                      }}
                   >
-                     Peores 4 Jugadores 
+                     Peores 5 Jugadores 
                   </Text>
                   <Flex
                      css={{
@@ -636,11 +633,11 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {summaryCombined.slice(-4).reverse().map((player, index) => (
+                     {summaryCombined.slice(-5).reverse().map((player, index) => (
                         <CardBalance1
                            key={player.tag}
                            player={player}
-                           position={summaryCombined.length - 4 + index}
+                           position={summaryCombined.length - 5 + index}
                         />
                      ))}
                   </Flex>
