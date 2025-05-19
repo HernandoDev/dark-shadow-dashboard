@@ -586,15 +586,14 @@ export const Content = () => {
                      h3
                      css={{
                         'textAlign': 'center',
-                        '@sm': {
-                           textAlign: 'inherit',
-                        },
+
                      }}
                   >
                      Top 5 Jugadores Combinados
                   </Text>
                   <Flex
                      css={{
+                        'margin': '0 11%',
                         'gap': '$10',
                         'flexWrap': 'wrap',
                         'justifyContent': 'center',
@@ -616,7 +615,7 @@ export const Content = () => {
                         'textAlign': 'center',
                         'color': 'red',
                         '@sm': {
-                           textAlign: 'inherit',
+                           textAlign: 'center',
                         },
                      }}
                   >
@@ -624,12 +623,12 @@ export const Content = () => {
                   </Text>
                   <Flex
                      css={{
+                        'margin': '0 11%',
                         'gap': '$10',
                         'flexWrap': 'wrap',
                         'justifyContent': 'center',
-                        '@sm': {
-                           flexWrap: 'nowrap',
-                        },
+                        'maxWidth': '100dvw',
+                      
                      }}
                      direction={'row'}
                   >

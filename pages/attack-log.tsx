@@ -1643,7 +1643,7 @@ const AttackLog: React.FC = () => {
                                             Seleccione una guerra
                                         </option>
                                         {warSaves
-                                            .filter(war => war.content?.state !== 'preparation' && war.content?.state !== 'warEnded')
+                                            .filter(war => war.content?.state !== 'preparation')
                                             .slice(-10)
                                             .reverse()
                                             .map((war, index) => (
