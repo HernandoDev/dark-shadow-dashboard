@@ -1448,13 +1448,16 @@ const AttackLog: React.FC = () => {
                                                             <User size={16} style={{ marginRight: '5px' }} />
                                                             Jugadores:
                                                         </strong>
+                                                        {/* nando */}
                                                         <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
-                                                            {Array.from(summary.players).map((player, index) => (
-                                                                <li key={index} style={{ marginBottom: '5px' }}>
-                                                                    <User size={12} style={{ marginRight: '5px' }} />
-
-                                                                    {player}</li>
-                                                            ))}
+                                                            {Array.from(summary.players)
+                                                                .filter(player => clanMembers.includes(player))
+                                                                .map((player, index) => (
+                                                                    <li key={index} style={{ marginBottom: '5px' }}>
+                                                                        <User size={12} style={{ marginRight: '5px' }} />
+                                                                        {player}
+                                                                    </li>
+                                                                ))}
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -1648,7 +1651,7 @@ const AttackLog: React.FC = () => {
                                             .reverse()
                                             .map((war, index) => (
                                                 <option key={index} value={war.fileName}>
-                                                    {formatWarDate(war.fileName)} 
+                                                    {formatWarDate(war.fileName)}
                                                 </option>
                                             ))}
                                         {warLeageSaves

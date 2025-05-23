@@ -358,17 +358,21 @@ const WarInfoPage = () => {
   };
   const formatDate = (isoDate: string): string => {
     const date = new Date(isoDate);
-    if (isNaN(date.getTime())) {
-      // Handle custom date format like "20250427T210544.000Z"
-      const year = isoDate.substring(0, 4);
-      const month = parseInt(isoDate.substring(4, 6), 10) - 1; // Months are 0-indexed
-      const day = parseInt(isoDate.substring(6, 8), 10);
-      const months = [
-        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-      ];
-      return `${day} de ${months[month]} de ${year}`;
-    }
+if (isNaN(date.getTime())) {
+  // Prevent error if isoDate is undefined or not a string
+  if (!isoDate || typeof isoDate !== 'string' || isoDate.length < 8) {
+    return 'Fecha no válida';
+  }
+  // Handle custom date format like "20250427T210544.000Z"
+  const year = isoDate.substring(0, 4);
+  const month = parseInt(isoDate.substring(4, 6), 10) - 1; // Months are 0-indexed
+  const day = parseInt(isoDate.substring(6, 8), 10);
+  const months = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ];
+  return `${day} de ${months[month]} de ${year}`;
+}
     const day = date.getUTCDate();
     const month = date.getUTCMonth();
     const year = date.getUTCFullYear();
