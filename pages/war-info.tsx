@@ -97,7 +97,8 @@ const generateWarMessage = (warDetails: any) => {
 
   const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
   const noAttack: string[] = [];
-
+// ...existing code...
+if (myClan?.members && Array.isArray(myClan.members)) {
   myClan.members.forEach((member: any) => {
     if (member.attacks && member.attacks.length > 0) {
       member.attacks.forEach((attack: any) => {
@@ -137,6 +138,8 @@ const generateWarMessage = (warDetails: any) => {
       noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s)`);
     }
   });
+}
+
 
   return `
 📢 Estado de la guerra: ${myClan.status || 'Desconocido'}
@@ -344,7 +347,7 @@ const WarInfoPage = () => {
 
   const getUniqueHeroes = (members: any[]): string[] => {
     const heroSet = new Set<string>();
-    members.forEach((member: { playerInfo: { heroes: any[]; }; }) => {
+    members?.forEach((member: { playerInfo: { heroes: any[]; }; }) => {
       if (member.playerInfo?.heroes) {
         member.playerInfo.heroes
           .filter((hero: { village: string; }) => hero.village === 'home')
@@ -382,7 +385,7 @@ const WarInfoPage = () => {
     const heroAverages: { [key: string]: number } = {};
     const heroCounts: { [key: string]: number } = {};
 
-    members.forEach((member: { playerInfo: { heroes: any[]; }; }) => {
+    members?.forEach((member: { playerInfo: { heroes: any[]; }; }) => {
       if (member.playerInfo?.heroes) {
         member.playerInfo.heroes
           .filter((hero: { village: string; }) => hero.village === 'home')
