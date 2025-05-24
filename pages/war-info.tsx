@@ -218,6 +218,8 @@ const WarInfoPage = () => {
 
   useEffect(() => {
     const loadData = async () => {
+           const clanTag = getClanTag().replace('%23', '#');
+      setClanTag(clanTag);
       try {
         if (activeTab === 'currentWar') {
           const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
