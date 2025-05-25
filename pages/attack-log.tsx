@@ -3,6 +3,7 @@ import { Button, Modal, Text, Loading, Input, FormElement } from '@nextui-org/re
 import { Plus, Star, Percent, User, Calendar, Target, Info, Shield } from 'react-feather'; // Import icons
 import { APIClashService } from '../services/apiClashService';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks'; // Adjust the path as needed
+import { get } from 'http';
 
 const getClanTag = () => {
     if (typeof window === 'undefined') return '';
@@ -150,7 +151,14 @@ const AttackLog: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchWarSaves(); // Fetch war saves on component mount
+        const fetchData = async () => {
+            const response = await APIClashService.getClanMembers(); // Clan Principal
+            const memberNames = response.items.map((member: { name: string }) => member.name);
+            setMembers(response.items); // Save the full members list
+            setClanMembers(memberNames);
+            fetchWarSaves(); // Fetch war saves on component mount
+        };
+        fetchData();
     }, []);
 
     const openModal = async () => {
@@ -1448,10 +1456,10 @@ const AttackLog: React.FC = () => {
                                                             <User size={16} style={{ marginRight: '5px' }} />
                                                             Jugadores:
                                                         </strong>
-                                                        {/* nando */}
                                                         <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
                                                             {Array.from(summary.players)
                                                                 .filter(player => clanMembers.includes(player))
+
                                                                 .map((player, index) => (
                                                                     <li key={index} style={{ marginBottom: '5px' }}>
                                                                         <User size={12} style={{ marginRight: '5px' }} />
