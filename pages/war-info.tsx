@@ -90,6 +90,9 @@ const generateWarMessage = (warDetails: any) => {
   if (!warDetails) return '';
 
   const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
+  if(warDetails.state === 'notInWar') {
+    return 'No estás en guerra actualmente.';
+  }
   const myClan = warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent; // Determine your clan
   const targetClan = warDetails.clan.tag === clanTag ? warDetails.opponent : warDetails.clan; // Determine the opponent clan
 
