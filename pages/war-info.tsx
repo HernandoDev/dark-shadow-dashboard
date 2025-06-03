@@ -90,7 +90,7 @@ const generateWarMessage = (warDetails: any) => {
   if (!warDetails) return '';
 
   const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
-  if(warDetails.state === 'notInWar') {
+  if (warDetails.state === 'notInWar') {
     return 'No estás en guerra actualmente.';
   }
   const myClan = warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent; // Determine your clan
@@ -100,48 +100,48 @@ const generateWarMessage = (warDetails: any) => {
 
   const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
   const noAttack: string[] = [];
-// ...existing code...
-if (myClan?.members && Array.isArray(myClan.members)) {
-  myClan.members.forEach((member: any) => {
-    if (member.attacks && member.attacks.length > 0) {
-      member.attacks.forEach((attack: any) => {
-        const stars = (attack.stars || 0) as 1 | 2 | 3;
+  // ...existing code...
+  if (myClan?.members && Array.isArray(myClan.members)) {
+    myClan.members.forEach((member: any) => {
+      if (member.attacks && member.attacks.length > 0) {
+        member.attacks.forEach((attack: any) => {
+          const stars = (attack.stars || 0) as 1 | 2 | 3;
 
-        // Find the target clan and member by searching for the defenderTag
-        const targetClanName = targetClan ? targetClan.name : 'Desconocido';
-        const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
+          // Find the target clan and member by searching for the defenderTag
+          const targetClanName = targetClan ? targetClan.name : 'Desconocido';
+          const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
 
-        if (playerEnemy) {
-          const comparisonEmoji =
-            member.mapPosition < playerEnemy.mapPosition
-              ? '⬇️(num. Inferior)' // Green arrow for higher-ranked
-              : member.mapPosition > playerEnemy.mapPosition
-                ? '⬆️(num. Superior)' // Red arrow for lower-ranked
-                : '🪞(Espejo)'; // Equals sign for equal rank
-          const ownInfo = `*${member.mapPosition}. ${member.name} (TH${member.townhallLevel})`;
-          const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
-          const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
+          if (playerEnemy) {
+            const comparisonEmoji =
+              member.mapPosition < playerEnemy.mapPosition
+                ? '⬇️(num. Inferior)' // Green arrow for higher-ranked
+                : member.mapPosition > playerEnemy.mapPosition
+                  ? '⬆️(num. Superior)' // Red arrow for lower-ranked
+                  : '🪞(Espejo)'; // Equals sign for equal rank
+            const ownInfo = `*${member.mapPosition}. ${member.name} (TH${member.townhallLevel})`;
+            const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
+            const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
 
-          const message = `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
+            const message = `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
 
-          starsGroup[stars]?.push(message);
+            starsGroup[stars]?.push(message);
+          }
+        });
+        if (member.attacks.length === 1) {
+          const attacksPerMember = warDetails.attacksPerMember || 1 // Default to 2 attacks per member if not provided
+          const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
+          if (attacksMissing > 0) {
+            noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s)`);
+          }
         }
-      });
-      if (member.attacks.length === 1) {
-        const attacksPerMember = warDetails.attacksPerMember || 1 // Default to 2 attacks per member if not provided
+      } else {
+
+        const attacksPerMember = warDetails.attacksPerMember || 1; // Default to 2 attacks per member if not provided
         const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-        if (attacksMissing > 0) {
-          noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s)`);
-        }
+        noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s)`);
       }
-    } else {
-
-      const attacksPerMember = warDetails.attacksPerMember || 1; // Default to 2 attacks per member if not provided
-      const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-      noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s)`);
-    }
-  });
-}
+    });
+  }
 
 
   return `
@@ -201,6 +201,7 @@ const WarInfoPage = () => {
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
   const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('MensajeGuerra');
   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+  const [messageWar, setMessageWar] = useState<string>(''); // State to store the generated war message
   const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
   const [savedAttacks, setSavedAttacks] = useState<any[]>([]);
@@ -221,8 +222,18 @@ const WarInfoPage = () => {
 
   useEffect(() => {
     const loadData = async () => {
-           const clanTag = getClanTag().replace('%23', '#');
+      const clanTag = getClanTag().replace('%23', '#');
       setClanTag(clanTag);
+      try {
+        const response = await APIClashService.getWarSaves();
+        setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
+        const message = generateFilteredWarMessage(fullWarDetails, response.leagueWars)
+        setMessageWar(message); // Set the generated war message to the state
+        setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
+        setWarSaves(response.normalWars || []); // Set the war saves to the state
+      } catch (error) {
+        console.error('Error fetching war saves:', error);
+      }
       try {
         if (activeTab === 'currentWar') {
           const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
@@ -261,6 +272,14 @@ const WarInfoPage = () => {
           setFullWarDetails(fullDetails);
         }
       } catch (error) {
+        try {
+          const response = await APIClashService.getWarSaves();
+          setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
+          setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
+          setWarSaves(response.normalWars || []); // Set the war saves to the state
+        } catch (error) {
+          console.error('Error fetching war saves:', error);
+        }
         console.error('Error loading war data:', error);
         setFullWarDetails(null);
       }
@@ -280,6 +299,7 @@ const WarInfoPage = () => {
   }, [activeTab]);
 
   useEffect(() => {
+
     fetchSavedAttacks()
       .then((data) => setSavedAttacks(Array.isArray(data) ? data : [])) // Ensure savedAttacks is always an array
       .catch((error) => {
@@ -363,21 +383,21 @@ const WarInfoPage = () => {
   };
   const formatDate = (isoDate: string): string => {
     const date = new Date(isoDate);
-if (isNaN(date.getTime())) {
-  // Prevent error if isoDate is undefined or not a string
-  if (!isoDate || typeof isoDate !== 'string' || isoDate.length < 8) {
-    return 'Fecha no válida';
-  }
-  // Handle custom date format like "20250427T210544.000Z"
-  const year = isoDate.substring(0, 4);
-  const month = parseInt(isoDate.substring(4, 6), 10) - 1; // Months are 0-indexed
-  const day = parseInt(isoDate.substring(6, 8), 10);
-  const months = [
-    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-  ];
-  return `${day} de ${months[month]} de ${year}`;
-}
+    if (isNaN(date.getTime())) {
+      // Prevent error if isoDate is undefined or not a string
+      if (!isoDate || typeof isoDate !== 'string' || isoDate.length < 8) {
+        return 'Fecha no válida';
+      }
+      // Handle custom date format like "20250427T210544.000Z"
+      const year = isoDate.substring(0, 4);
+      const month = parseInt(isoDate.substring(4, 6), 10) - 1; // Months are 0-indexed
+      const day = parseInt(isoDate.substring(6, 8), 10);
+      const months = [
+        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      ];
+      return `${day} de ${months[month]} de ${year}`;
+    }
     const day = date.getUTCDate();
     const month = date.getUTCMonth();
     const year = date.getUTCFullYear();
@@ -549,26 +569,32 @@ if (isNaN(date.getTime())) {
     setCustomMessage(event.target.value);
   };
 
-  const generateFilteredWarMessage = (warDetails: any) => {
+  const generateFilteredWarMessage = (warDetails: any, warSaves: any) => {
     let latestSave;
     // Obtener el último guardado considerando el estado "preparation"
     if (currentWarDetails && Object.keys(currentWarDetails).length > 0) {
       latestSave = currentWarDetails;
     } else {
+      debugger
       // Obtener el más reciente desde warLeageSaves
-      const lastSave = warLeageSaves[warLeageSaves.length - 1]?.content;
+      const lastSave = warSaves[warSaves.length - 1]?.content;
+      const inWarSaves = warSaves
+        .filter((save: any) => save.content?.state === "inWar")
+        .sort((a: any, b: any) => {
+          const aTime = a.content?.warStartTime || a.content?.startTime || "";
+          const bTime = b.content?.warStartTime || b.content?.startTime || "";
+          return bTime.localeCompare(aTime); // descendente
+        });
 
-      // Si el estado es "preparation", buscar el archivo anterior
-      if (lastSave && lastSave.state === "preparation") {
-        const previousSave = warLeageSaves[warLeageSaves.length - 2]?.content;
-        if (previousSave) {
-          latestSave = previousSave;
-        } else {
-          latestSave = lastSave; // Si no hay un archivo anterior, usar el más reciente
-        }
+      if (inWarSaves.length > 0) {
+        latestSave = inWarSaves[0].content;
+      } else if (currentWarDetails && Object.keys(currentWarDetails).length > 0) {
+        latestSave = currentWarDetails;
       } else {
-        latestSave = lastSave;
+        // Si no hay ninguno en "inWar", usar el último save disponible
+        latestSave = warSaves[warSaves.length - 1]?.content;
       }
+
     }
 
     if (!latestSave) {
@@ -644,8 +670,7 @@ if (isNaN(date.getTime())) {
       .reduce((sum, count) => sum + count, 0);
 
     const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
-
-    return `
+    const result = `
   ${additionalInfo}
   
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
@@ -653,6 +678,7 @@ if (isNaN(date.getTime())) {
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
   ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks + 1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
     `.trim();
+    return result;
   };
 
   return (
@@ -1053,7 +1079,7 @@ if (isNaN(date.getTime())) {
               fontSize: '14px',
             }}
           >
-            {generateFilteredWarMessage(fullWarDetails)}
+            {messageWar}
           </pre>
           <div className='ButtonNeonAnimate'>
             <div className="grid-bg">
@@ -1064,7 +1090,7 @@ if (isNaN(date.getTime())) {
               <div className="grid-line"></div>
             </div>
             <div className="button-container">
-              <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))} className="hacker-button" data-text=" Copiar Mensaje">
+              <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails, warLeageSaves))} className="hacker-button" data-text=" Copiar Mensaje">
                 Copiar Mensaje
                 <div className="neon-frame"></div>
                 <div className="circuit-traces">
@@ -1118,7 +1144,7 @@ if (isNaN(date.getTime())) {
                 Seleccione una guerra
               </option>
               {warSaves
-                .filter(war => war.content?.state !== 'preparation' )
+                .filter(war => war.content?.state !== 'preparation')
                 .slice(-10)
                 .reverse()
                 .map((war, index) => (
