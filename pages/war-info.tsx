@@ -202,9 +202,9 @@ const WarInfoPage = () => {
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
   const [savedAttacks, setSavedAttacks] = useState<any[]>([]);
   const [customMessage, setCustomMessage] = useState<string>(''); // State for the custom message
-  const [includeThreeStars, setIncludeThreeStars] = useState(true);
-  const [includeTwoStars, setIncludeTwoStars] = useState(true);
-  const [includeOneStar, setIncludeOneStar] = useState(true);
+  const [includeThreeStars, setIncludeThreeStars] = useState(false);
+  const [includeTwoStars, setIncludeTwoStars] = useState(false);
+  const [includeOneStar, setIncludeOneStar] = useState(false);
   const [includeMissingAttacks, setIncludeMissingAttacks] = useState(true);
   const [includeOneMissingAttack, setIncludeOneMissingAttack] = useState(false);
   const [includeTwoMissingAttacks, setIncludeTwoMissingAttacks] = useState(false);
