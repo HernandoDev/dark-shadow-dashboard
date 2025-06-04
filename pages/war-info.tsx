@@ -90,9 +90,6 @@ const generateWarMessage = (warDetails: any) => {
   if (!warDetails) return '';
 
   const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
-  if (warDetails.state === 'notInWar') {
-    return 'No estás en guerra actualmente.';
-  }
   const myClan = warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent; // Determine your clan
   const targetClan = warDetails.clan.tag === clanTag ? warDetails.opponent : warDetails.clan; // Determine the opponent clan
 
@@ -201,7 +198,6 @@ const WarInfoPage = () => {
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
   const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('MensajeGuerra');
   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
-  const [messageWar, setMessageWar] = useState<string>(''); // State to store the generated war message
   const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
   const [savedAttacks, setSavedAttacks] = useState<any[]>([]);
@@ -222,18 +218,6 @@ const WarInfoPage = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const clanTag = getClanTag().replace('%23', '#');
-      setClanTag(clanTag);
-      try {
-        const response = await APIClashService.getWarSaves();
-        setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
-        const message = generateFilteredWarMessage(fullWarDetails, response.leagueWars)
-        setMessageWar(message); // Set the generated war message to the state
-        setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
-        setWarSaves(response.normalWars || []); // Set the war saves to the state
-      } catch (error) {
-        console.error('Error fetching war saves:', error);
-      }
       try {
         if (activeTab === 'currentWar') {
           const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
@@ -272,14 +256,6 @@ const WarInfoPage = () => {
           setFullWarDetails(fullDetails);
         }
       } catch (error) {
-        try {
-          const response = await APIClashService.getWarSaves();
-          setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
-          setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
-          setWarSaves(response.normalWars || []); // Set the war saves to the state
-        } catch (error) {
-          console.error('Error fetching war saves:', error);
-        }
         console.error('Error loading war data:', error);
         setFullWarDetails(null);
       }
@@ -299,7 +275,6 @@ const WarInfoPage = () => {
   }, [activeTab]);
 
   useEffect(() => {
-
     fetchSavedAttacks()
       .then((data) => setSavedAttacks(Array.isArray(data) ? data : [])) // Ensure savedAttacks is always an array
       .catch((error) => {
@@ -569,16 +544,18 @@ const WarInfoPage = () => {
     setCustomMessage(event.target.value);
   };
 
-  const generateFilteredWarMessage = (warDetails: any, warSaves: any) => {
+  const generateFilteredWarMessage = (warDetails: any) => {
     let latestSave;
     // Obtener el último guardado considerando el estado "preparation"
-    if (currentWarDetails && Object.keys(currentWarDetails).length > 0) {
+    if (currentWarDetails && Object.keys(currentWarDetails).length > 0 && currentWarDetails.state !== "notInWar") {
       latestSave = currentWarDetails;
     } else {
-      debugger
+      if (warLeageSaves.length === 0) {
+        return "Cargando información de guerra...";
+      }
       // Obtener el más reciente desde warLeageSaves
-      const lastSave = warSaves[warSaves.length - 1]?.content;
-      const inWarSaves = warSaves
+      const lastSave = warLeageSaves[warLeageSaves.length - 1]?.content;
+      const inWarSaves = warLeageSaves
         .filter((save: any) => save.content?.state === "inWar")
         .sort((a: any, b: any) => {
           const aTime = a.content?.warStartTime || a.content?.startTime || "";
@@ -588,7 +565,7 @@ const WarInfoPage = () => {
 
       if (inWarSaves.length > 0) {
         latestSave = inWarSaves[0].content;
-      } else if (currentWarDetails && Object.keys(currentWarDetails).length > 0) {
+      } else if (currentWarDetails && Object.keys(currentWarDetails).length > 0 && currentWarDetails.state !== "notInWar") {
         latestSave = currentWarDetails;
       } else {
         // Si no hay ninguno en "inWar", usar el último save disponible
@@ -670,7 +647,8 @@ const WarInfoPage = () => {
       .reduce((sum, count) => sum + count, 0);
 
     const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
-    const result = `
+
+    return `
   ${additionalInfo}
   
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
@@ -678,7 +656,6 @@ const WarInfoPage = () => {
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
   ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks + 1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
     `.trim();
-    return result;
   };
 
   return (
@@ -1079,7 +1056,7 @@ const WarInfoPage = () => {
               fontSize: '14px',
             }}
           >
-            {messageWar}
+            {generateFilteredWarMessage(fullWarDetails)}
           </pre>
           <div className='ButtonNeonAnimate'>
             <div className="grid-bg">
@@ -1090,7 +1067,7 @@ const WarInfoPage = () => {
               <div className="grid-line"></div>
             </div>
             <div className="button-container">
-              <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails, warLeageSaves))} className="hacker-button" data-text=" Copiar Mensaje">
+              <button onClick={() => copyToClipboard(generateFilteredWarMessage(fullWarDetails))} className="hacker-button" data-text=" Copiar Mensaje">
                 Copiar Mensaje
                 <div className="neon-frame"></div>
                 <div className="circuit-traces">
