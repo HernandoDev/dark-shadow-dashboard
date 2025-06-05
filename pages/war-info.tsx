@@ -677,7 +677,7 @@ const WarInfoPage = () => {
       const starsToBeSafe = (oppStars + oppStats.attacksMissing * 3 + 1) - myStars;
       if (starsToBeSafe > 0 && mainStats.attacksMissing > 0) {
         const comboSafe = getAttackCombination(starsToBeSafe, mainStats.attacksMissing);
-        result += `\n🔒 Si sumamos al menos ${starsToBeSafe} estrellas más (${comboSafe}), serás inalcanzable aunque el rival haga 3⭐ en todos sus ataques restantes.`;
+        result += `\n🔒 Si sumamos al menos ${starsToBeSafe} estrellas más (${comboSafe}), seremos inalcanzable aunque el rival haga 3⭐ en todos sus ataques restantes.`;
       }
     }
 
