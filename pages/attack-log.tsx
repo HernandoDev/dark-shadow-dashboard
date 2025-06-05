@@ -1458,7 +1458,7 @@ const AttackLog: React.FC = () => {
                                                         </strong>
                                                         <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
                                                             {Array.from(summary.players)
-                                                                .filter(player => clanMembers.includes(player))
+                                                                .filter(player => player)
 
                                                                 .map((player, index) => (
                                                                     <li key={index} style={{ marginBottom: '5px' }}>
