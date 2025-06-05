@@ -243,7 +243,7 @@ const DonationsTab = ({ selectedPlayer, selectedPlayerTag }: { selectedPlayer: s
             try {
                 const data = await APIClashService.getCapitalRaidsSaves();
                 setCapitalRaids(data); 
-                debugger
+                
             } catch (err: any) {
                 setError(err.message || 'Error fetching capital raids data');
             }
