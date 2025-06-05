@@ -232,8 +232,8 @@ export const Content = () => {
          .map(p => {
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-            const score = avgStars * (1 + Math.log(p.totalAttacks));
-            return {
+const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
+          return {
                tag: p.tag,
                name: p.name,
                townhallLevel: p.townhallLevel,
@@ -245,7 +245,7 @@ export const Content = () => {
          })
          .sort((a, b) =>
             b.score - a.score ||
-            b.avgDestruction - a.avgDestruction
+            b.avgStars - a.avgStars
          );
 
       setSummaryLiga(summaryArr);
@@ -302,7 +302,7 @@ export const Content = () => {
          .map(p => {
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-            const score = avgStars * (1 + Math.log(p.totalAttacks));
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
             return {
                tag: p.tag,
                name: p.name,
@@ -315,7 +315,7 @@ export const Content = () => {
          })
          .sort((a, b) =>
             b.score - a.score ||
-            b.avgDestruction - a.avgDestruction
+            b.avgStars - a.avgStars
          );
 
       setSummaryWar(summaryArr);
@@ -325,7 +325,7 @@ export const Content = () => {
    React.useEffect(() => {
       if ((!summaryLiga.length && !summaryWar.length) || !members.length) return;
       const memberTags = new Set(members);
-      const LIGA_FACTOR = 10;
+      const LIGA_FACTOR = 2;
       // Map para obtener los 3 ejércitos más usados por jugador
       const armyMap: Record<string, string[]> = {};
       if (attackLogs && Array.isArray(attackLogs)) {
@@ -369,7 +369,9 @@ export const Content = () => {
          if (!memberTags.has(p.tag)) return;
          const avgStars = p.avgStars;
          const totalAttacks = p.totalAttacks;
-         const score = avgStars * (1 + Math.log(totalAttacks));
+               let aux = (1 + Math.log(p.totalAttacks) / 3)
+         
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
          combinedMap[p.tag] = {
             tag: p.tag,
             name: p.name,
@@ -393,7 +395,9 @@ export const Content = () => {
          if (!memberTags.has(p.tag)) return;
          const avgStars = p.avgStars;
          const totalAttacks = p.totalAttacks;
-         const score = avgStars * (1 + Math.log(totalAttacks));
+         let aux = (1 + Math.log(p.totalAttacks) / 3)
+         
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
          if (!combinedMap[p.tag]) {
             combinedMap[p.tag] = {
                tag: p.tag,
@@ -574,7 +578,7 @@ export const Content = () => {
                                  <b>Guerras normales:</b> Se suman todos los ataques realizados por cada jugador, calculando su media de estrellas y destrucción.<br />
                                  <b>Guerras de liga:</b> Se realiza el mismo cálculo, pero los resultados de liga tienen un peso mayor  en el ranking combinado.<br />
                                  <b>Ranking combinado:</b> Se suman los resultados de ambas modalidades, ponderando la liga, y se calcula un "score" que tiene en cuenta la media de estrellas y el número de ataques realizados.<br />
-                                 <b>Top y Peores jugadores:</b> Se muestran los 5 mejores y 5 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(10 veces mayor).<br />
+                                 <b>Top y Peores jugadores:</b> Se muestran los 5 mejores y 5 peores jugadores según este score combinado los resultados de liga tienen un peso mayor(2 veces mayor).<br />
                                  <b>Ejércitos más usados:</b> Para cada jugador, también se muestran los 3 ejércitos que más ha utilizado en sus ataques recientes.<br /><br />
                                  Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
                               </Text>
@@ -589,7 +593,7 @@ export const Content = () => {
 
                      }}
                   >
-                     Top 5 Jugadores Combinados
+                     Top 5 Jugadores 
                   </Text>
                   <Flex
                      css={{
@@ -602,7 +606,7 @@ export const Content = () => {
                      }}
                      direction={'row'}
                   >
-                     {summaryCombined.slice(0, 5).map((player, index) => (
+                     {summaryCombined.slice(0, 15).map((player, index) => (
                         <CardBalance1 key={player.tag} player={player} position={index + 1} />
                      ))}
                   </Flex>
