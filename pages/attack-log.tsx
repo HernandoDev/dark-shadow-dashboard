@@ -9,7 +9,10 @@ const getClanTag = () => {
     if (typeof window === 'undefined') return '';
     return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
 };
-
+function getIncludedPlayers(players: Set<string>, clanMembers: string[]) {
+    debugger
+    return Array.from(players).filter(player => clanMembers.includes(player));
+}
 const AttackLog: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'searchPlayers' | 'clanSummary'>('clanSummary'); // Tab state
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -108,7 +111,7 @@ const AttackLog: React.FC = () => {
             setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
             setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
             setWarSaves(response.normalWars || []); //
-            
+            debugger
         } catch (error) {
             console.error('Error fetching war saves:', error);
         } finally {
@@ -117,7 +120,7 @@ const AttackLog: React.FC = () => {
     };
 
     const formatWarDate = (fileName: string): string => {
-        
+        debugger
         const cleanFileName = fileName.replace('.json', ''); // Remove .json extension
         const parts = cleanFileName.split('_');
 
@@ -425,6 +428,14 @@ const AttackLog: React.FC = () => {
     };
 
     useEffect(() => {
+        const fetchData = async () => {
+            const response = await APIClashService.getClanMembers(); // Clan Principal
+            const memberNames = response.items.map((member: { name: string }) => member.name);
+            setMembers(response.items); // Save the full members list
+            setClanMembers(memberNames);
+            fetchWarSaves(); // Fetch war saves on component mount
+        };
+        fetchData();
         fetchSavedAttacks()
             .then((data) => setSavedAttacks(Array.isArray(data) ? data : [])) // Ensure savedAttacks is always an array
             .catch((error) => {
@@ -1457,15 +1468,12 @@ const AttackLog: React.FC = () => {
                                                             Jugadores:
                                                         </strong>
                                                         <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
-                                                            {Array.from(summary.players)
-                                                                .filter(player => player)
-
-                                                                .map((player, index) => (
-                                                                    <li key={index} style={{ marginBottom: '5px' }}>
-                                                                        <User size={12} style={{ marginRight: '5px' }} />
-                                                                        {player}
-                                                                    </li>
-                                                                ))}
+                                                            {getIncludedPlayers(summary.players, clanMembers).map((player, index) => (
+                                                                <li key={index} style={{ marginBottom: '5px' }}>
+                                                                    <User size={12} style={{ marginRight: '5px' }} />
+                                                                    {player}
+                                                                </li>
+                                                            ))}
                                                         </ul>
                                                     </li>
                                                 </ul>
