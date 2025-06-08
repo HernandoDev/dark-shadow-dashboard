@@ -612,7 +612,7 @@ const WarInfoPage = () => {
       } else if (myPerc < oppPerc) {
         result += "⚠️ Solo es posible empatar en estrellas, pero perderiamos por porcentaje aunque hagas 3 estrellas en todos los ataques restantes.\n";
       } else {
-        result += "⚠️ Solo es posible empatar en estrellas y porcentaje si haces 3 estrellas en todos los ataques restantes.\n";
+        result += "⚠️ Solo es posible empatar en estrellas y porcentaje si hacemos 3 estrellas en todos los ataques restantes.\n";
       }
     } else {
       const starsNeeded = oppStars - myStars + 1;
@@ -633,7 +633,7 @@ const WarInfoPage = () => {
         result += `\n🔎 El rival necesita ${starsToTie} estrellas para empatarnos (${combo}).`;
         if (starsToTie > 0) {
           const comboToWin = getAttackCombination(starsToTie + 1, attacksAvailable);
-          result += ` Si logra ${starsToTie + 1} estrellas (${comboToWin}), te superará.`;
+          result += ` Si logra ${starsToTie + 1} estrellas (${comboToWin}), nos superará.`;
         }
       }
     }
@@ -654,12 +654,12 @@ const WarInfoPage = () => {
 
     // ¿Puede el rival remontar?
     if (oppMaxStars < myStars) {
-      result += "\n✅ El rival NO puede alcanzarte, aunque haga 3 estrellas en todos sus ataques restantes. ¡Victoria asegurada!";
+      result += "\n✅ El rival NO puede alcanzarnos, aunque haga 3 estrellas en todos sus ataques restantes. ¡Victoria asegurada!";
     } else if (oppMaxStars === myStars) {
       if (oppPerc > myPerc) {
-        result += "\n⚠️ El rival solo puede empatar en estrellas, pero te ganaría por porcentaje si hace 3 estrellas en todos sus ataques restantes.";
+        result += "\n⚠️ El rival solo puede empatar en estrellas, pero nos ganaría por porcentaje si hace 3 estrellas en todos sus ataques restantes.";
       } else if (oppPerc < myPerc) {
-        result += "\n⚠️ El rival solo puede empatar en estrellas, pero perdería por porcentaje aunque haga 3 estrellas en todos sus ataques restantes.";
+        result += "\n⚠️ El rival solo puede empatar en estrellas, pero perderiamos por porcentaje si hace 3 estrellas en todos sus ataques restantes.";
       } else {
         result += "\n⚠️ El rival solo puede empatar en estrellas y porcentaje si hace 3 estrellas en todos sus ataques restantes.";
       }
@@ -668,7 +668,7 @@ const WarInfoPage = () => {
       const attacksAvailable = oppStats.attacksMissing;
       if (starsNeeded > 0) {
         const combo = getAttackCombination(starsNeeded, attacksAvailable);
-        result += `\n⚠️ El rival aún puede remontar si logra al menos ${starsNeeded} estrellas más que tú (${combo}).`;
+        result += `\n⚠️ El rival aún puede remontar si logra al menos ${starsNeeded} estrellas más que nosotros (${combo}).`;
       }
     }
 
@@ -677,7 +677,7 @@ const WarInfoPage = () => {
       const starsToBeSafe = (oppStars + oppStats.attacksMissing * 3 + 1) - myStars;
       if (starsToBeSafe > 0 && mainStats.attacksMissing > 0) {
         const comboSafe = getAttackCombination(starsToBeSafe, mainStats.attacksMissing);
-        result += `\n🔒 Si sumamos al menos ${starsToBeSafe} estrellas más (${comboSafe}), seremos inalcanzable aunque el rival haga 3⭐ en todos sus ataques restantes.`;
+        result += `\n🔒 Si sumamos al menos ${starsToBeSafe} estrellas más (${comboSafe}), seremos inalcanzables aunque el rival haga 3⭐ en todos sus ataques restantes.`;
       }
     }
 
