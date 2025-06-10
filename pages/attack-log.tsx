@@ -10,7 +10,7 @@ const getClanTag = () => {
     return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
 };
 function getIncludedPlayers(players: Set<string>, clanMembers: string[]) {
-    debugger
+    
     return Array.from(players).filter(player => clanMembers.includes(player));
 }
 const AttackLog: React.FC = () => {
@@ -111,7 +111,7 @@ const AttackLog: React.FC = () => {
             setWarLeageSaves(response.leagueWars || []); // Assuming response contains the league wars
             setLeageGroupsSaves(response.leagueGroups || []); // Assuming response contains the league groups
             setWarSaves(response.normalWars || []); //
-            debugger
+            
         } catch (error) {
             console.error('Error fetching war saves:', error);
         } finally {
@@ -120,7 +120,7 @@ const AttackLog: React.FC = () => {
     };
 
     const formatWarDate = (fileName: string): string => {
-        debugger
+        
         const cleanFileName = fileName.replace('.json', ''); // Remove .json extension
         const parts = cleanFileName.split('_');
 
