@@ -232,7 +232,7 @@ export const Content = () => {
          .map(p => {
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
+const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
           return {
                tag: p.tag,
                name: p.name,
@@ -302,7 +302,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
          .map(p => {
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-            const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
             return {
                tag: p.tag,
                name: p.name,
@@ -370,9 +370,9 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
          if (!memberTags.has(p.tag)) return;
          const avgStars = p.avgStars;
          const totalAttacks = p.totalAttacks;
-               let aux = (1 + Math.log(p.totalAttacks) / 3)
+               let aux = (1 + Math.log(p.totalAttacks) / 4)
          
-            const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          combinedMap[p.tag] = {
             tag: p.tag,
             name: p.name,
@@ -396,9 +396,9 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
          if (!memberTags.has(p.tag)) return;
          const avgStars = p.avgStars;
          const totalAttacks = p.totalAttacks;
-         let aux = (1 + Math.log(p.totalAttacks) / 3)
+         let aux = (1 + Math.log(p.totalAttacks) / 4)
          
-            const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          if (!combinedMap[p.tag]) {
             combinedMap[p.tag] = {
                tag: p.tag,
