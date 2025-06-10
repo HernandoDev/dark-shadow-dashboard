@@ -134,19 +134,27 @@ export const APIClashService = {
     return res.json();
   },
 
-  getAttackLogs: async () => {
+getAttackLogs: async () => {
     const clanTag = getClanTag();
     if (!clanTag) throw new Error('Clan tag not set');
     if (!isAuthenticated()) throw new Error('User not authenticated');
 
-    // Enviar clanTag como parámetro de consulta
     const res = await fetch(`${baseUrl}/attack-log?clanTag=${encodeURIComponent(clanTag)}`);
-    
     if (!res.ok) {
         console.error('Error al obtener los ataques guardados');
-        throw new Error('Error al obtener los ataques guardados');
+        return []; 
     }
-    return res.json();
+    const text = await res.text();
+    if (!text) {
+        console.error('NO HAY ATAQUES GUARDADOS');
+        return []; 
+    }
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        console.error('Error parsing attack logs JSON', e);
+        return [];
+    }
 },
 
   deleteAttack: async (attackId: string) => {

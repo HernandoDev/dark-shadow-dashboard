@@ -330,6 +330,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
       const armyMap: Record<string, string[]> = {};
       if (attackLogs && Array.isArray(attackLogs)) {
          // Contar ataques por tipo de ejército para cada jugador (por nombre)
+         debugger
          const armyCount: Record<string, Record<string, number>> = {};
          attackLogs.forEach((log: any) => {
             if (!armyCount[log.member]) armyCount[log.member] = {};
