@@ -594,7 +594,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 3);
 
                      }}
                   >
-                     Top 5 Jugadores 
+                     Top 15 Jugadores 
                   </Text>
                   <Flex
                      css={{
