@@ -325,7 +325,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
    React.useEffect(() => {
       if ((!summaryLiga.length && !summaryWar.length) || !members.length) return;
       const memberTags = new Set(members);
-      const LIGA_FACTOR = 2;
+      const LIGA_FACTOR = 2.5;
       // Map para obtener los 3 ejércitos más usados por jugador
       const armyMap: Record<string, string[]> = {};
       if (attackLogs && Array.isArray(attackLogs)) {
@@ -607,7 +607,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                      }}
                      direction={'row'}
                   >
-                     {summaryCombined.slice(0, 15).map((player, index) => (
+                     {summaryCombined.slice(0, 50).map((player, index) => (
                         <CardBalance1 key={player.tag} player={player} position={index + 1} />
                      ))}
                   </Flex>
