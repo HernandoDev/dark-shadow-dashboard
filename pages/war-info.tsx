@@ -86,60 +86,73 @@ const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksP
   }).filter((member: any) => member.attacksMissing > 0);
 };
 
-const generateWarMessage = (warDetails: any) => {
+const getMyClan = (warDetails: WarDetails, clanTag: string): Clan | undefined =>
+  warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent;
+
+const getTargetClan = (warDetails: WarDetails, clanTag: string): Clan | undefined =>
+  warDetails.clan.tag === clanTag ? warDetails.opponent : warDetails.clan;
+
+const getComparisonEmoji = (myPos: number, enemyPos: number) =>
+  myPos < enemyPos
+    ? '⬇️(num. Inferior)'
+    : myPos > enemyPos
+      ? '⬆️(num. Superior)'
+      : '🪞(Espejo)';
+
+const buildAttackMessage = (member: Member, playerEnemy: Member) => {
+  const ownInfo = `*${member.mapPosition}. ${member.name} (TH${member.townhallLevel})`;
+  const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
+  const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
+  const emoji = getComparisonEmoji(member.mapPosition, playerEnemy.mapPosition);
+  return `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${emoji} ${warning}`;
+};
+
+const getStarsGroup = (
+  members: Member[],
+  targetClan: Clan | undefined
+): { [key: number]: string[] } => {
+  const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
+  members.forEach((member) => {
+    if (member.attacks && member.attacks.length > 0) {
+      member.attacks.forEach((attack) => {
+        const stars = (attack.stars || 0) as 1 | 2 | 3;
+        const playerEnemy = targetClan?.members.find((m) => m.tag === attack.defenderTag);
+        if (playerEnemy) {
+          starsGroup[stars]?.push(buildAttackMessage(member, playerEnemy));
+        }
+      });
+    }
+  });
+  return starsGroup;
+};
+
+const getNoAttackList = (
+  members: Member[],
+  attacksPerMember: number = 1
+): string[] => {
+  const noAttack: string[] = [];
+  members.forEach((member) => {
+    const attacksDone = member.attacks?.length || 0;
+    const attacksMissing = attacksPerMember - attacksDone;
+    if (attacksMissing > 0) {
+      noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s)`);
+    }
+  });
+  return noAttack;
+};
+
+const generateWarMessage = (warDetails: WarDetails) => {
   if (!warDetails) return '';
 
-  const clanTag = getClanTag().replace('%23', '#'); // Get your clan's tag
-  const myClan = warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent; // Determine your clan
-  const targetClan = warDetails.clan.tag === clanTag ? warDetails.opponent : warDetails.clan; // Determine the opponent clan
+  const clanTag = getClanTag().replace('%23', '#');
+  const myClan = getMyClan(warDetails, clanTag);
+  const targetClan = getTargetClan(warDetails, clanTag);
 
   if (!myClan) return 'No se encontró información de tu clan.';
 
-  const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
-  const noAttack: string[] = [];
-  // ...existing code...
-  if (myClan?.members && Array.isArray(myClan.members)) {
-    myClan.members.forEach((member: any) => {
-      if (member.attacks && member.attacks.length > 0) {
-        member.attacks.forEach((attack: any) => {
-          const stars = (attack.stars || 0) as 1 | 2 | 3;
-
-          // Find the target clan and member by searching for the defenderTag
-          const targetClanName = targetClan ? targetClan.name : 'Desconocido';
-          const playerEnemy = targetClan?.members.find((m: any) => m.tag === attack.defenderTag);
-
-          if (playerEnemy) {
-            const comparisonEmoji =
-              member.mapPosition < playerEnemy.mapPosition
-                ? '⬇️(num. Inferior)' // Green arrow for higher-ranked
-                : member.mapPosition > playerEnemy.mapPosition
-                  ? '⬆️(num. Superior)' // Red arrow for lower-ranked
-                  : '🪞(Espejo)'; // Equals sign for equal rank
-            const ownInfo = `*${member.mapPosition}. ${member.name} (TH${member.townhallLevel})`;
-            const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
-            const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
-
-            const message = `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${comparisonEmoji} ${warning}`;
-
-            starsGroup[stars]?.push(message);
-          }
-        });
-        if (member.attacks.length === 1) {
-          const attacksPerMember = warDetails.attacksPerMember || 1 // Default to 2 attacks per member if not provided
-          const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-          if (attacksMissing > 0) {
-            noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s)`);
-          }
-        }
-      } else {
-
-        const attacksPerMember = warDetails.attacksPerMember || 1; // Default to 2 attacks per member if not provided
-        const attacksMissing = attacksPerMember - (member.attacks?.length || 0);
-        noAttack.push(`* ${member.mapPosition}. ${member.name} →  ${attacksMissing} ataque(s)`);
-      }
-    });
-  }
-
+  const attacksPerMember = warDetails.attacksPerMember || 1;
+  const starsGroup = getStarsGroup(myClan.members, targetClan);
+  const noAttack = getNoAttackList(myClan.members, attacksPerMember);
 
   return `
 📢 Estado de la guerra: ${myClan.status || 'Desconocido'}
@@ -178,6 +191,31 @@ const deleteAttack = async (attackId: string) => {
     console.error(`Error deleting attack with ID ${attackId}:`, error);
   }
 };
+interface Member {
+  mapPosition: number;
+  name: string;
+  townhallLevel: number;
+  attacks?: Attack[];
+  tag: string;
+}
+
+interface Attack {
+  stars: number;
+  defenderTag: string;
+}
+
+interface Clan {
+  tag: string;
+  name: string;
+  status?: string;
+  members: Member[];
+}
+
+interface WarDetails {
+  clan: Clan;
+  opponent: Clan;
+  attacksPerMember?: number;
+}
 
 interface ClanMember {
   tag: string;
@@ -218,59 +256,67 @@ const WarInfoPage = () => {
   const [showSavedAttacks, setShowSavedAttacks] = useState(false); // State for collapsible saved attacks section
   const [showWarMap, setShowWarMap] = useState(false); // State for collapsible war map section
 
+  const enrichMembersWithDetails = async (members: any[]): Promise<any[]> => {
+    return Promise.all(
+      members.map(async (member: any) => {
+        const formattedTag = member.tag.replace('#', '%23');
+        const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
+        return { ...member, playerInfo };
+      })
+    );
+  };
+
+  // Helper: fetch and process league group details
+  const fetchLeagueGroupDetails = async (setFullWarDetails: (details: any) => void) => {
+    const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
+    if (clanWarLeagueGroupDetails?.clans) {
+      const fullDetails = await Promise.all(
+        clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[] }) => {
+          const membersWithDetails = await enrichMembersWithDetails(clan.members);
+          return { ...clan, members: membersWithDetails };
+        })
+      );
+      setFullWarDetails(fullDetails);
+    }
+  };
+
+  // Helper: fetch and process current war details
+  const fetchCurrentWarDetails = async (
+    setcurrentWarDetails: (details: any) => void,
+    setFullWarDetails: (details: any) => void,
+    getWarSummary: (log: any) => any
+  ) => {
+    const currentWarDetails = await APIClashService.getClanCurrentWar();
+    setcurrentWarDetails(currentWarDetails);
+
+    const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
+    const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
+
+    const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
+    const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
+      console.error("Error al obtener el registro de guerra del clan");
+      return { items: [] };
+    });
+    const clanWarLogSummary = getWarSummary(opponentWarLog);
+    const fullDetails = [
+      { ...currentWarDetails.clan, members: clanDetails },
+      { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
+    ];
+    setFullWarDetails(fullDetails);
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
         if (activeTab === 'currentWar') {
-          const clanWarLeagueGroupDetails = await APIClashService.getClanWarLeagueGroup();
-          if (clanWarLeagueGroupDetails?.clans) {
-            const fullDetails = await Promise.all(
-              clanWarLeagueGroupDetails.clans.map(async (clan: { members: any[]; }) => {
-                const membersWithDetails = await Promise.all(
-                  clan.members.map(async (member: { tag: string; }) => {
-                    const formattedTag = member.tag.replace('#', '%23');
-                    const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-                    return { ...member, playerInfo };
-                  })
-                );
-                return { ...clan, members: membersWithDetails };
-              })
-            );
-            setFullWarDetails(fullDetails);
-          }
+          await fetchLeagueGroupDetails(setFullWarDetails);
         } else {
-          const currentWarDetails = await APIClashService.getClanCurrentWar();
-          setcurrentWarDetails(currentWarDetails);
-
-          const clanDetails = await enrichMembersWithDetails(currentWarDetails.clan.members);
-          const opponentDetails = await enrichMembersWithDetails(currentWarDetails.opponent.members);
-
-          const opponentTag = currentWarDetails.opponent.tag.replace('#', '%23');
-          const opponentWarLog = await APIClashService.getWarLog(opponentTag).catch(() => {
-            console.error("Error al obtener el registro de guerra del clan");
-            return { items: [] };
-          });
-          const clanWarLogSummary = getWarSummary(opponentWarLog);
-          const fullDetails = [
-            { ...currentWarDetails.clan, members: clanDetails },
-            { ...currentWarDetails.opponent, members: opponentDetails, warLog: clanWarLogSummary },
-          ];
-          setFullWarDetails(fullDetails);
+          await fetchCurrentWarDetails(setcurrentWarDetails, setFullWarDetails, getWarSummary);
         }
       } catch (error) {
         console.error('Error loading war data:', error);
         setFullWarDetails(null);
       }
-    };
-
-    const enrichMembersWithDetails = async (members: any[]): Promise<any[]> => {
-      return Promise.all(
-        members.map(async (member: any) => {
-          const formattedTag = member.tag.replace('#', '%23');
-          const playerInfo = await APIClashService.getPlayerInfo(formattedTag);
-          return { ...member, playerInfo };
-        })
-      );
     };
 
     loadData();
@@ -433,64 +479,68 @@ const WarInfoPage = () => {
     return `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
   }
 
-  const getWarSummary = (warLog: any) => {
-    if (!warLog || !warLog.items) {
-      return {
-        totalWars: 0,
-        wins: 0,
-        losses: 0,
-        ties: 0,
-        maxWinStreak: 0,
-        maxLossStreak: 0,
-        significantWins: 0,
-        significantLosses: 0,
-      };
-    }
+  const filterRecentWars = (warLog: any, days: number, parseDate: (dateStr: string) => string) => {
+    if (!warLog || !warLog.items) return [];
     const now = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(now.getDate() - 60);
-    const recentWars = warLog.items.filter((war: any) => {
-      const parsedDateStr = parseCustomDate(war.endTime);
+    const cutoff = new Date();
+    cutoff.setDate(now.getDate() - days);
+    return warLog.items.filter((war: any) => {
+      const parsedDateStr = parseDate(war.endTime);
       const warEndTime = new Date(parsedDateStr);
-      return warEndTime > thirtyDaysAgo;
+      return warEndTime > cutoff;
     });
+  };
 
-    let winStreak = 0;
-    let maxWinStreak = 0;
-    let lossStreak = 0;
-    let maxLossStreak = 0;
-
-    const warSummaries = recentWars.map((war: any) => {
-      const isWin = war.result === "win";
-      const isLoss = war.result === "lose";
-      const margin = Math.abs(war.clan.stars - war.opponent.stars);
-
-      if (isWin) {
+  // SRP: Calcula las rachas de victorias y derrotas
+  const calculateStreaks = (wars: any[]) => {
+    let winStreak = 0, maxWinStreak = 0, lossStreak = 0, maxLossStreak = 0;
+    wars.forEach((war: any) => {
+      if (war.result === "win") {
         winStreak++;
         lossStreak = 0;
         maxWinStreak = Math.max(maxWinStreak, winStreak);
-      } else if (isLoss) {
+      } else if (war.result === "lose") {
         lossStreak++;
         winStreak = 0;
         maxLossStreak = Math.max(maxLossStreak, lossStreak);
       }
-
-      return {
-        result: war.result,
-        margin,
-        significant: margin >= 10,
-      };
     });
+    return { maxWinStreak, maxLossStreak };
+  };
+
+  // SRP: Resume los resultados de guerra
+  const summarizeWars = (wars: any[]) => {
+    let wins = 0, losses = 0, ties = 0, significantWins = 0, significantLosses = 0;
+    wars.forEach((war: any) => {
+      const margin = Math.abs(war.clan.stars - war.opponent.stars);
+      if (war.result === "win") {
+        wins++;
+        if (margin >= 10) significantWins++;
+      } else if (war.result === "lose") {
+        losses++;
+        if (margin >= 10) significantLosses++;
+      } else if (war.result === "tie") {
+        ties++;
+      }
+    });
+    return { wins, losses, ties, significantWins, significantLosses };
+  };
+
+  // OCP: Función principal, fácil de extender
+  const getWarSummary = (warLog: any) => {
+    const recentWars = filterRecentWars(warLog, 60, parseCustomDate);
+    const { maxWinStreak, maxLossStreak } = calculateStreaks(recentWars);
+    const { wins, losses, ties, significantWins, significantLosses } = summarizeWars(recentWars);
 
     return {
       totalWars: recentWars.length,
-      wins: warSummaries.filter((war: any) => war.result === "win").length,
-      losses: warSummaries.filter((war: any) => war.result === "lose").length,
-      ties: warSummaries.filter((war: any) => war.result === "tie").length,
+      wins,
+      losses,
+      ties,
       maxWinStreak,
       maxLossStreak,
-      significantWins: warSummaries.filter((war: any) => war.result === "win" && war.significant).length,
-      significantLosses: warSummaries.filter((war: any) => war.result === "lose" && war.significant).length,
+      significantWins,
+      significantLosses,
     };
   };
 
@@ -545,158 +595,168 @@ const WarInfoPage = () => {
   const handleCustomMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCustomMessage(event.target.value);
   };
-  function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
+  function getTimeLeft(endTime: string): string {
+    if (!endTime) return "Desconocido";
+    const year = endTime.substring(0, 4);
+    const month = endTime.substring(4, 6);
+    const day = endTime.substring(6, 8);
+    const hour = endTime.substring(9, 11);
+    const minute = endTime.substring(11, 13);
+    const second = endTime.substring(13, 15);
+    const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
+    const end = new Date(isoString);
+    const now = new Date();
+    let diff = end.getTime() - now.getTime();
+    if (diff <= 0) return "¡La guerra ha terminado!";
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    diff -= hours * (1000 * 60 * 60);
+    const minutes = Math.floor(diff / (1000 * 60));
+    return `${hours} horas y ${minutes} minutos`;
+  }
+
+  function getAttacksDone(clan: any): number {
+    return clan.members.reduce((acc: number, m: any) => acc + (m.attacks ? m.attacks.length : 0), 0);
+  }
+
+  function getAttacksLeft(clan: any, teamSize: number, attacksPerMember: number): number {
+    return teamSize * attacksPerMember - getAttacksDone(clan);
+  }
+
+  // O: Open/Closed Principle - getMaxStars es fácil de extender para nuevas reglas
+  function getMaxStars(clan: any, isLeague: boolean, teamSize: number, attacksPerMember: number): number {
+    if (isLeague) {
+      return (clan.stars || 0) + getAttacksLeft(clan, teamSize, attacksPerMember) * 3;
+    }
+    const baseBestStars: { [defenderTag: string]: number } = {};
+    for (const member of clan.members) {
+      if (member.attacks) {
+        for (const attack of member.attacks) {
+          if (!baseBestStars[attack.defenderTag] || attack.stars > baseBestStars[attack.defenderTag]) {
+            baseBestStars[attack.defenderTag] = attack.stars;
+          }
+        }
+      }
+    }
+    let attacksLeft = getAttacksLeft(clan, teamSize, attacksPerMember);
+    const bases = Object.keys(baseBestStars).map(tag => ({
+      tag,
+      stars: baseBestStars[tag]
+    }));
+    for (const member of clan.members) {
+      if (!baseBestStars[member.tag]) {
+        bases.push({ tag: member.tag, stars: 0 });
+      }
+    }
+    bases.sort((a, b) => a.stars - b.stars);
+
+    let possibleStars = 0;
+    for (const base of bases) {
+      let starsToAdd = 3 - base.stars;
+      if (starsToAdd > 0 && attacksLeft > 0) {
+        const usedAttacks = Math.min(1, attacksLeft);
+        possibleStars += base.stars + (usedAttacks > 0 ? starsToAdd : 0);
+        attacksLeft -= usedAttacks;
+      } else {
+        possibleStars += base.stars;
+      }
+    }
+    if (attacksLeft > 0) {
+      possibleStars += attacksLeft * 3;
+    }
+    return Math.min(possibleStars, teamSize * 3);
+  }
+
+  // L: Liskov Substitution Principle - Las funciones no rompen contratos al extenderse
+  // I: Interface Segregation Principle - No aplica directamente aquí por ser funciones utilitarias
+  // D: Dependency Inversion Principle - Las dependencias (funciones) se inyectan por parámetros si se requiere
+
+  function getDynamicTitle(ourStars: number, enemyStars: number, ourMaxStars: number, enemyMaxStars: number, ourAttacksLeft: number, enemyMax: number): string {
+    if (ourStars > enemyMaxStars) {
+      return '🏆🎉 ¡FELICIDADES CLAN! ¡VICTORIA ASEGURADA! 🎉🏆\n';
+    } else if (enemyStars > ourMaxStars) {
+      return '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar \n';
+    } else if (ourStars > enemyStars) {
+      if (enemyMax >= ourStars + ourAttacksLeft * 3) {
+        return '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n\n';
+      } else {
+        return '🎉 ¡Vamos ganando! ¡Sigamos así para asegurar la victoria! 🎉\n';
+      }
+    } else if (ourStars < enemyStars) {
+      return '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n⚠️¡A darlo todo en los ataques restantes!\n';
+    } else {
+      return '🤝⚠️ EMPATE ¡Cada ataque cuenta!⚠️🤝\n';
+    }
+  }
+
+  // S: Single Responsibility Principle - Combinaciones de ataques
+  function getAttackCombinations(attacksLeft: number, starsNeeded: number, prefix: string): string[] {
+    let combinaciones: string[] = [];
+    for (let three = attacksLeft; three >= 0; three--) {
+      for (let two = attacksLeft - three; two >= 0; two--) {
+        let one = attacksLeft - three - two;
+        let total = three * 3 + two * 2 + one * 1;
+        if (total >= starsNeeded) {
+          if (one === 0 && two === 0 && three > 0) {
+            combinaciones.push(`✅ ${prefix} todos los ataques de 3⭐ para ${total} estrellas`);
+          } else if (three === 0 && two > 0 && one === 0) {
+            combinaciones.push(`✅ ${prefix} ${two} ataque${two > 1 ? 's' : ''} de 2⭐ para ${total} estrellas`);
+          } else if (three === 0 && two === 0 && one > 0) {
+            combinaciones.push(`✅ ${prefix} ${one} ataque${one > 1 ? 's' : ''} de 1⭐ para ${total} estrellas`);
+          } else if (three > 0 && one === 0 && two > 0) {
+            combinaciones.push(`✅ ${prefix} ${three} ataques de 3⭐ y ${two} de 2⭐ para ${total} estrellas`);
+          } else if (three > 0 && two === 0 && one > 0) {
+            combinaciones.push(`✅ ${prefix} ${three} ataques de 3⭐ y ${one} de 1⭐ para ${total} estrellas`);
+          } else if (three > 0 && two > 0 && one > 0) {
+            combinaciones.push(`✅ ${prefix} ${three} ataques de 3⭐, ${two} de 2⭐ y ${one} de 1⭐ para ${total} estrellas`);
+          }
+        }
+      }
+    }
+    return combinaciones;
+  }
+
+  // Función principal refactorizada
+  function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any): string {
     if (!latestSave || !mainClan || !opponentClan) return "No hay datos suficientes para predecir.";
     const isLeague = !!latestSave.season;
     const attacksPerMember = isLeague ? 1 : 2;
     const teamSize = latestSave.teamSize || mainClan.members.length;
 
-    // Calcular tiempo restante
-    function getTimeLeft(endTime: string) {
-      if (!endTime) return "Desconocido";
-      const year = endTime.substring(0, 4);
-      const month = endTime.substring(4, 6);
-      const day = endTime.substring(6, 8);
-      const hour = endTime.substring(9, 11);
-      const minute = endTime.substring(11, 13);
-      const second = endTime.substring(13, 15);
-      const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
-      const end = new Date(isoString);
-      const now = new Date();
-      let diff = end.getTime() - now.getTime();
-      if (diff <= 0) return "¡La guerra ha terminado!";
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      diff -= hours * (1000 * 60 * 60);
-      const minutes = Math.floor(diff / (1000 * 60));
-      return `${hours} horas y ${minutes} minutos`;
-    }
-
-    // Calcula ataques realizados y faltantes
-    function getAttacksDone(clan: any) {
-      let attacks = 0;
-      for (const m of clan.members) {
-        if (m.attacks) attacks += m.attacks.length;
-      }
-      return attacks;
-    }
-    function getAttacksLeft(clan: any) {
-      return teamSize * attacksPerMember - getAttacksDone(clan);
-    }
-    // Calcular estrellas máximas reales (solo para guerras normales, no liga)
-    function getMaxStars(clan: any) {
-      if (isLeague) {
-        // En liga, cada ataque cuenta, solo hay 1 por miembro
-        return (clan.stars || 0) + getAttacksLeft(clan) * 3;
-      }
-      // En guerra normal, cada aldea solo puede dar máximo 3 estrellas (mejor ataque cuenta)
-      // Creamos un mapa de defensorTag -> mejor ataque recibido
-      const baseBestStars: { [defenderTag: string]: number } = {};
-      // Contar ataques ya hechos
-      for (const member of clan.members) {
-        if (member.attacks) {
-          for (const attack of member.attacks) {
-            if (!baseBestStars[attack.defenderTag] || attack.stars > baseBestStars[attack.defenderTag]) {
-              baseBestStars[attack.defenderTag] = attack.stars;
-            }
-          }
-        }
-      }
-      // Ahora, para cada base que no tiene 3 estrellas, podemos mejorarla a 3 con los ataques restantes
-      let attacksLeft = getAttacksLeft(clan);
-      // Ordenar las bases por las que menos estrellas tienen
-      const bases = Object.keys(baseBestStars).map(tag => ({
-        tag,
-        stars: baseBestStars[tag]
-      }));
-      // Añadir las bases que no han sido atacadas (pueden no estar en baseBestStars)
-      for (const member of clan.members) {
-        if (!baseBestStars[member.tag]) {
-          bases.push({ tag: member.tag, stars: 0 });
-        }
-      }
-      // Ordenar por menos estrellas primero
-      bases.sort((a, b) => a.stars - b.stars);
-
-      let possibleStars = 0;
-      for (const base of bases) {
-        let starsToAdd = 3 - base.stars;
-        if (starsToAdd > 0 && attacksLeft > 0) {
-          // Solo podemos mejorar hasta 3 estrellas y solo si hay ataques disponibles
-          const usedAttacks = Math.min(1, attacksLeft); // Solo 1 ataque puede mejorar la base
-          possibleStars += base.stars + (usedAttacks > 0 ? starsToAdd : 0);
-          attacksLeft -= usedAttacks;
-        } else {
-          possibleStars += base.stars;
-        }
-      }
-      // Si sobran ataques (por ejemplo, menos bases que ataques), cada ataque puede dar 3 estrellas a una base no atacada
-      if (attacksLeft > 0) {
-        possibleStars += attacksLeft * 3;
-      }
-      // El máximo real no puede ser mayor a teamSize * 3
-      return Math.min(possibleStars, teamSize * 3);
-    }
-
-    // Calcula estrellas y destrucción actuales
     const ourStars = mainClan.stars || 0;
     const ourDestruction = mainClan.destructionPercentage || 0;
     const enemyStars = opponentClan.stars || 0;
     const enemyDestruction = opponentClan.destructionPercentage || 0;
 
-    // Máximo de estrellas posibles para cada clan (ajustado para guerras normales)
-    const ourAttacksLeft = getAttacksLeft(mainClan);
-    const enemyAttacksLeft = getAttacksLeft(opponentClan);
+    const ourAttacksLeft = getAttacksLeft(mainClan, teamSize, attacksPerMember);
+    const enemyAttacksLeft = getAttacksLeft(opponentClan, teamSize, attacksPerMember);
 
     const ourMaxStars = isLeague
       ? ourStars + ourAttacksLeft * 3
-      : getMaxStars(mainClan);
+      : getMaxStars(mainClan, isLeague, teamSize, attacksPerMember);
     const enemyMaxStars = isLeague
       ? enemyStars + enemyAttacksLeft * 3
-      : getMaxStars(opponentClan);
+      : getMaxStars(opponentClan, isLeague, teamSize, attacksPerMember);
 
-    // Tiempo restante
     const timeLeft = getTimeLeft(latestSave.endTime);
 
-    // TITULO DINÁMICO
-    let title = '';
-    if (ourStars > enemyMaxStars) {
-      title = '🏆🎉 ¡FELICIDADES CLAN! ¡VICTORIA ASEGURADA! 🎉🏆\n';
-    } else if (enemyStars > ourMaxStars) {
-      title = '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar \n';
-    } else if (ourStars > enemyStars) {
-      // ¿Nos pueden remontar?
-      const enemyMax = enemyMaxStars;
-      if (enemyMax >= ourStars + ourAttacksLeft * 3) {
-        title = '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n\n';
-      } else {
-        title = '🎉 ¡Vamos ganando! ¡Sigamos así para asegurar la victoria! 🎉\n';
-      }
-    } else if (ourStars < enemyStars) {
-      title = '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n⚠️¡A darlo todo en los ataques restantes!\n';
-    } else {
-      title = '🤝⚠️ EMPATE ¡Cada ataque cuenta!⚠️🤝\n';
-    }
+    const title = getDynamicTitle(ourStars, enemyStars, ourMaxStars, enemyMaxStars, ourAttacksLeft, enemyMaxStars);
 
-    // Estado actual
     let result = `${title}⏳ Tiempo restante de guerra: ${timeLeft}\n\n`;
     result += `Estado actual de la guerra ⚔️:\n`;
     result += `Nosotros: ${ourStars}⭐ (${ourDestruction.toFixed(1)}%)\n`;
     result += `Ellos: ${enemyStars}⭐ (${enemyDestruction.toFixed(1)}%)\n\n`;
     result += `---------------------\n\n`;
 
-    // Ataques restantes
     result += `Ataques restantes:\n`;
     result += `Nosotros: ${ourAttacksLeft} ataque(s)⚔️\n`;
     result += `Ellos: ${enemyAttacksLeft} ataque(s)⚔️\n\n`;
     result += `---------------------\n`;
 
-    // Máximo de estrellas posibles
     result += `Máximo de estrellas posibles con nuestros ataques disponibles:\n`;
     result += `Nosotros: ${ourMaxStars}⭐\n`;
     result += `Ellos: ${enemyMaxStars}⭐\n\n`;
     result += `---------------------\n`;
 
-    // ¿Ya está definida la guerra?
     if (ourStars > enemyMaxStars) {
       result += `🎉¡Ya ganamos la guerra! Aunque el rival haga todos sus ataques con 3 estrellas, no nos puede alcanzar.🎉\n`;
       return result;
@@ -706,7 +766,6 @@ const WarInfoPage = () => {
       return result;
     }
 
-    // ¿Qué necesitamos para remontar?
     if (ourStars < enemyStars) {
       const starsToTie = enemyStars - ourStars;
       const starsToWin = enemyStars - ourStars + 1;
@@ -716,18 +775,15 @@ const WarInfoPage = () => {
       const starsToTie = ourStars - enemyStars;
       result += `🎉Vamos ganando por ${starsToTie}⭐.\n`;
 
-      // Aquí calculamos las combinaciones posibles para que el rival nos empate o supere
-      const starsNeeded = ourStars - enemyStars + 1; // Para ganar, necesita al menos esto
+      const starsNeeded = ourStars - enemyStars + 1;
       if (enemyAttacksLeft > 0) {
         result += `\n⚔️El rival necesita sumar al menos ${starsNeeded}⭐ en sus ${enemyAttacksLeft} ataques restantes para superarnos en ⭐.\n`;
-        // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
         const enemyMaxIfPerfect = enemyMaxStars;
         const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
         if (ourAttacksLeft > 0) {
           if (starsToSecureWin <= 0) {
             result += `¡Ya tenemos la victoria matemática asegurada! El rival no puede alcanzarnos aunque haga todos sus ataques con 3 estrellas.\n`;
           } else if (ourMaxStars < enemyMaxStars) {
-            // No es posible ser inalcanzable, mostrar mensaje claro y CUÁNTO necesita el rival para ser inalcanzable
             const starsRivalToBeUnreachable = ourMaxStars - enemyStars + 1;
             result += `\n---------------------\n`;
             result += `\n⚠️Con los ataques restantes, no es posible asegurar la victoria matemática.\n`;
@@ -736,81 +792,28 @@ const WarInfoPage = () => {
             result += `Para nosotros ser inalcanzables, necesitaríamos que el rival falle ataques.\n`;
             result += `\n---------------------\n`;
 
-            // Mostrar combinaciones posibles para que el rival sea inalcanzable
-            result += `\n📝Combinaciones posibles de ataques para que el rival sea inalcanzable\n⚠️Necesitan ${ourMaxStars}⭐ | ${enemyAttacksLeft} ataque(s)⚔️:\n`;
-            let found = false;
-            let combinaciones: string[] = [];
-            for (let three = enemyAttacksLeft; three >= 0; three--) {
-              for (let two = enemyAttacksLeft - three; two >= 0; two--) {
-                let one = enemyAttacksLeft - three - two;
-                let total = three * 3 + two * 2 + one * 1;
-                if (total >= starsRivalToBeUnreachable) {
-                  // Solo mostrar combinaciones mínimas (sin ataques de 1 si es posible)
-                  if (one === 0 && two === 0 && three > 0) {
-                    combinaciones.push(`✅ Tienen que hacer todos los ataques de 3⭐ para ${total} estrellas`);
-                  } else if (three === 0 && two > 0 && one === 0) {
-                    combinaciones.push(`✅ Tienen que hacer ${two} ataque${two > 1 ? 's' : ''} de 2⭐ para ${total} estrellas`);
-                  } else if (three === 0 && two === 0 && one > 0) {
-                    combinaciones.push(`✅ Tienen que hacer ${one} ataque${one > 1 ? 's' : ''} de 1⭐ para ${total} estrellas`);
-                  } else if (three > 0 && one === 0 && two > 0) {
-                    combinaciones.push(`✅ Tienen que hacer ${three} ataques de 3⭐ y ${two} de 2⭐ para ${total} estrellas`);
-                  } else if (three > 0 && two === 0 && one > 0) {
-                    combinaciones.push(`✅ Tienen que hacer ${three} ataques de 3⭐ y ${one} de 1⭐ para ${total} estrellas`);
-                  } else if (three > 0 && two > 0 && one > 0) {
-                    combinaciones.push(`✅ Tienen que hacer ${three} ataques de 3⭐, ${two} de 2⭐ y ${one} de 1⭐ para ${total} estrellas`);
-                  }
-                  found = true;
-                }
-              }
-            }
+            const combinaciones = getAttackCombinations(enemyAttacksLeft, starsRivalToBeUnreachable, "Tienen que hacer");
             if (combinaciones.length > 0) {
+              result += `\n📝Combinaciones posibles de ataques para que el rival sea inalcanzable\n⚠️Necesitan ${ourMaxStars}⭐ | ${enemyAttacksLeft} ataque(s)⚔️:\n`;
               result += combinaciones.join('\n');
-            }
-            if (!found) {
+            } else {
               result += "❌No hay combinación posible, el rival no puede ser inalcanzable con los ataques que le quedan.❌\n";
             }
           } else {
             result += `\n---------------------\n`;
             result += `\n⚔️Si sumamos al menos ${starsToSecureWin} estrellas ⭐ más en nuestros ataques restantes.\n🎉El rival NO podrá alcanzarnos aunque haga todos sus ataques perfectos.🎉\n`;
 
-            // Mostrar combinaciones posibles para lograr esas estrellas
-            result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
-            let found = false;
-            let combinaciones: string[] = [];
-            for (let three = ourAttacksLeft; three >= 0; three--) {
-              for (let two = ourAttacksLeft - three; two >= 0; two--) {
-                let one = ourAttacksLeft - three - two;
-                let total = three * 3 + two * 2 + one * 1;
-                if (total >= starsToSecureWin) {
-                  // Mensaje natural y fácil de leer
-                  if (one === 0 && two === 0 && three > 0) {
-                    combinaciones.push(`✅ Tenemos que hacer todos los ataques de 3⭐ para ${total} estrellas`);
-                  } else if (three === 0 && two > 0 && one === 0) {
-                    combinaciones.push(`✅ Tenemos que hacer ${two} ataque${two > 1 ? 's' : ''} de 2⭐ para ${total} estrellas`);
-                  } else if (three === 0 && two === 0 && one > 0) {
-                    combinaciones.push(`✅ Tenemos que hacer ${one} ataque${one > 1 ? 's' : ''} de 1⭐ para ${total} estrellas`);
-                  } else if (three > 0 && one === 0 && two > 0) {
-                    combinaciones.push(`✅ Tenemos que hacer ${three} ataques de 3⭐ y ${two} de 2⭐ para ${total} estrellas`);
-                  } else if (three > 0 && two === 0 && one > 0) {
-                    combinaciones.push(`✅ Tenemos que hacer ${three} ataques de 3⭐ y ${one} de 1⭐ para ${total} estrellas`);
-                  } else if (three > 0 && two > 0 && one > 0) {
-                    combinaciones.push(`✅ Tenemos que hacer ${three} ataques de 3⭐, ${two} de 2⭐ y ${one} de 1⭐ para ${total} estrellas`);
-                  }
-                  found = true;
-                }
-              }
-            }
+            const combinaciones = getAttackCombinations(ourAttacksLeft, starsToSecureWin, "Tenemos que hacer");
             if (combinaciones.length > 0) {
+              result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
               result += combinaciones.join('\n');
-            }
-            if (!found) {
+            } else {
               result += "❌No hay combinación posible, necesitamos más ataques o estrellas para ser inalcanzables.❌\n";
             }
           }
         }
       }
     } else {
-      // Empate en estrellas
       if (ourDestruction > enemyDestruction) {
         result += `Empate en estrellas, pero vamos ganando por destrucción (${(ourDestruction - enemyDestruction).toFixed(1)}%).\n`;
       } else if (ourDestruction < enemyDestruction) {
@@ -822,119 +825,134 @@ const WarInfoPage = () => {
     }
     return result;
   }
-  const generateFilteredWarMessage = (warDetails: any) => {
-    let latestSave;
-    // Obtener el último guardado considerando el estado "preparation"
-    if (currentWarDetails && Object.keys(currentWarDetails).length > 0 && currentWarDetails.state !== "notInWar") {
-      latestSave = currentWarDetails;
+// SOLID refactor for generateFilteredWarMessage
+
+// S: Single Responsibility Principle - Each helper does one thing
+function getLatestWarSave(currentWarDetails: any, warLeageSaves: any[], warSaves: any[]) {
+  if (currentWarDetails && Object.keys(currentWarDetails).length > 0 && currentWarDetails.state !== "notInWar") {
+    return currentWarDetails;
+  }
+  if (warLeageSaves.length === 0) {
+    return null;
+  }
+  const inWarSaves = warLeageSaves
+    .filter((save: any) => save.content?.state === "inWar")
+    .sort((a: any, b: any) => {
+      const aTime = a.content?.warStartTime || a.content?.startTime || "";
+      const bTime = b.content?.warStartTime || b.content?.startTime || "";
+      return bTime.localeCompare(aTime); // descendente
+    });
+  if (inWarSaves.length > 0) {
+    return inWarSaves[0].content;
+  }
+  if (warSaves.length > 0) {
+    return warSaves[warSaves.length - 1]?.content;
+  }
+  return null;
+}
+
+// O: Open/Closed Principle - Additional info logic is easy to extend
+function getAdditionalInfo(state: string, latestSave: any, mainClan: any, opponentClan: any, now: Date) {
+  if (state === "preparation") {
+    const preparationEndTime = new Date(
+      `${latestSave.startTime.substring(0, 4)}-${latestSave.startTime.substring(4, 6)}-${latestSave.startTime.substring(6, 8)}T${latestSave.startTime.substring(9, 11)}:${latestSave.startTime.substring(11, 13)}:${latestSave.startTime.substring(13, 15)}.000Z`
+    );
+    const timeRemaining = Math.max(0, preparationEndTime.getTime() - now.getTime());
+    const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+    return `La guerra está en preparación. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+  }
+  if (state === "inWar") {
+    const battleEndTime = new Date(
+      `${latestSave.endTime.substring(0, 4)}-${latestSave.endTime.substring(4, 6)}-${latestSave.endTime.substring(6, 8)}T${latestSave.endTime.substring(9, 11)}:${latestSave.endTime.substring(11, 13)}:${latestSave.endTime.substring(13, 15)}.000Z`
+    );
+    const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
+    const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+    if (mainClan.stars > opponentClan.stars) {
+      return `🎉 ¡Vamos ganando la guerra! 🏆\n\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+    } else if (mainClan.stars < opponentClan.stars) {
+      return `😔 Vamos perdiendo la guerra. 💔\nEl clan oponente tiene más estrellas (${opponentClan.stars}🌟) que nosotros (${mainClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+    } else if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
+      return `⚔️ ¡Empate en estrellas, pero vamos ganando por porcentaje! 🎯\n\nNuestro porcentaje de destrucción (${mainClan.destructionPercentage}%) es mayor que el del oponente (${opponentClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
+    } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
+      return `⚔️ ¡Empate en estrellas, pero vamos perdiendo por porcentaje! 😓\n\nEl porcentaje de destrucción del oponente (${opponentClan.destructionPercentage}%) es mayor que el nuestro (${mainClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
     } else {
-      if (warLeageSaves.length === 0) {
-        return "Cargando información de guerra...";
-      }
-      // Obtener el más reciente desde warLeageSaves
-      const lastSave = warLeageSaves[warLeageSaves.length - 1]?.content;
-      const inWarSaves = warLeageSaves
-        .filter((save: any) => save.content?.state === "inWar")
-        .sort((a: any, b: any) => {
-          const aTime = a.content?.warStartTime || a.content?.startTime || "";
-          const bTime = b.content?.warStartTime || b.content?.startTime || "";
-          return bTime.localeCompare(aTime); // descendente
-        });
-
-      if (inWarSaves.length > 0) {
-        latestSave = inWarSaves[0].content;
-      } else if (currentWarDetails && Object.keys(currentWarDetails).length > 0 && currentWarDetails.state !== "notInWar") {
-        latestSave = currentWarDetails;
-      } else {
-        // Si no hay ninguno en "inWar", usar el último save disponible
-        latestSave = warSaves[warSaves.length - 1]?.content;
-      }
-
+      return `🤝 La guerra está completamente empatada. 😮\n\nAmbos clanes tienen las mismas estrellas (${mainClan.stars}🌟) y el mismo porcentaje de destrucción (${mainClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
     }
+  }
+  return '';
+}
 
-    if (!latestSave) {
-      return "No hay información disponible para generar el mensaje.";
-    }
+// I: Interface Segregation Principle - Only the needed props are passed to helpers
 
-    const state = latestSave.state;
-    const now = new Date();
+// D: Dependency Inversion Principle - All dependencies are injected as parameters
 
-    let additionalInfo = '';
-    if (state === "preparation") {
-      const preparationEndTime = new Date(
-        `${latestSave.startTime.substring(0, 4)}-${latestSave.startTime.substring(4, 6)}-${latestSave.startTime.substring(6, 8)}T${latestSave.startTime.substring(9, 11)}:${latestSave.startTime.substring(11, 13)}:${latestSave.startTime.substring(13, 15)}.000Z`
-      );
-      const timeRemaining = Math.max(0, preparationEndTime.getTime() - now.getTime());
-      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-      additionalInfo = `La guerra está en preparación. Tiempo restante: ${hours} horas y ${minutes} minutos.`;
-    } else if (state === "inWar") {
-      const battleEndTime = new Date(
-        `${latestSave.endTime.substring(0, 4)}-${latestSave.endTime.substring(4, 6)}-${latestSave.endTime.substring(6, 8)}T${latestSave.endTime.substring(9, 11)}:${latestSave.endTime.substring(11, 13)}:${latestSave.endTime.substring(13, 15)}.000Z`
-      );
-      const timeRemaining = Math.max(0, battleEndTime.getTime() - now.getTime());
-      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+const generateFilteredWarMessage = (warDetails: any) => {
+  // S: Use helper for latest save selection
+  const latestSave = getLatestWarSave(currentWarDetails, warLeageSaves, warSaves);
 
-      const clanTag = getClanTag().replace('%23', '#');
-      const isMainClan = latestSave.clan.tag === clanTag;
+  if (!latestSave) {
+    return "No hay información disponible para generar el mensaje.";
+  }
 
-      const mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
-      const opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
-      predictMessage = predictWarOutcome(latestSave, mainClan, opponentClan);
+  const state = latestSave.state;
+  const now = new Date();
 
-      if (mainClan.stars > opponentClan.stars) {
-        additionalInfo = `🎉 ¡Vamos ganando la guerra! 🏆\n\nNuestro clan tiene más estrellas (${mainClan.stars}🌟) que el oponente (${opponentClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
-      } else if (mainClan.stars < opponentClan.stars) {
-        additionalInfo = `😔 Vamos perdiendo la guerra. 💔\nEl clan oponente tiene más estrellas (${opponentClan.stars}🌟) que nosotros (${mainClan.stars}🌟).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
-      } else {
-        if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
-          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos ganando por porcentaje! 🎯\n\nNuestro porcentaje de destrucción (${mainClan.destructionPercentage}%) es mayor que el del oponente (${opponentClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
-        } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
-          additionalInfo = `⚔️ ¡Empate en estrellas, pero vamos perdiendo por porcentaje! 😓\n\nEl porcentaje de destrucción del oponente (${opponentClan.destructionPercentage}%) es mayor que el nuestro (${mainClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
-        } else {
-          additionalInfo = `🤝 La guerra está completamente empatada. 😮\n\nAmbos clanes tienen las mismas estrellas (${mainClan.stars}🌟) y el mismo porcentaje de destrucción (${mainClan.destructionPercentage}%).\n\n⏳ Tiempo restante: ${hours} horas y ${minutes} minutos.`;
-        }
-      }
-    }
+  // O: Use helper for additional info
+  let additionalInfo = '';
+  let mainClan = null;
+  let opponentClan = null;
+  if (state === "inWar") {
+    const clanTag = getClanTag().replace('%23', '#');
+    const isMainClan = latestSave.clan.tag === clanTag;
+    mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
+    opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
+    predictMessage = predictWarOutcome(latestSave, mainClan, opponentClan);
+  } else {
+    mainClan = latestSave.clan;
+    opponentClan = latestSave.opponent;
+  }
+  additionalInfo = getAdditionalInfo(state, latestSave, mainClan, opponentClan, now);
 
-    const fullMessage = generateWarMessage(latestSave);
-    const sections = fullMessage.split('🌟🌟🌟');
+  // S: Section extraction logic
+  const fullMessage = generateWarMessage(latestSave);
+  const sections = fullMessage.split('🌟🌟🌟');
+  const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
+  const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
+  const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
+  const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
 
-    const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
-    const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
-    const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
-    const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
-    let filteredMissingAttacksSection = missingAttacksSection;
-    if (includeOneMissingAttack) {
-      filteredMissingAttacksSection = filteredMissingAttacksSection
-        .split('\n')
-        .filter((line) => line.includes('1 ataque(s)'))
-        .join('\n');
-    }
+  // S: Filtering logic for missing attacks
+  let filteredMissingAttacksSection = missingAttacksSection;
+  if (includeOneMissingAttack) {
+    filteredMissingAttacksSection = filteredMissingAttacksSection
+      .split('\n')
+      .filter((line) => line.includes('1 ataque(s)'))
+      .join('\n');
+  }
+  if (includeTwoMissingAttacks) {
+    filteredMissingAttacksSection = filteredMissingAttacksSection
+      .split('\n')
+      .filter((line) => line.includes('2 ataque(s)'))
+      .join('\n');
+  }
 
-    if (includeTwoMissingAttacks) {
-      filteredMissingAttacksSection = filteredMissingAttacksSection
-        .split('\n')
-        .filter((line) => line.includes('2 ataque(s)'))
-        .join('\n');
-    }
+  // S: Calculation logic for totals
+  const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
 
-    const totalMissingAttacks = (filteredMissingAttacksSection.match(/Faltan \d+ ataque/g) || [])
-      .map((line) => parseInt(line.match(/\d+/)?.[0] || '0'))
-      .reduce((sum, count) => sum + count, 0);
+  // L: Liskov - All helpers can be extended without breaking contract
 
-    const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
-
-    return `
+  // Compose final message
+  return `
   ${additionalInfo}
   
   ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
   ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
   ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
   ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks + 1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
-    `.trim();
-  };
+  `.trim();
+};
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
