@@ -552,25 +552,25 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   const teamSize = latestSave.teamSize || mainClan.members.length;
 
   // Calcular tiempo restante
-function getTimeLeft(endTime: string) {
-  if (!endTime) return "Desconocido";
-  // Convierte "20250706T234212.000Z" a "2025-07-06T23:42:12.000Z"
-  const year = endTime.substring(0, 4);
-  const month = endTime.substring(4, 6);
-  const day = endTime.substring(6, 8);
-  const hour = endTime.substring(9, 11);
-  const minute = endTime.substring(11, 13);
-  const second = endTime.substring(13, 15);
-  const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
-  const end = new Date(isoString);
-  const now = new Date();
-  let diff = end.getTime() - now.getTime();
-  if (diff <= 0) return "¡La guerra ha terminado!";
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  diff -= hours * (1000 * 60 * 60);
-  const minutes = Math.floor(diff / (1000 * 60));
-  return `${hours} horas y ${minutes} minutos`;
-}
+  function getTimeLeft(endTime: string) {
+    if (!endTime) return "Desconocido";
+    const year = endTime.substring(0, 4);
+    const month = endTime.substring(4, 6);
+    const day = endTime.substring(6, 8);
+    const hour = endTime.substring(9, 11);
+    const minute = endTime.substring(11, 13);
+    const second = endTime.substring(13, 15);
+    const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
+    const end = new Date(isoString);
+    const now = new Date();
+    let diff = end.getTime() - now.getTime();
+    if (diff <= 0) return "¡La guerra ha terminado!";
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    diff -= hours * (1000 * 60 * 60);
+    const minutes = Math.floor(diff / (1000 * 60));
+    return `${hours} horas y ${minutes} minutos`;
+  }
+
   // Calcula ataques realizados y faltantes
   function getAttacksDone(clan: any) {
     let attacks = 0;
@@ -600,8 +600,28 @@ function getTimeLeft(endTime: string) {
   // Tiempo restante
   const timeLeft = getTimeLeft(latestSave.endTime);
 
+  // TITULO DINÁMICO
+  let title = '';
+  if (ourStars > enemyMaxStars) {
+    title = '🏆🎉 ¡FELICIDADES CLAN! ¡VICTORIA ASEGURADA! 🎉🏆\n';
+  } else if (enemyStars > ourMaxStars) {
+    title = '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar, ¡ánimo para la próxima!\n';
+  } else if (ourStars > enemyStars) {
+    // ¿Nos pueden remontar?
+    const enemyMax = enemyStars + enemyAttacksLeft * 3;
+    if (enemyMax >= ourStars + ourAttacksLeft * 3) {
+      title = '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n¡No bajen la guardia y aseguren la victoria!\n';
+    } else {
+      title = '🎉 ¡Vamos ganando! ¡Sigamos así para asegurar la victoria! 🎉\n';
+    }
+  } else if (ourStars < enemyStars) {
+    title = '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n¡A darlo todo en los ataques restantes!\n';
+  } else {
+    title = '🤝 EMPATE ACTUAL: ¡Cada ataque cuenta! 🤝\n';
+  }
+
   // Estado actual
-  let result = `⏳ Tiempo restante de guerra: ${timeLeft}\n\n`;
+  let result = `${title}⏳ Tiempo restante de guerra: ${timeLeft}\n\n`;
   result += `Estado actual de la guerra ⚔️:\n`;
   result += `Nosotros: ${ourStars}⭐ (${ourDestruction.toFixed(1)}%)\n`;
   result += `Ellos: ${enemyStars}⭐ (${enemyDestruction.toFixed(1)}%)\n\n`;
@@ -639,7 +659,7 @@ function getTimeLeft(endTime: string) {
     // Aquí calculamos las combinaciones posibles para que el rival nos empate o supere
     const starsNeeded = ourStars - enemyStars + 1; // Para ganar, necesita al menos esto
     if (enemyAttacksLeft > 0) {
-      result += `\n⚔️El rival necesita sumar al menos ${starsNeeded} estrellas ⭐ en sus ${enemyAttacksLeft} ataques  restantes para ganarnos.\n`;
+      result += `\n⚔️El rival necesita sumar al menos ${starsNeeded} estrellas ⭐ en sus ${enemyAttacksLeft} ataques restantes para ganarnos.\n`;
       // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
       const enemyMaxIfPerfect = enemyStars + enemyAttacksLeft * 3;
       const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
@@ -647,7 +667,7 @@ function getTimeLeft(endTime: string) {
         if (starsToSecureWin <= 0) {
           result += `¡Ya tienes la victoria matemática asegurada! El rival no puede alcanzarte aunque haga todos sus ataques con 3 estrellas.\n`;
         } else {
-          result += `\n⚔️Si sumas al menos ${starsToSecureWin} estrellas ⭐ más en tus ataques restantes .\n🎉El rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.🎉\n`;
+          result += `\n⚔️Si sumas al menos ${starsToSecureWin} estrellas ⭐ más en tus ataques restantes.\n🎉El rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.🎉\n`;
 
           // Mostrar combinaciones posibles para lograr esas estrellas
           result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
