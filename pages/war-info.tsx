@@ -11,242 +11,33 @@ import WarInfoFilters from '../components/war-info/WarInfoFilters';
 import WarInfoMessage from '../components/war-info/WarInfoMessage';
 import WarLogs from '../components/war-info/WarLogs';
 import CurrentWar from '../components/war-info/CurrentWar';
-// import * as WarInfoHelpers from '../components/war-info/WarInfoHelpers';
-
-const heroTranslations = {
-  "Barbarian King": "Rey Bárbaro",
-  "Archer Queen": "Reina Arquera",
-  "Grand Warden": "Gran Centinela",
-  "Royal Champion": "Campeona Real",
-  "Battle Machine": "Máquina Bélica",
-  "Minion Prince": "Príncipe Minion",
-  "Battle Copter": "Helicóptero de Batalla",
-};
-var predictMessage = '';
-const getClanTag = () => {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('clanTag') || '%232QL0GCQGQ';
-};
-
-const evaluateWarResult = (selectedWar: any) => {
-  const state = selectedWar.content.state;
-
-  if (state === "preparation") {
-    return "La guerra está en preparación. No se pueden realizar cálulos.";
-  } else {
-    const clanTag = getClanTag().replace('%23', '#'); // Formatear el clanTag
-    const isMainClan = selectedWar.content.clan.tag === clanTag;
-
-    const mainClan = isMainClan ? selectedWar.content.clan : selectedWar.content.opponent;
-    const opponentClan = isMainClan ? selectedWar.content.opponent : selectedWar.content.clan;
-
-    if (mainClan.stars > opponentClan.stars) {
-      return "Ganamos la guerra";
-    } else if (mainClan.stars < opponentClan.stars) {
-      return "Perdimos la guerra";
-    } else {
-      // Empate: comparar porcentaje de destrucción
-      if (mainClan.destructionPercentage > opponentClan.destructionPercentage) {
-        return "Ganamos la guerra";
-      } else if (mainClan.destructionPercentage < opponentClan.destructionPercentage) {
-        return "Perdimos la guerra";
-      } else {
-        return "La guerra terminó en empate";
-      }
-    }
-  }
-};
-
-const extractTimestampFromFileName = (fileName: string): string => {
-  ;
-  const parts = fileName.replace('.json', '').split('_'); // Remove .json and split by '_'
-
-  if (parts[0] === 'war') {
-    // Formato: war_%232QL0GCQGQ_2025-04-30
-    return parts[2]; // El timestamp está en la tercera posición
-  } else if (parts[0] === 'liga' && parts[1] === 'war') {
-    // Formato: liga_war_%232RUU8RYCY_#8P99UYU8R_2025-05-02
-    return parts[4]; // El timestamp está en la quinta posición
-  } else {
-    throw new Error('Formato de archivo no reconocido');
-  }
-};
-
-const getThColor = (memberThLevel: number, thRival: number): string => {
-  if (memberThLevel > thRival) return 'green';
-  if (memberThLevel < thRival) return 'red';
-  return 'gray';
-};
-
-const calculatePoints = (stars: number, memberThLevel: number, thRival: number, multiplier: number): number => {
-  return stars * (memberThLevel / thRival) * multiplier;
-};
-
-const getPlayersWhoDidNotAttack = (members: any[], savedAttacks: any[], attacksPerMember: number) => {
-  const attackCounts = savedAttacks.reduce((acc: any, attack: any) => {
-    acc[attack.member] = (acc[attack.member] || 0) + 1;
-    return acc;
-  }, {});
-
-  return members.map((member: any) => {
-    const attacksMade = attackCounts[member.name] || 0;
-    const attacksMissing = Math.max(0, attacksPerMember - attacksMade);
-    return { name: member.name, attacksMissing };
-  }).filter((member: any) => member.attacksMissing > 0);
-};
-
-const getMyClan = (warDetails: WarDetails, clanTag: string): Clan | undefined =>
-  warDetails.clan.tag === clanTag ? warDetails.clan : warDetails.opponent;
-
-const getTargetClan = (warDetails: WarDetails, clanTag: string): Clan | undefined =>
-  warDetails.clan.tag === clanTag ? warDetails.opponent : warDetails.clan;
-
-const getComparisonEmoji = (myPos: number, enemyPos: number) =>
-  myPos < enemyPos
-    ? '⬇️(num. Inferior)'
-    : myPos > enemyPos
-      ? '⬆️(num. Superior)'
-      : '🪞(Espejo)';
-
-const buildAttackMessage = (member: Member, playerEnemy: Member) => {
-  const ownInfo = `*${member.mapPosition}. ${member.name} (TH${member.townhallLevel})`;
-  const enemyInfo = `${playerEnemy.mapPosition}. ${playerEnemy.name} (TH${playerEnemy.townhallLevel})`;
-  const warning = member.townhallLevel < playerEnemy.townhallLevel ? ' ⚠️ TH superior' : '';
-  const emoji = getComparisonEmoji(member.mapPosition, playerEnemy.mapPosition);
-  return `${ownInfo} VERSUS→ ${enemyInfo} | El rival era ${emoji} ${warning}`;
-};
-
-const getStarsGroup = (
-  members: Member[],
-  targetClan: Clan | undefined
-): { [key: number]: string[] } => {
-  const starsGroup: { [key: number]: string[] } = { 3: [], 2: [], 1: [] };
-  members.forEach((member) => {
-    if (member.attacks && member.attacks.length > 0) {
-      member.attacks.forEach((attack) => {
-        const stars = (attack.stars || 0) as 1 | 2 | 3;
-        const playerEnemy = targetClan?.members.find((m) => m.tag === attack.defenderTag);
-        if (playerEnemy) {
-          starsGroup[stars]?.push(buildAttackMessage(member, playerEnemy));
-        }
-      });
-    }
-  });
-  return starsGroup;
-};
-
-const getNoAttackList = (
-  members: Member[],
-  attacksPerMember: number = 1
-): string[] => {
-  const noAttack: string[] = [];
-  members.forEach((member) => {
-    const attacksDone = member.attacks?.length || 0;
-    const attacksMissing = attacksPerMember - attacksDone;
-    if (attacksMissing > 0) {
-      noAttack.push(`* ${member.mapPosition}. ${member.name} → ${attacksMissing} ataque(s)`);
-    }
-  });
-  return noAttack;
-};
-
-const generateWarMessage = (warDetails: WarDetails) => {
-  if (!warDetails) return '';
-
-  const clanTag = getClanTag().replace('%23', '#');
-  const myClan = getMyClan(warDetails, clanTag);
-  const targetClan = getTargetClan(warDetails, clanTag);
-
-  if (!myClan) return 'No se encontró información de tu clan.';
-
-  const attacksPerMember = warDetails.attacksPerMember || 1;
-  const starsGroup = getStarsGroup(myClan.members, targetClan);
-  const noAttack = getNoAttackList(myClan.members, attacksPerMember);
-
-  return `
-📢 Estado de la guerra: ${myClan.status || 'Desconocido'}
-🌟🌟🌟
-${starsGroup[3].join('\n') || 'Ningún ataque de 3 estrellas'}
-
-🌟🌟
-${starsGroup[2].join('\n') || 'Ningún ataque de 2 estrellas'}
-
-🌟
-${starsGroup[1].join('\n') || 'Ningún ataque de 1 estrella'}
-
-❌
-${noAttack.join('\n') || 'Todos atacaron'}
-  `;
-};
-
-const copyToClipboard = (text: string) => {
-  navigator.clipboard.writeText(text).then(() => {
-    console.log('Texto copiado al portapapeles:', text);
-
-  });
-};
-
-const deleteAttack = async (attackId: string) => {
-  try {
-    const result = await APIClashService.deleteAttack(attackId);
-    if (result) {
-      window.location.reload(); // Reload the page to reflect the changes
-      console.log(`Attack with ID ${attackId} deleted successfully.`);
-
-    } else {
-      console.error(`Failed to delete attack with ID ${attackId}.`);
-    }
-  } catch (error) {
-    console.error(`Error deleting attack with ID ${attackId}:`, error);
-  }
-};
-interface Member {
-  mapPosition: number;
-  name: string;
-  townhallLevel: number;
-  attacks?: Attack[];
-  tag: string;
-}
-
-interface Attack {
-  stars: number;
-  defenderTag: string;
-}
-
-interface Clan {
-  tag: string;
-  name: string;
-  status?: string;
-  members: Member[];
-}
-
-interface WarDetails {
-  clan: Clan;
-  opponent: Clan;
-  attacksPerMember?: number;
-}
-
-interface ClanMember {
-  tag: string;
-  name: string;
-  townhallLevel: number;
-  mapPosition: number;
-  attacks?: Attack[];
-}
-
-interface Attack {
-  stars: number;
-  destructionPercentage: number;
-  defenderTag: string;
-}
+import {
+  heroTranslations,
+  getClanTag,
+  evaluateWarResult,
+  extractTimestampFromFileName,
+  getThColor,
+  calculatePoints,
+  getPlayersWhoDidNotAttack,
+  getMyClan,
+  getTargetClan,
+  getComparisonEmoji,
+  buildAttackMessage,
+  getStarsGroup,
+  getNoAttackList,
+  generateWarMessage,
+  copyToClipboard,
+  deleteAttack
+} from '../components/war-info/WarInfoHelpers';
+import { Member, Attack, Clan, WarDetails, ClanMember } from '../components/war-info/warInfoTypes';
 
 const WarInfoPage = () => {
   const [clanTag, setClanTag] = useState('%232QL0GCQGQ');
   const [fullWarDetails, setFullWarDetails] = useState<any[] | null>(null);
   const [activeTab, setActiveTab] = useState<'currentWar' | 'warLogs' | 'MensajeGuerra'>('MensajeGuerra');
   const [warSaves, setWarSaves] = useState<any[]>([]); // State to store war saves
+  const [predictMessage, setPredictMessage] = useState<string>(''); // Estado para el mensaje de predicción
   const [messagePrediction, setmessagePrediction] = useState<string>(''); // State to store war saves
-
   const [loadingWarSaves, setLoadingWarSaves] = useState(false); // State to track loading status
   const [selectedWar, setSelectedWar] = useState<any>(null); // State to store the selected war
   const [savedAttacks, setSavedAttacks] = useState<any[]>([]);
@@ -917,7 +708,7 @@ const generateFilteredWarMessage = (warDetails: any) => {
     const isMainClan = latestSave.clan.tag === clanTag;
     mainClan = isMainClan ? latestSave.clan : latestSave.opponent;
     opponentClan = isMainClan ? latestSave.opponent : latestSave.clan;
-    predictMessage = predictWarOutcome(latestSave, mainClan, opponentClan);
+    setPredictMessage(predictWarOutcome(latestSave, mainClan, opponentClan));
   } else {
     mainClan = latestSave.clan;
     opponentClan = latestSave.opponent;
