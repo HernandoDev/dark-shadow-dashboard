@@ -545,6 +545,7 @@ const WarInfoPage = () => {
   const handleCustomMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCustomMessage(event.target.value);
   };
+// ...existing code...
 function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   if (!latestSave || !mainClan || !opponentClan) return "No hay datos suficientes para predecir.";
   const isLeague = !!latestSave.season;
@@ -582,6 +583,60 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   function getAttacksLeft(clan: any) {
     return teamSize * attacksPerMember - getAttacksDone(clan);
   }
+  // Calcular estrellas máximas reales (solo para guerras normales, no liga)
+  function getMaxStars(clan: any) {
+    if (isLeague) {
+      // En liga, cada ataque cuenta, solo hay 1 por miembro
+      return (clan.stars || 0) + getAttacksLeft(clan) * 3;
+    }
+    // En guerra normal, cada aldea solo puede dar máximo 3 estrellas (mejor ataque cuenta)
+    // Creamos un mapa de defensorTag -> mejor ataque recibido
+    const baseBestStars: { [defenderTag: string]: number } = {};
+    // Contar ataques ya hechos
+    for (const member of clan.members) {
+      if (member.attacks) {
+        for (const attack of member.attacks) {
+          if (!baseBestStars[attack.defenderTag] || attack.stars > baseBestStars[attack.defenderTag]) {
+            baseBestStars[attack.defenderTag] = attack.stars;
+          }
+        }
+      }
+    }
+    // Ahora, para cada base que no tiene 3 estrellas, podemos mejorarla a 3 con los ataques restantes
+    let attacksLeft = getAttacksLeft(clan);
+    // Ordenar las bases por las que menos estrellas tienen
+    const bases = Object.keys(baseBestStars).map(tag => ({
+      tag,
+      stars: baseBestStars[tag]
+    }));
+    // Añadir las bases que no han sido atacadas (pueden no estar en baseBestStars)
+    for (const member of clan.members) {
+      if (!baseBestStars[member.tag]) {
+        bases.push({ tag: member.tag, stars: 0 });
+      }
+    }
+    // Ordenar por menos estrellas primero
+    bases.sort((a, b) => a.stars - b.stars);
+
+    let possibleStars = 0;
+    for (const base of bases) {
+      let starsToAdd = 3 - base.stars;
+      if (starsToAdd > 0 && attacksLeft > 0) {
+        // Solo podemos mejorar hasta 3 estrellas y solo si hay ataques disponibles
+        const usedAttacks = Math.min(1, attacksLeft); // Solo 1 ataque puede mejorar la base
+        possibleStars += base.stars + (usedAttacks > 0 ? starsToAdd : 0);
+        attacksLeft -= usedAttacks;
+      } else {
+        possibleStars += base.stars;
+      }
+    }
+    // Si sobran ataques (por ejemplo, menos bases que ataques), cada ataque puede dar 3 estrellas a una base no atacada
+    if (attacksLeft > 0) {
+      possibleStars += attacksLeft * 3;
+    }
+    // El máximo real no puede ser mayor a teamSize * 3
+    return Math.min(possibleStars, teamSize * 3);
+  }
 
   // Calcula estrellas y destrucción actuales
   const ourStars = mainClan.stars || 0;
@@ -589,13 +644,16 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   const enemyStars = opponentClan.stars || 0;
   const enemyDestruction = opponentClan.destructionPercentage || 0;
 
-  // Máximo de estrellas posibles para cada clan
+  // Máximo de estrellas posibles para cada clan (ajustado para guerras normales)
   const ourAttacksLeft = getAttacksLeft(mainClan);
   const enemyAttacksLeft = getAttacksLeft(opponentClan);
 
-  // Cada ataque puede dar máximo 3 estrellas
-  const ourMaxStars = ourStars + ourAttacksLeft * 3;
-  const enemyMaxStars = enemyStars + enemyAttacksLeft * 3;
+  const ourMaxStars = isLeague
+    ? ourStars + ourAttacksLeft * 3
+    : getMaxStars(mainClan);
+  const enemyMaxStars = isLeague
+    ? enemyStars + enemyAttacksLeft * 3
+    : getMaxStars(opponentClan);
 
   // Tiempo restante
   const timeLeft = getTimeLeft(latestSave.endTime);
@@ -605,19 +663,19 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   if (ourStars > enemyMaxStars) {
     title = '🏆🎉 ¡FELICIDADES CLAN! ¡VICTORIA ASEGURADA! 🎉🏆\n';
   } else if (enemyStars > ourMaxStars) {
-    title = '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar, ¡ánimo para la próxima!\n';
+    title = '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar \n';
   } else if (ourStars > enemyStars) {
     // ¿Nos pueden remontar?
-    const enemyMax = enemyStars + enemyAttacksLeft * 3;
+    const enemyMax = enemyMaxStars;
     if (enemyMax >= ourStars + ourAttacksLeft * 3) {
-      title = '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n¡No bajen la guardia y aseguren la victoria!\n';
+      title = '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n\n';
     } else {
       title = '🎉 ¡Vamos ganando! ¡Sigamos así para asegurar la victoria! 🎉\n';
     }
   } else if (ourStars < enemyStars) {
-    title = '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n¡A darlo todo en los ataques restantes!\n';
+    title = '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n⚠️¡A darlo todo en los ataques restantes!\n';
   } else {
-    title = '🤝 EMPATE ACTUAL: ¡Cada ataque cuenta! 🤝\n';
+    title = '🤝⚠️ EMPATE ¡Cada ataque cuenta!⚠️🤝\n';
   }
 
   // Estado actual
@@ -661,7 +719,7 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
     if (enemyAttacksLeft > 0) {
       result += `\n⚔️El rival necesita sumar al menos ${starsNeeded} estrellas ⭐ en sus ${enemyAttacksLeft} ataques restantes para ganarnos.\n`;
       // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
-      const enemyMaxIfPerfect = enemyStars + enemyAttacksLeft * 3;
+      const enemyMaxIfPerfect = enemyMaxStars;
       const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
       if (ourAttacksLeft > 0) {
         if (starsToSecureWin <= 0) {
