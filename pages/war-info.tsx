@@ -626,7 +626,7 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
           result += `Si sumas al menos ${starsToSecureWin} estrellas más en tus ataques restantes, el rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.\n`;
 
           // Mostrar combinaciones posibles para lograr esas estrellas
-          result += `Combinaciones posibles de ataques para lograrlo (3⭐, 2⭐, 1⭐):\n`;
+          result += `Combinaciones posibles de ataques para ser inalcanzables:\n`;
           let found = false;
           for (let three = ourAttacksLeft; three >= 0; three--) {
             for (let two = ourAttacksLeft - three; two >= 0; two--) {
