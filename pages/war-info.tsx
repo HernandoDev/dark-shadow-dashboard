@@ -794,7 +794,7 @@ const WarInfoPage = () => {
 
             const combinaciones = getAttackCombinations(enemyAttacksLeft, starsRivalToBeUnreachable, "Tienen que hacer");
             if (combinaciones.length > 0) {
-              result += `\n📝Combinaciones posibles de ataques para que el rival sea inalcanzable\n⚠️Necesitan ${ourMaxStars}⭐ | ${enemyAttacksLeft} ataque(s)⚔️:\n`;
+              result += `\n📝Combinaciones posibles de ataques para que el rival sea inalcanzable\n⚠️Necesitan ${starsRivalToBeUnreachable}⭐ | ${enemyAttacksLeft} ataque(s)⚔️:\n`;
               result += combinaciones.join('\n');
             } else {
               result += "❌No hay combinación posible, el rival no puede ser inalcanzable con los ataques que le quedan.❌\n";
