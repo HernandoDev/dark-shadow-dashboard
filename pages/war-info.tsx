@@ -545,248 +545,283 @@ const WarInfoPage = () => {
   const handleCustomMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCustomMessage(event.target.value);
   };
-function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
-  if (!latestSave || !mainClan || !opponentClan) return "No hay datos suficientes para predecir.";
-  const isLeague = !!latestSave.season;
-  const attacksPerMember = isLeague ? 1 : 2;
-  const teamSize = latestSave.teamSize || mainClan.members.length;
+  function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
+    if (!latestSave || !mainClan || !opponentClan) return "No hay datos suficientes para predecir.";
+    const isLeague = !!latestSave.season;
+    const attacksPerMember = isLeague ? 1 : 2;
+    const teamSize = latestSave.teamSize || mainClan.members.length;
 
-  // Calcular tiempo restante
-  function getTimeLeft(endTime: string) {
-    if (!endTime) return "Desconocido";
-    const year = endTime.substring(0, 4);
-    const month = endTime.substring(4, 6);
-    const day = endTime.substring(6, 8);
-    const hour = endTime.substring(9, 11);
-    const minute = endTime.substring(11, 13);
-    const second = endTime.substring(13, 15);
-    const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
-    const end = new Date(isoString);
-    const now = new Date();
-    let diff = end.getTime() - now.getTime();
-    if (diff <= 0) return "¡La guerra ha terminado!";
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    diff -= hours * (1000 * 60 * 60);
-    const minutes = Math.floor(diff / (1000 * 60));
-    return `${hours} horas y ${minutes} minutos`;
-  }
+    // Calcular tiempo restante
+    function getTimeLeft(endTime: string) {
+      if (!endTime) return "Desconocido";
+      const year = endTime.substring(0, 4);
+      const month = endTime.substring(4, 6);
+      const day = endTime.substring(6, 8);
+      const hour = endTime.substring(9, 11);
+      const minute = endTime.substring(11, 13);
+      const second = endTime.substring(13, 15);
+      const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
+      const end = new Date(isoString);
+      const now = new Date();
+      let diff = end.getTime() - now.getTime();
+      if (diff <= 0) return "¡La guerra ha terminado!";
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff -= hours * (1000 * 60 * 60);
+      const minutes = Math.floor(diff / (1000 * 60));
+      return `${hours} horas y ${minutes} minutos`;
+    }
 
-  // Calcula ataques realizados y faltantes
-  function getAttacksDone(clan: any) {
-    let attacks = 0;
-    for (const m of clan.members) {
-      if (m.attacks) attacks += m.attacks.length;
+    // Calcula ataques realizados y faltantes
+    function getAttacksDone(clan: any) {
+      let attacks = 0;
+      for (const m of clan.members) {
+        if (m.attacks) attacks += m.attacks.length;
+      }
+      return attacks;
     }
-    return attacks;
-  }
-  function getAttacksLeft(clan: any) {
-    return teamSize * attacksPerMember - getAttacksDone(clan);
-  }
-  // Calcular estrellas máximas reales (solo para guerras normales, no liga)
-  function getMaxStars(clan: any) {
-    if (isLeague) {
-      // En liga, cada ataque cuenta, solo hay 1 por miembro
-      return (clan.stars || 0) + getAttacksLeft(clan) * 3;
+    function getAttacksLeft(clan: any) {
+      return teamSize * attacksPerMember - getAttacksDone(clan);
     }
-    // En guerra normal, cada aldea solo puede dar máximo 3 estrellas (mejor ataque cuenta)
-    // Creamos un mapa de defensorTag -> mejor ataque recibido
-    const baseBestStars: { [defenderTag: string]: number } = {};
-    // Contar ataques ya hechos
-    for (const member of clan.members) {
-      if (member.attacks) {
-        for (const attack of member.attacks) {
-          if (!baseBestStars[attack.defenderTag] || attack.stars > baseBestStars[attack.defenderTag]) {
-            baseBestStars[attack.defenderTag] = attack.stars;
+    // Calcular estrellas máximas reales (solo para guerras normales, no liga)
+    function getMaxStars(clan: any) {
+      if (isLeague) {
+        // En liga, cada ataque cuenta, solo hay 1 por miembro
+        return (clan.stars || 0) + getAttacksLeft(clan) * 3;
+      }
+      // En guerra normal, cada aldea solo puede dar máximo 3 estrellas (mejor ataque cuenta)
+      // Creamos un mapa de defensorTag -> mejor ataque recibido
+      const baseBestStars: { [defenderTag: string]: number } = {};
+      // Contar ataques ya hechos
+      for (const member of clan.members) {
+        if (member.attacks) {
+          for (const attack of member.attacks) {
+            if (!baseBestStars[attack.defenderTag] || attack.stars > baseBestStars[attack.defenderTag]) {
+              baseBestStars[attack.defenderTag] = attack.stars;
+            }
           }
         }
       }
-    }
-    // Ahora, para cada base que no tiene 3 estrellas, podemos mejorarla a 3 con los ataques restantes
-    let attacksLeft = getAttacksLeft(clan);
-    // Ordenar las bases por las que menos estrellas tienen
-    const bases = Object.keys(baseBestStars).map(tag => ({
-      tag,
-      stars: baseBestStars[tag]
-    }));
-    // Añadir las bases que no han sido atacadas (pueden no estar en baseBestStars)
-    for (const member of clan.members) {
-      if (!baseBestStars[member.tag]) {
-        bases.push({ tag: member.tag, stars: 0 });
+      // Ahora, para cada base que no tiene 3 estrellas, podemos mejorarla a 3 con los ataques restantes
+      let attacksLeft = getAttacksLeft(clan);
+      // Ordenar las bases por las que menos estrellas tienen
+      const bases = Object.keys(baseBestStars).map(tag => ({
+        tag,
+        stars: baseBestStars[tag]
+      }));
+      // Añadir las bases que no han sido atacadas (pueden no estar en baseBestStars)
+      for (const member of clan.members) {
+        if (!baseBestStars[member.tag]) {
+          bases.push({ tag: member.tag, stars: 0 });
+        }
       }
-    }
-    // Ordenar por menos estrellas primero
-    bases.sort((a, b) => a.stars - b.stars);
+      // Ordenar por menos estrellas primero
+      bases.sort((a, b) => a.stars - b.stars);
 
-    let possibleStars = 0;
-    for (const base of bases) {
-      let starsToAdd = 3 - base.stars;
-      if (starsToAdd > 0 && attacksLeft > 0) {
-        // Solo podemos mejorar hasta 3 estrellas y solo si hay ataques disponibles
-        const usedAttacks = Math.min(1, attacksLeft); // Solo 1 ataque puede mejorar la base
-        possibleStars += base.stars + (usedAttacks > 0 ? starsToAdd : 0);
-        attacksLeft -= usedAttacks;
-      } else {
-        possibleStars += base.stars;
-      }
-    }
-    // Si sobran ataques (por ejemplo, menos bases que ataques), cada ataque puede dar 3 estrellas a una base no atacada
-    if (attacksLeft > 0) {
-      possibleStars += attacksLeft * 3;
-    }
-    // El máximo real no puede ser mayor a teamSize * 3
-    return Math.min(possibleStars, teamSize * 3);
-  }
-
-  // Calcula estrellas y destrucción actuales
-  const ourStars = mainClan.stars || 0;
-  const ourDestruction = mainClan.destructionPercentage || 0;
-  const enemyStars = opponentClan.stars || 0;
-  const enemyDestruction = opponentClan.destructionPercentage || 0;
-
-  // Máximo de estrellas posibles para cada clan (ajustado para guerras normales)
-  const ourAttacksLeft = getAttacksLeft(mainClan);
-  const enemyAttacksLeft = getAttacksLeft(opponentClan);
-
-  const ourMaxStars = isLeague
-    ? ourStars + ourAttacksLeft * 3
-    : getMaxStars(mainClan);
-  const enemyMaxStars = isLeague
-    ? enemyStars + enemyAttacksLeft * 3
-    : getMaxStars(opponentClan);
-
-  // Tiempo restante
-  const timeLeft = getTimeLeft(latestSave.endTime);
-
-  // TITULO DINÁMICO
-  let title = '';
-  if (ourStars > enemyMaxStars) {
-    title = '🏆🎉 ¡FELICIDADES CLAN! ¡VICTORIA ASEGURADA! 🎉🏆\n';
-  } else if (enemyStars > ourMaxStars) {
-    title = '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar \n';
-  } else if (ourStars > enemyStars) {
-    // ¿Nos pueden remontar?
-    const enemyMax = enemyMaxStars;
-    if (enemyMax >= ourStars + ourAttacksLeft * 3) {
-      title = '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n\n';
-    } else {
-      title = '🎉 ¡Vamos ganando! ¡Sigamos así para asegurar la victoria! 🎉\n';
-    }
-  } else if (ourStars < enemyStars) {
-    title = '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n⚠️¡A darlo todo en los ataques restantes!\n';
-  } else {
-    title = '🤝⚠️ EMPATE ¡Cada ataque cuenta!⚠️🤝\n';
-  }
-
-  // Estado actual
-  let result = `${title}⏳ Tiempo restante de guerra: ${timeLeft}\n\n`;
-  result += `Estado actual de la guerra ⚔️:\n`;
-  result += `Nosotros: ${ourStars}⭐ (${ourDestruction.toFixed(1)}%)\n`;
-  result += `Ellos: ${enemyStars}⭐ (${enemyDestruction.toFixed(1)}%)\n\n`;
-  result += `---------------------\n\n`;
-
-  // Ataques restantes
-  result += `Ataques restantes:\n`;
-  result += `Nosotros: ${ourAttacksLeft} ataque(s)⚔️\n`;
-  result += `Ellos: ${enemyAttacksLeft} ataque(s)⚔️\n\n`;
-  result += `---------------------\n`;
-
-  // Máximo de estrellas posibles
-  result += `Máximo de estrellas posibles con nuestros ataques disponibles:\n`;
-  result += `Nosotros: ${ourMaxStars}⭐\n`;
-  result += `Ellos: ${enemyMaxStars}⭐\n\n`;
-  result += `---------------------\n`;
-
-  // ¿Ya está definida la guerra?
-  if (ourStars > enemyMaxStars) {
-    result += `🎉¡Ya ganamos la guerra! Aunque el rival haga todos sus ataques con 3 estrellas, no nos puede alcanzar.🎉\n`;
-    return result;
-  }
-  if (enemyStars > ourMaxStars) {
-    result += `❌❌¡Ya perdimos la guerra! Aunque hagamos todos nuestros ataques con 3 estrellas, no podemos alcanzar al rival.❌❌\n`;
-    return result;
-  }
-
-  // ¿Qué necesitamos para remontar?
-  if (ourStars < enemyStars) {
-    const starsToTie = enemyStars - ourStars;
-    const starsToWin = enemyStars - ourStars + 1;
-    result += `❌Estamos perdiendo por ${starsToTie} estrellas.\n`;
-    result += `⚠️Necesitamos al menos ${starsToWin} estrellas más que ellos para ganar (o empatar y superar en % de destrucción).\n`;
-  } else if (ourStars > enemyStars) {
-    const starsToTie = ourStars - enemyStars;
-    result += `🎉Vamos ganando por ${starsToTie} estrellas. ⭐\n`;
-
-    // Aquí calculamos las combinaciones posibles para que el rival nos empate o supere
-    const starsNeeded = ourStars - enemyStars + 1; // Para ganar, necesita al menos esto
-    if (enemyAttacksLeft > 0) {
-      result += `\n⚔️El rival necesita sumar al menos ${starsNeeded} estrellas ⭐ en sus ${enemyAttacksLeft} ataques restantes para ganarnos.\n`;
-      // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
-      const enemyMaxIfPerfect = enemyMaxStars;
-      const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
-      if (ourAttacksLeft > 0) {
-        if (starsToSecureWin <= 0) {
-          result += `¡Ya tenemos la victoria matemática asegurada! El rival no puede alcanzarnos aunque haga todos sus ataques con 3 estrellas.\n`;
-        } else if (ourMaxStars < enemyMaxStars) {
-          // No es posible ser inalcanzable, mostrar mensaje claro y CUÁNTO necesita el rival para ser inalcanzable
-          const starsRivalToBeUnreachable = ourMaxStars - enemyStars + 1;
-          result += `\n---------------------\n`;
-          result += `\n⚠️Con los ataques restantes, no es posible asegurar la victoria matemática.\n`;
-          result += `Nuestro máximo posible es ${ourMaxStars}⭐ y el del rival es ${enemyMaxStars}⭐.\n`;
-          result += `Para ser inalcanzables, el rival necesitaría sumar al menos ${starsRivalToBeUnreachable} estrellas en sus ataques (es decir, igualar o superar nuestro máximo posible).\n`;
-          result += `Para ser inalcanzables, necesitaríamos que el rival falle ataques.\n`;
-
-          // Mostrar combinaciones posibles para que el rival sea inalcanzable
-          result += `\n📝Combinaciones posibles de ataques para que el rival sea inalcanzable (alcanzar ${ourMaxStars} estrellas):\n`;
-          let found = false;
-          for (let three = enemyAttacksLeft; three >= 0; three--) {
-            for (let two = enemyAttacksLeft - three; two >= 0; two--) {
-              let one = enemyAttacksLeft - three - two;
-              let total = three * 3 + two * 2 + one * 1;
-              if (total >= starsRivalToBeUnreachable) {
-                result += `✅ ${three} ataques de 3⭐, ${two} de 2⭐, ${one} de 1⭐ = ${total} estrellas\n`;
-                found = true;
-              }
-            }
-          }
-          if (!found) {
-            result += "❌No hay combinación posible, el rival no puede ser inalcanzable con los ataques que le quedan.❌\n";
-          }
+      let possibleStars = 0;
+      for (const base of bases) {
+        let starsToAdd = 3 - base.stars;
+        if (starsToAdd > 0 && attacksLeft > 0) {
+          // Solo podemos mejorar hasta 3 estrellas y solo si hay ataques disponibles
+          const usedAttacks = Math.min(1, attacksLeft); // Solo 1 ataque puede mejorar la base
+          possibleStars += base.stars + (usedAttacks > 0 ? starsToAdd : 0);
+          attacksLeft -= usedAttacks;
         } else {
-          result += `\n---------------------\n`;
-          result += `\n⚔️Si sumamos al menos ${starsToSecureWin} estrellas ⭐ más en nuestros ataques restantes.\n🎉El rival NO podrá alcanzarnos aunque haga todos sus ataques perfectos.🎉\n`;
+          possibleStars += base.stars;
+        }
+      }
+      // Si sobran ataques (por ejemplo, menos bases que ataques), cada ataque puede dar 3 estrellas a una base no atacada
+      if (attacksLeft > 0) {
+        possibleStars += attacksLeft * 3;
+      }
+      // El máximo real no puede ser mayor a teamSize * 3
+      return Math.min(possibleStars, teamSize * 3);
+    }
 
-          // Mostrar combinaciones posibles para lograr esas estrellas
-          result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
-          let found = false;
-          for (let three = ourAttacksLeft; three >= 0; three--) {
-            for (let two = ourAttacksLeft - three; two >= 0; two--) {
-              let one = ourAttacksLeft - three - two;
-              let total = three * 3 + two * 2 + one * 1;
-              if (total >= starsToSecureWin) {
-                result += `✅ ${three} ataques de 3⭐, ${two} de 2⭐, ${one} de 1⭐ = ${total} estrellas\n`;
-                found = true;
+    // Calcula estrellas y destrucción actuales
+    const ourStars = mainClan.stars || 0;
+    const ourDestruction = mainClan.destructionPercentage || 0;
+    const enemyStars = opponentClan.stars || 0;
+    const enemyDestruction = opponentClan.destructionPercentage || 0;
+
+    // Máximo de estrellas posibles para cada clan (ajustado para guerras normales)
+    const ourAttacksLeft = getAttacksLeft(mainClan);
+    const enemyAttacksLeft = getAttacksLeft(opponentClan);
+
+    const ourMaxStars = isLeague
+      ? ourStars + ourAttacksLeft * 3
+      : getMaxStars(mainClan);
+    const enemyMaxStars = isLeague
+      ? enemyStars + enemyAttacksLeft * 3
+      : getMaxStars(opponentClan);
+
+    // Tiempo restante
+    const timeLeft = getTimeLeft(latestSave.endTime);
+
+    // TITULO DINÁMICO
+    let title = '';
+    if (ourStars > enemyMaxStars) {
+      title = '🏆🎉 ¡FELICIDADES CLAN! ¡VICTORIA ASEGURADA! 🎉🏆\n';
+    } else if (enemyStars > ourMaxStars) {
+      title = '💀❌ DERROTA MATEMÁTICA ❌💀\nYa no podemos remontar \n';
+    } else if (ourStars > enemyStars) {
+      // ¿Nos pueden remontar?
+      const enemyMax = enemyMaxStars;
+      if (enemyMax >= ourStars + ourAttacksLeft * 3) {
+        title = '⚠️ ATENCIÓN CLAN: ¡Aún nos pueden remontar! ⚠️\n\n';
+      } else {
+        title = '🎉 ¡Vamos ganando! ¡Sigamos así para asegurar la victoria! 🎉\n';
+      }
+    } else if (ourStars < enemyStars) {
+      title = '🚨 ATENCIÓN CLAN: ¡TENEMOS QUE REMONTAR! 🚨\n⚠️¡A darlo todo en los ataques restantes!\n';
+    } else {
+      title = '🤝⚠️ EMPATE ¡Cada ataque cuenta!⚠️🤝\n';
+    }
+
+    // Estado actual
+    let result = `${title}⏳ Tiempo restante de guerra: ${timeLeft}\n\n`;
+    result += `Estado actual de la guerra ⚔️:\n`;
+    result += `Nosotros: ${ourStars}⭐ (${ourDestruction.toFixed(1)}%)\n`;
+    result += `Ellos: ${enemyStars}⭐ (${enemyDestruction.toFixed(1)}%)\n\n`;
+    result += `---------------------\n\n`;
+
+    // Ataques restantes
+    result += `Ataques restantes:\n`;
+    result += `Nosotros: ${ourAttacksLeft} ataque(s)⚔️\n`;
+    result += `Ellos: ${enemyAttacksLeft} ataque(s)⚔️\n\n`;
+    result += `---------------------\n`;
+
+    // Máximo de estrellas posibles
+    result += `Máximo de estrellas posibles con nuestros ataques disponibles:\n`;
+    result += `Nosotros: ${ourMaxStars}⭐\n`;
+    result += `Ellos: ${enemyMaxStars}⭐\n\n`;
+    result += `---------------------\n`;
+
+    // ¿Ya está definida la guerra?
+    if (ourStars > enemyMaxStars) {
+      result += `🎉¡Ya ganamos la guerra! Aunque el rival haga todos sus ataques con 3 estrellas, no nos puede alcanzar.🎉\n`;
+      return result;
+    }
+    if (enemyStars > ourMaxStars) {
+      result += `❌❌¡Ya perdimos la guerra! Aunque hagamos todos nuestros ataques con 3 estrellas, no podemos alcanzar al rival.❌❌\n`;
+      return result;
+    }
+
+    // ¿Qué necesitamos para remontar?
+    if (ourStars < enemyStars) {
+      const starsToTie = enemyStars - ourStars;
+      const starsToWin = enemyStars - ourStars + 1;
+      result += `❌Estamos perdiendo por ${starsToTie} estrellas.\n`;
+      result += `⚠️Necesitamos al menos ${starsToWin} estrellas más que ellos para ganar (o empatar y superar en % de destrucción).\n`;
+    } else if (ourStars > enemyStars) {
+      const starsToTie = ourStars - enemyStars;
+      result += `🎉Vamos ganando por ${starsToTie}⭐.\n`;
+
+      // Aquí calculamos las combinaciones posibles para que el rival nos empate o supere
+      const starsNeeded = ourStars - enemyStars + 1; // Para ganar, necesita al menos esto
+      if (enemyAttacksLeft > 0) {
+        result += `\n⚔️El rival necesita sumar al menos ${starsNeeded}⭐ en sus ${enemyAttacksLeft} ataques restantes para superarnos en ⭐.\n`;
+        // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
+        const enemyMaxIfPerfect = enemyMaxStars;
+        const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
+        if (ourAttacksLeft > 0) {
+          if (starsToSecureWin <= 0) {
+            result += `¡Ya tenemos la victoria matemática asegurada! El rival no puede alcanzarnos aunque haga todos sus ataques con 3 estrellas.\n`;
+          } else if (ourMaxStars < enemyMaxStars) {
+            // No es posible ser inalcanzable, mostrar mensaje claro y CUÁNTO necesita el rival para ser inalcanzable
+            const starsRivalToBeUnreachable = ourMaxStars - enemyStars + 1;
+            result += `\n---------------------\n`;
+            result += `\n⚠️Con los ataques restantes, no es posible asegurar la victoria matemática.\n`;
+            result += `Nuestro máximo posible es ${ourMaxStars}⭐ y el del rival es ${enemyMaxStars}⭐.\n`;
+            result += `Para que el rival sea inalcanzable, necesita  sumar al menos ${starsRivalToBeUnreachable}⭐ en sus ataques (es decir,  superar nuestro máximo posible).\n`;
+            result += `Para nosotros ser inalcanzables, necesitaríamos que el rival falle ataques.\n`;
+            result += `\n---------------------\n`;
+
+            // Mostrar combinaciones posibles para que el rival sea inalcanzable
+            result += `\n📝Combinaciones posibles de ataques para que el rival sea inalcanzable\n⚠️Necesitan ${ourMaxStars}⭐ | ${enemyAttacksLeft} ataque(s)⚔️:\n`;
+            let found = false;
+            let combinaciones: string[] = [];
+            for (let three = enemyAttacksLeft; three >= 0; three--) {
+              for (let two = enemyAttacksLeft - three; two >= 0; two--) {
+                let one = enemyAttacksLeft - three - two;
+                let total = three * 3 + two * 2 + one * 1;
+                if (total >= starsRivalToBeUnreachable) {
+                  // Solo mostrar combinaciones mínimas (sin ataques de 1 si es posible)
+                  if (one === 0 && two === 0 && three > 0) {
+                    combinaciones.push(`✅ Tienen que hacer todos los ataques de 3⭐ para ${total} estrellas`);
+                  } else if (three === 0 && two > 0 && one === 0) {
+                    combinaciones.push(`✅ Tienen que hacer ${two} ataque${two > 1 ? 's' : ''} de 2⭐ para ${total} estrellas`);
+                  } else if (three === 0 && two === 0 && one > 0) {
+                    combinaciones.push(`✅ Tienen que hacer ${one} ataque${one > 1 ? 's' : ''} de 1⭐ para ${total} estrellas`);
+                  } else if (three > 0 && one === 0 && two > 0) {
+                    combinaciones.push(`✅ Tienen que hacer ${three} ataques de 3⭐ y ${two} de 2⭐ para ${total} estrellas`);
+                  } else if (three > 0 && two === 0 && one > 0) {
+                    combinaciones.push(`✅ Tienen que hacer ${three} ataques de 3⭐ y ${one} de 1⭐ para ${total} estrellas`);
+                  } else if (three > 0 && two > 0 && one > 0) {
+                    combinaciones.push(`✅ Tienen que hacer ${three} ataques de 3⭐, ${two} de 2⭐ y ${one} de 1⭐ para ${total} estrellas`);
+                  }
+                  found = true;
+                }
               }
             }
-          }
-          if (!found) {
-            result += "❌No hay combinación posible, necesitamos más ataques o estrellas para ser inalcanzables.❌\n";
+            if (combinaciones.length > 0) {
+              result += combinaciones.join('\n');
+            }
+            if (!found) {
+              result += "❌No hay combinación posible, el rival no puede ser inalcanzable con los ataques que le quedan.❌\n";
+            }
+          } else {
+            result += `\n---------------------\n`;
+            result += `\n⚔️Si sumamos al menos ${starsToSecureWin} estrellas ⭐ más en nuestros ataques restantes.\n🎉El rival NO podrá alcanzarnos aunque haga todos sus ataques perfectos.🎉\n`;
+
+            // Mostrar combinaciones posibles para lograr esas estrellas
+            result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
+            let found = false;
+            let combinaciones: string[] = [];
+            for (let three = ourAttacksLeft; three >= 0; three--) {
+              for (let two = ourAttacksLeft - three; two >= 0; two--) {
+                let one = ourAttacksLeft - three - two;
+                let total = three * 3 + two * 2 + one * 1;
+                if (total >= starsToSecureWin) {
+                  // Mensaje natural y fácil de leer
+                  if (one === 0 && two === 0 && three > 0) {
+                    combinaciones.push(`✅ Tenemos que hacer todos los ataques de 3⭐ para ${total} estrellas`);
+                  } else if (three === 0 && two > 0 && one === 0) {
+                    combinaciones.push(`✅ Tenemos que hacer ${two} ataque${two > 1 ? 's' : ''} de 2⭐ para ${total} estrellas`);
+                  } else if (three === 0 && two === 0 && one > 0) {
+                    combinaciones.push(`✅ Tenemos que hacer ${one} ataque${one > 1 ? 's' : ''} de 1⭐ para ${total} estrellas`);
+                  } else if (three > 0 && one === 0 && two > 0) {
+                    combinaciones.push(`✅ Tenemos que hacer ${three} ataques de 3⭐ y ${two} de 2⭐ para ${total} estrellas`);
+                  } else if (three > 0 && two === 0 && one > 0) {
+                    combinaciones.push(`✅ Tenemos que hacer ${three} ataques de 3⭐ y ${one} de 1⭐ para ${total} estrellas`);
+                  } else if (three > 0 && two > 0 && one > 0) {
+                    combinaciones.push(`✅ Tenemos que hacer ${three} ataques de 3⭐, ${two} de 2⭐ y ${one} de 1⭐ para ${total} estrellas`);
+                  }
+                  found = true;
+                }
+              }
+            }
+            if (combinaciones.length > 0) {
+              result += combinaciones.join('\n');
+            }
+            if (!found) {
+              result += "❌No hay combinación posible, necesitamos más ataques o estrellas para ser inalcanzables.❌\n";
+            }
           }
         }
       }
-    }
-  } else {
-    // Empate en estrellas
-    if (ourDestruction > enemyDestruction) {
-      result += `Empate en estrellas, pero vamos ganando por destrucción (${(ourDestruction - enemyDestruction).toFixed(1)}%).\n`;
-    } else if (ourDestruction < enemyDestruction) {
-      result += `Empate en estrellas, pero vamos perdiendo por destrucción (${(enemyDestruction - ourDestruction).toFixed(1)}%).\n`;
     } else {
-      result += `Empate total en estrellas y destrucción. ¡La guerra está muy pareja!\n`;
+      // Empate en estrellas
+      if (ourDestruction > enemyDestruction) {
+        result += `Empate en estrellas, pero vamos ganando por destrucción (${(ourDestruction - enemyDestruction).toFixed(1)}%).\n`;
+      } else if (ourDestruction < enemyDestruction) {
+        result += `Empate en estrellas, pero vamos perdiendo por destrucción (${(enemyDestruction - ourDestruction).toFixed(1)}%).\n`;
+      } else {
+        result += `Empate total en estrellas y destrucción. ¡La guerra está muy pareja!\n`;
+      }
+      result += `Cada ataque puede definir la guerra, ¡hay que aprovecharlos al máximo!\n`;
     }
-    result += `Cada ataque puede definir la guerra, ¡hay que aprovecharlos al máximo!\n`;
+    return result;
   }
-  return result;
-}
   const generateFilteredWarMessage = (warDetails: any) => {
     let latestSave;
     // Obtener el último guardado considerando el estado "preparation"
