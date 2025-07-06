@@ -683,7 +683,7 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
             }
           }
           if (!found) {
-            result += "❌No hay combinación posible, necesitamos más ataques o estrellas.❌\n";
+            result += "❌No hay combinación posible, necesitamos más ataques o estrellas para ser inalcanzables.❌\n";
           }
         }
       }
