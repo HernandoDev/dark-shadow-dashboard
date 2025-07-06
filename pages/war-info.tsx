@@ -545,177 +545,118 @@ const WarInfoPage = () => {
   const handleCustomMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCustomMessage(event.target.value);
   };
-  function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
-    if (!latestSave || !mainClan || !opponentClan) return "No hay datos suficientes para predecir.";
+function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
+  if (!latestSave || !mainClan || !opponentClan) return "No hay datos suficientes para predecir.";
+  const isLeague = !!latestSave.season;
+  const attacksPerMember = isLeague ? 1 : 2;
+  const teamSize = latestSave.teamSize || mainClan.members.length;
 
-    const isLeague = !!latestSave.season;
-    const attacksPerMember = isLeague ? 1 : 2;
-
-    function getAttackStats(clan: any) {
-      let attacksDone = 0;
-      let attacksMissing = 0;
-      clan.members.forEach((member: any) => {
-        const done = Array.isArray(member.attacks) ? member.attacks.length : 0;
-        attacksDone += done;
-        attacksMissing += Math.max(0, attacksPerMember - done);
-      });
-      return { attacksDone, attacksMissing };
+  // Calcula ataques realizados y faltantes
+  function getAttacksDone(clan: any) {
+    let attacks = 0;
+    for (const m of clan.members) {
+      if (m.attacks) attacks += m.attacks.length;
     }
-
-    function getAttackCombination(starsNeeded: number, attacksAvailable: number) {
-      let combinations: string[] = [];
-      for (let threes = Math.min(attacksAvailable, Math.floor(starsNeeded / 3)); threes >= 0; threes--) {
-        let remainingStars = starsNeeded - threes * 3;
-        if (remainingStars < 0) continue;
-        let twos = Math.min(attacksAvailable - threes, Math.ceil(remainingStars / 2));
-        if (threes + twos > attacksAvailable) continue;
-        if (threes * 3 + twos * 2 >= starsNeeded && threes + twos <= attacksAvailable) {
-          combinations.push(
-            `${threes > 0 ? `${threes} ataque(s) de 3⭐` : ''}${threes > 0 && twos > 0 ? ' y ' : ''}${twos > 0 ? `${twos} ataque(s) de 2⭐` : ''}`
-          );
-        }
-      }
-      if (combinations.length === 0) {
-        let twos = Math.ceil(starsNeeded / 2);
-        if (twos <= attacksAvailable) {
-          combinations.push(`${twos} ataque(s) de 2⭐`);
-        }
-      }
-      return combinations.length > 0 ? combinations[0] : '';
-    }
-
-    // PLUS: TH analysis
-    function getAverageTH(members: any[]) {
-      const ths = members.map((m: any) => m.townhallLevel || (m.playerInfo?.townHallLevel ?? 0));
-      return ths.length ? ths.reduce((a, b) => a + b, 0) / ths.length : 0;
-    }
-
-    const mainStats = getAttackStats(mainClan);
-    const oppStats = getAttackStats(opponentClan);
-
-    const myStars = mainClan.stars;
-    const oppStars = opponentClan.stars;
-    const myPerc = mainClan.destructionPercentage;
-    const oppPerc = opponentClan.destructionPercentage;
-
-    const myMaxStars = myStars + mainStats.attacksMissing * 3;
-    const oppMaxStars = oppStars + oppStats.attacksMissing * 3;
-
-    let result = "";
-
-    // Predicción para tu clan
-    if (myMaxStars < oppStars) {
-      result += "❌ Es imposible ganar o empatar, aunque se logren 3 estrellas en todos los ataques restantes.\n";
-    } else if (myMaxStars === oppStars) {
-      if (myPerc > oppPerc) {
-        result += "⚠️ Solo es posible empatar en estrellas, pero ganariamos por porcentaje si haces 3 estrellas en todos los ataques restantes.\n";
-      } else if (myPerc < oppPerc) {
-        result += "⚠️ Solo es posible empatar en estrellas, pero perderiamos por porcentaje aunque hagas 3 estrellas en todos los ataques restantes.\n";
-      } else {
-        result += "⚠️ Solo es posible empatar en estrellas y porcentaje si hacemos 3 estrellas en todos los ataques restantes.\n";
-      }
-    } else {
-      const starsNeeded = oppStars - myStars + 1;
-      const attacksAvailable = mainStats.attacksMissing;
-      if (starsNeeded > 0) {
-        const combo = getAttackCombination(starsNeeded, attacksAvailable);
-        result += "✅ ¡Aún es posible ganar la guerra si se logran suficientes estrellas en los ataques restantes!\n";
-        result += `Necesitamos al menos ${starsNeeded} estrellas más que el rival (${combo}) para superarlo.\n`;
-      }
-    }
-
-    // Predicción para el rival (si tú vas ganando)
-    if (myStars > oppStars) {
-      const starsToTie = myStars - oppStars;
-      const attacksAvailable = oppStats.attacksMissing;
-      if (attacksAvailable > 0) {
-        const combo = getAttackCombination(starsToTie, attacksAvailable);
-        result += `\n🔎 El rival necesita ${starsToTie} estrellas para empatarnos (${combo}).`;
-        if (starsToTie > 0) {
-          const comboToWin = getAttackCombination(starsToTie + 1, attacksAvailable);
-          result += ` Si logra ${starsToTie + 1} estrellas (${comboToWin}), nos superará.`;
-        }
-      }
-    }
-
-    // Predicción para tu clan (si el rival va ganando)
-    if (oppStars > myStars) {
-      const starsToTie = oppStars - myStars;
-      const attacksAvailable = mainStats.attacksMissing;
-      if (attacksAvailable > 0) {
-        const combo = getAttackCombination(starsToTie, attacksAvailable);
-        result += `\n🔎 Necesitamos ${starsToTie} estrellas para empatar al rival (${combo}).`;
-        if (starsToTie > 0) {
-          const comboToWin = getAttackCombination(starsToTie + 1, attacksAvailable);
-          result += ` Si logramos ${starsToTie + 1} estrellas (${comboToWin}), lo superamos.`;
-        }
-      }
-    }
-
-    // ¿Puede el rival remontar?
-    if (oppMaxStars < myStars) {
-      result += "\n✅ El rival NO puede alcanzarnos, aunque haga 3 estrellas en todos sus ataques restantes. ¡Victoria asegurada!";
-    } else if (oppMaxStars === myStars) {
-      if (oppPerc > myPerc) {
-        result += "\n⚠️ El rival solo puede empatar en estrellas, pero nos ganaría por porcentaje si hace 3 estrellas en todos sus ataques restantes.";
-      } else if (oppPerc < myPerc) {
-        result += "\n⚠️ El rival solo puede empatar en estrellas, pero perderiamos por porcentaje si hace 3 estrellas en todos sus ataques restantes.";
-      } else {
-        result += "\n⚠️ El rival solo puede empatar en estrellas y porcentaje si hace 3 estrellas en todos sus ataques restantes.";
-      }
-    } else if (myStars >= oppStars) {
-      const starsNeeded = myStars - oppStars + 1;
-      const attacksAvailable = oppStats.attacksMissing;
-      if (starsNeeded > 0) {
-        const combo = getAttackCombination(starsNeeded, attacksAvailable);
-        result += `\n⚠️ El rival aún puede remontar si logra al menos ${starsNeeded} estrellas más que nosotros (${combo}).`;
-      }
-    }
-
-    // Cálculo de estrellas para ser inalcanzable
-    if (oppStats.attacksMissing > 0) {
-      const starsToBeSafe = (oppStars + oppStats.attacksMissing * 3 + 1) - myStars;
-      if (starsToBeSafe > 0 && mainStats.attacksMissing > 0) {
-        const comboSafe = getAttackCombination(starsToBeSafe, mainStats.attacksMissing);
-        result += `\n🔒 Si sumamos al menos ${starsToBeSafe} estrellas más (${comboSafe}), seremos inalcanzables aunque el rival haga 3⭐ en todos sus ataques restantes.`;
-      }
-    }
-
-    // PLUS: Analizar TH de ataques pendientes
-    const avgThOpponent = getAverageTH(opponentClan.members);
-    const avgThMain = getAverageTH(mainClan.members);
-
-    const mainWithAttacks = mainClan.members.filter((m: any) => {
-      const done = Array.isArray(m.attacks) ? m.attacks.length : 0;
-      const th = m.townhallLevel || (m.playerInfo?.townHallLevel ?? 0);
-      return (attacksPerMember - done) > 0 && th > avgThOpponent;
-    });
-
-    const oppWithAttacks = opponentClan.members.filter((m: any) => {
-      const done = Array.isArray(m.attacks) ? m.attacks.length : 0;
-      const th = m.townhallLevel || (m.playerInfo?.townHallLevel ?? 0);
-      return (attacksPerMember - done) > 0 && th > avgThMain;
-    });
-
-    if (mainWithAttacks.length > 0) {
-      result += `\n\n🟢 Nuestro clan tiene ${mainWithAttacks.length} jugador(es) con ataques pendientes y TH superior al promedio del rival:\n`;
-      mainWithAttacks.forEach((m: any) => {
-        result += `- ${m.name} (TH${m.townhallLevel || (m.playerInfo?.townHallLevel ?? '?')})\n`;
-      });
-    }
-
-    if (oppWithAttacks.length > 0) {
-      result += `\n🔴 El rival tiene ${oppWithAttacks.length} jugador(es) con ataques pendientes y TH superior al promedio de nuestro clan:\n`;
-      oppWithAttacks.forEach((m: any) => {
-        result += `- ${m.name} (TH${m.townhallLevel || (m.playerInfo?.townHallLevel ?? '?')})\n`;
-      });
-    }
-
-    result += `\n\n🛡️ Nuestro clan: ${mainStats.attacksMissing} ataques restantes.\n`;
-    result += `⚔️ Rival: ${oppStats.attacksMissing} ataques restantes.\n`;
-
-    return result.trim();
+    return attacks;
   }
+  function getAttacksLeft(clan: any) {
+    return teamSize * attacksPerMember - getAttacksDone(clan);
+  }
+
+  // Calcula estrellas y destrucción actuales
+  const ourStars = mainClan.stars || 0;
+  const ourDestruction = mainClan.destructionPercentage || 0;
+  const enemyStars = opponentClan.stars || 0;
+  const enemyDestruction = opponentClan.destructionPercentage || 0;
+
+  // Máximo de estrellas posibles para cada clan
+  const ourAttacksLeft = getAttacksLeft(mainClan);
+  const enemyAttacksLeft = getAttacksLeft(opponentClan);
+
+  // Cada ataque puede dar máximo 3 estrellas
+  const ourMaxStars = ourStars + ourAttacksLeft * 3;
+  const enemyMaxStars = enemyStars + enemyAttacksLeft * 3;
+
+  // Estado actual
+  let result = `Estado actual:\n`;
+  result += `Nosotros: ${ourStars}⭐ (${ourDestruction.toFixed(1)}%)\n`;
+  result += `Ellos: ${enemyStars}⭐ (${enemyDestruction.toFixed(1)}%)\n\n`;
+
+  // Ataques restantes
+  result += `Ataques restantes:\n`;
+  result += `Nosotros: ${ourAttacksLeft}\n`;
+  result += `Ellos: ${enemyAttacksLeft}\n\n`;
+
+  // Máximo de estrellas posibles
+  result += `Máximo de estrellas posibles:\n`;
+  result += `Nosotros: ${ourMaxStars}\n`;
+  result += `Ellos: ${enemyMaxStars}\n\n`;
+
+  // ¿Ya está definida la guerra?
+  if (ourStars > enemyMaxStars) {
+    result += `¡Ya ganamos la guerra! Aunque el rival haga todos sus ataques con 3 estrellas, no nos puede alcanzar.\n`;
+    return result;
+  }
+  if (enemyStars > ourMaxStars) {
+    result += `¡Ya perdimos la guerra! Aunque hagamos todos nuestros ataques con 3 estrellas, no podemos alcanzar al rival.\n`;
+    return result;
+  }
+
+  // ¿Qué necesitamos para remontar?
+  if (ourStars < enemyStars) {
+    const starsToTie = enemyStars - ourStars;
+    const starsToWin = enemyStars - ourStars + 1;
+    result += `Estamos perdiendo por ${starsToTie} estrellas.\n`;
+    result += `Necesitamos al menos ${starsToWin} estrellas más que ellos para ganar (o empatar y superar en % de destrucción).\n`;
+  } else if (ourStars > enemyStars) {
+    const starsToTie = ourStars - enemyStars;
+    result += `Vamos ganando por ${starsToTie} estrellas.\n`;
+
+    // Aquí calculamos las combinaciones posibles para que el rival nos empate o supere
+    const starsNeeded = ourStars - enemyStars + 1; // Para ganar, necesita al menos esto
+    if (enemyAttacksLeft > 0) {
+      result += `\nEl rival necesita sumar al menos ${starsNeeded} estrellas en sus ${enemyAttacksLeft} ataques restantes para ganarnos.\n`;
+      // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
+      const enemyMaxIfPerfect = enemyStars + enemyAttacksLeft * 3;
+      const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
+     if (ourAttacksLeft > 0) {
+        if (starsToSecureWin <= 0) {
+          result += `¡Ya tienes la victoria matemática asegurada! El rival no puede alcanzarte aunque haga todos sus ataques con 3 estrellas.\n`;
+        } else {
+          result += `Si sumas al menos ${starsToSecureWin} estrellas más en tus ataques restantes, el rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.\n`;
+
+          // Mostrar combinaciones posibles para lograr esas estrellas
+          result += `Combinaciones posibles de ataques para lograrlo (3⭐, 2⭐, 1⭐):\n`;
+          let found = false;
+          for (let three = ourAttacksLeft; three >= 0; three--) {
+            for (let two = ourAttacksLeft - three; two >= 0; two--) {
+              let one = ourAttacksLeft - three - two;
+              let total = three * 3 + two * 2 + one * 1;
+              if (total >= starsToSecureWin) {
+                result += `- ${three} ataques de 3⭐, ${two} de 2⭐, ${one} de 1⭐ = ${total} estrellas\n`;
+                found = true;
+              }
+            }
+          }
+          if (!found) {
+            result += "No hay combinación posible, necesitas más ataques o estrellas.\n";
+          }
+        }
+      }
+    }
+  } else {
+    // Empate en estrellas
+    if (ourDestruction > enemyDestruction) {
+      result += `Empate en estrellas, pero vamos ganando por destrucción (${(ourDestruction - enemyDestruction).toFixed(1)}%).\n`;
+    } else if (ourDestruction < enemyDestruction) {
+      result += `Empate en estrellas, pero vamos perdiendo por destrucción (${(enemyDestruction - ourDestruction).toFixed(1)}%).\n`;
+    } else {
+      result += `Empate total en estrellas y destrucción. ¡La guerra está muy pareja!\n`;
+    }
+    result += `Cada ataque puede definir la guerra, ¡hay que aprovecharlos al máximo!\n`;
+  }
+  return result;
+}
   const generateFilteredWarMessage = (warDetails: any) => {
     let latestSave;
     // Obtener el último guardado considerando el estado "preparation"
