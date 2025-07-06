@@ -608,13 +608,13 @@ function getTimeLeft(endTime: string) {
 
   // Ataques restantes
   result += `Ataques restantes:\n`;
-  result += `Nosotros: ${ourAttacksLeft}\n`;
-  result += `Ellos: ${enemyAttacksLeft}\n\n`;
+  result += `Nosotros: ${ourAttacksLeft} ataque(s)⚔️\n`;
+  result += `Ellos: ${enemyAttacksLeft} ataque(s)⚔️\n\n`;
 
   // Máximo de estrellas posibles
   result += `Máximo de estrellas posibles con nuestros ataques disponibles:\n`;
-  result += `Nosotros: ${ourMaxStars}\n`;
-  result += `Ellos: ${enemyMaxStars}\n\n`;
+  result += `Nosotros: ${ourMaxStars}⭐\n`;
+  result += `Ellos: ${enemyMaxStars}⭐\n\n`;
 
   // ¿Ya está definida la guerra?
   if (ourStars > enemyMaxStars) {
