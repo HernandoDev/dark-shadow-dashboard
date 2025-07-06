@@ -665,9 +665,9 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
       const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
       if (ourAttacksLeft > 0) {
         if (starsToSecureWin <= 0) {
-          result += `¡Ya tienes la victoria matemática asegurada! El rival no puede alcanzarte aunque haga todos sus ataques con 3 estrellas.\n`;
+          result += `¡Ya tenemos la victoria matemática asegurada! El rival no puede alcanzarnos aunque haga todos sus ataques con 3 estrellas.\n`;
         } else {
-          result += `\n⚔️Si sumas al menos ${starsToSecureWin} estrellas ⭐ más en tus ataques restantes.\n🎉El rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.🎉\n`;
+          result += `\n⚔️Si sumamos al menos ${starsToSecureWin} estrellas ⭐ más en nuestros ataques restantes.\n🎉El rival NO podrá alcanzarnos aunque haga todos sus ataques perfectos.🎉\n`;
 
           // Mostrar combinaciones posibles para lograr esas estrellas
           result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
