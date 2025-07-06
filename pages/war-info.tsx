@@ -551,6 +551,26 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   const attacksPerMember = isLeague ? 1 : 2;
   const teamSize = latestSave.teamSize || mainClan.members.length;
 
+  // Calcular tiempo restante
+function getTimeLeft(endTime: string) {
+  if (!endTime) return "Desconocido";
+  // Convierte "20250706T234212.000Z" a "2025-07-06T23:42:12.000Z"
+  const year = endTime.substring(0, 4);
+  const month = endTime.substring(4, 6);
+  const day = endTime.substring(6, 8);
+  const hour = endTime.substring(9, 11);
+  const minute = endTime.substring(11, 13);
+  const second = endTime.substring(13, 15);
+  const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
+  const end = new Date(isoString);
+  const now = new Date();
+  let diff = end.getTime() - now.getTime();
+  if (diff <= 0) return "¡La guerra ha terminado!";
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  diff -= hours * (1000 * 60 * 60);
+  const minutes = Math.floor(diff / (1000 * 60));
+  return `${hours} horas y ${minutes} minutos`;
+}
   // Calcula ataques realizados y faltantes
   function getAttacksDone(clan: any) {
     let attacks = 0;
@@ -577,8 +597,12 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   const ourMaxStars = ourStars + ourAttacksLeft * 3;
   const enemyMaxStars = enemyStars + enemyAttacksLeft * 3;
 
+  // Tiempo restante
+  const timeLeft = getTimeLeft(latestSave.endTime);
+
   // Estado actual
-  let result = `Estado actual:\n`;
+  let result = `⏳ Tiempo restante de guerra: ${timeLeft}\n\n`;
+  result += `Estado actual de la guerra ⚔️:\n`;
   result += `Nosotros: ${ourStars}⭐ (${ourDestruction.toFixed(1)}%)\n`;
   result += `Ellos: ${enemyStars}⭐ (${enemyDestruction.toFixed(1)}%)\n\n`;
 
@@ -588,17 +612,17 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   result += `Ellos: ${enemyAttacksLeft}\n\n`;
 
   // Máximo de estrellas posibles
-  result += `Máximo de estrellas posibles:\n`;
+  result += `Máximo de estrellas posibles con nuestros ataques disponibles:\n`;
   result += `Nosotros: ${ourMaxStars}\n`;
   result += `Ellos: ${enemyMaxStars}\n\n`;
 
   // ¿Ya está definida la guerra?
   if (ourStars > enemyMaxStars) {
-    result += `¡Ya ganamos la guerra! Aunque el rival haga todos sus ataques con 3 estrellas, no nos puede alcanzar.\n`;
+    result += `🎉¡Ya ganamos la guerra! Aunque el rival haga todos sus ataques con 3 estrellas, no nos puede alcanzar.🎉\n`;
     return result;
   }
   if (enemyStars > ourMaxStars) {
-    result += `¡Ya perdimos la guerra! Aunque hagamos todos nuestros ataques con 3 estrellas, no podemos alcanzar al rival.\n`;
+    result += `❌❌¡Ya perdimos la guerra! Aunque hagamos todos nuestros ataques con 3 estrellas, no podemos alcanzar al rival.❌❌\n`;
     return result;
   }
 
@@ -606,40 +630,40 @@ function predictWarOutcome(latestSave: any, mainClan: any, opponentClan: any) {
   if (ourStars < enemyStars) {
     const starsToTie = enemyStars - ourStars;
     const starsToWin = enemyStars - ourStars + 1;
-    result += `Estamos perdiendo por ${starsToTie} estrellas.\n`;
-    result += `Necesitamos al menos ${starsToWin} estrellas más que ellos para ganar (o empatar y superar en % de destrucción).\n`;
+    result += `❌Estamos perdiendo por ${starsToTie} estrellas.\n`;
+    result += `⚠️Necesitamos al menos ${starsToWin} estrellas más que ellos para ganar (o empatar y superar en % de destrucción).\n`;
   } else if (ourStars > enemyStars) {
     const starsToTie = ourStars - enemyStars;
-    result += `Vamos ganando por ${starsToTie} estrellas.\n`;
+    result += `🎉Vamos ganando por ${starsToTie} estrellas. ⭐\n`;
 
     // Aquí calculamos las combinaciones posibles para que el rival nos empate o supere
     const starsNeeded = ourStars - enemyStars + 1; // Para ganar, necesita al menos esto
     if (enemyAttacksLeft > 0) {
-      result += `\nEl rival necesita sumar al menos ${starsNeeded} estrellas en sus ${enemyAttacksLeft} ataques restantes para ganarnos.\n`;
+      result += `\n⚔️El rival necesita sumar al menos ${starsNeeded} estrellas ⭐ en sus ${enemyAttacksLeft} ataques  restantes para ganarnos.\n`;
       // Cálculo de estrellas que necesitas sumar para asegurar la victoria matemática
       const enemyMaxIfPerfect = enemyStars + enemyAttacksLeft * 3;
       const starsToSecureWin = enemyMaxIfPerfect - ourStars + 1;
-     if (ourAttacksLeft > 0) {
+      if (ourAttacksLeft > 0) {
         if (starsToSecureWin <= 0) {
           result += `¡Ya tienes la victoria matemática asegurada! El rival no puede alcanzarte aunque haga todos sus ataques con 3 estrellas.\n`;
         } else {
-          result += `Si sumas al menos ${starsToSecureWin} estrellas más en tus ataques restantes, el rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.\n`;
+          result += `\n⚔️Si sumas al menos ${starsToSecureWin} estrellas ⭐ más en tus ataques restantes .\n🎉El rival NO podrá alcanzarte aunque haga todos sus ataques perfectos.🎉\n`;
 
           // Mostrar combinaciones posibles para lograr esas estrellas
-          result += `Combinaciones posibles de ataques para ser inalcanzables:\n`;
+          result += `\n📝Combinaciones posibles de ataques para ser inalcanzables:\n`;
           let found = false;
           for (let three = ourAttacksLeft; three >= 0; three--) {
             for (let two = ourAttacksLeft - three; two >= 0; two--) {
               let one = ourAttacksLeft - three - two;
               let total = three * 3 + two * 2 + one * 1;
               if (total >= starsToSecureWin) {
-                result += `- ${three} ataques de 3⭐, ${two} de 2⭐, ${one} de 1⭐ = ${total} estrellas\n`;
+                result += `✅ ${three} ataques de 3⭐, ${two} de 2⭐, ${one} de 1⭐ = ${total} estrellas\n`;
                 found = true;
               }
             }
           }
           if (!found) {
-            result += "No hay combinación posible, necesitas más ataques o estrellas.\n";
+            result += "❌No hay combinación posible, necesitamos más ataques o estrellas.❌\n";
           }
         }
       }
