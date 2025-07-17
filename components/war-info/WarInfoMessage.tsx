@@ -4,14 +4,20 @@ import React, { useState } from 'react';
 const WarInfoMessage = ({
   generateFilteredWarMessage = (fullWarDetails: {}) => '',
   fullWarDetails = {},
-  predictMessage = ''
+  predictMessage = '',
+  includeThreeStars = true,
+  setIncludeThreeStars = (value: boolean) => {},
+  includeTwoStars = true,
+  setIncludeTwoStars = (value: boolean) => {},
+  includeOneStar = true,
+  setIncludeOneStar = (value: boolean) => {},
+  includeMissingAttacks = false,
+  setIncludeMissingAttacks = (value: boolean) => {},
+  includeOneMissingAttack = false,
+  setIncludeOneMissingAttack = (value: boolean) => {},
+  includeTwoMissingAttacks = false,
+  setIncludeTwoMissingAttacks = (value: boolean) => {}
 }) => {
-  const [includeThreeStars, setIncludeThreeStars] = useState(true);
-  const [includeTwoStars, setIncludeTwoStars] = useState(true);
-  const [includeOneStar, setIncludeOneStar] = useState(true);
-  const [includeMissingAttacks, setIncludeMissingAttacks] = useState(false);
-  const [includeOneMissingAttack, setIncludeOneMissingAttack] = useState(false);
-  const [includeTwoMissingAttacks, setIncludeTwoMissingAttacks] = useState(false);
 
   const copyToClipboard = (text: string) => {
     if (navigator.clipboard) {

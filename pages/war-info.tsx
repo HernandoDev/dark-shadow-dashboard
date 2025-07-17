@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { APIClashService } from '../services/apiClashService';
-import { Button } from '@nextui-org/react';
-import { FaStar, FaTrophy, FaTimesCircle } from 'react-icons/fa';
-import { Calendar, Info, Percent, Shield, Star, Target, User } from 'react-feather';
 import { fetchSavedAttacks } from '../utils/fetchSavedAttacks';
-import WarInfoHeader from '../components/war-info/WarInfoHeader';
-import WarInfoTabs from '../components/war-info/WarInfoTabs';
-import WarInfoSummary from '../components/war-info/WarInfoSummary';
-import WarInfoFilters from '../components/war-info/WarInfoFilters';
 import WarInfoMessage from '../components/war-info/WarInfoMessage';
 import WarLogs from '../components/war-info/WarLogs';
 import CurrentWar from '../components/war-info/CurrentWar';
@@ -26,6 +19,7 @@ import {
   getStarsGroup,
   getNoAttackList,
   generateWarMessage,
+  generateFilteredWarMessage,
   copyToClipboard,
   deleteAttack
 } from '../components/war-info/WarInfoHelpers';
@@ -688,7 +682,7 @@ function getAdditionalInfo(state: string, latestSave: any, mainClan: any, oppone
 
 // D: Dependency Inversion Principle - All dependencies are injected as parameters
 
-const generateFilteredWarMessage = (warDetails: any) => {
+const generateFilteredWarMessageLocal = (warDetails: any): string => {
   // S: Use helper for latest save selection
   const latestSave = getLatestWarSave(currentWarDetails, warLeageSaves, warSaves);
 
@@ -715,43 +709,18 @@ const generateFilteredWarMessage = (warDetails: any) => {
   }
   additionalInfo = getAdditionalInfo(state, latestSave, mainClan, opponentClan, now);
 
-  // S: Section extraction logic
-  const fullMessage = generateWarMessage(latestSave);
-  const sections = fullMessage.split('🌟🌟🌟');
-  const threeStarsSection = sections[1]?.split('🌟🌟')[0]?.trim() || '';
-  const twoStarsSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[0]?.trim() || '';
-  const oneStarSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[0]?.trim() || '';
-  const missingAttacksSection = sections[1]?.split('🌟🌟')[1]?.split('🌟')[1]?.split('❌')[1]?.trim() || '';
+  // Usar la nueva función helper que aplica filtros correctamente
+  const filteredMessage = generateFilteredWarMessage(latestSave, {
+    includeThreeStars,
+    includeTwoStars,
+    includeOneStar,
+    includeMissingAttacks,
+    includeOneMissingAttack,
+    includeTwoMissingAttacks
+  });
 
-  // S: Filtering logic for missing attacks
-  let filteredMissingAttacksSection = missingAttacksSection;
-  if (includeOneMissingAttack) {
-    filteredMissingAttacksSection = filteredMissingAttacksSection
-      .split('\n')
-      .filter((line) => line.includes('1 ataque(s)'))
-      .join('\n');
-  }
-  if (includeTwoMissingAttacks) {
-    filteredMissingAttacksSection = filteredMissingAttacksSection
-      .split('\n')
-      .filter((line) => line.includes('2 ataque(s)'))
-      .join('\n');
-  }
-
-  // S: Calculation logic for totals
-  const totalPlayersWithMissingAttacks = (filteredMissingAttacksSection.match(/\n/g) || []).length;
-
-  // L: Liskov - All helpers can be extended without breaking contract
-
-  // Compose final message
-  return `
-  ${additionalInfo}
-  
-  ${includeThreeStars ? `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${threeStarsSection}` : ''}
-  ${includeTwoStars ? `\n🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${twoStarsSection}` : ''}
-  ${includeOneStar ? `\n🌟 1 Estrella  (❌No aceptable❌)\n${oneStarSection}` : ''}
-  ${includeMissingAttacks ? `\n❌PERSONAS QUE NO HAN ATACADO AÚN\n Total de personas con ataques pendientes: ${totalPlayersWithMissingAttacks + 1}\n\n${filteredMissingAttacksSection}*\n\n` : ''}
-  `.trim();
+  // Combinar información adicional con el mensaje filtrado
+  return `${additionalInfo}\n\n${filteredMessage}`.trim();
 };
 
   return (
@@ -829,8 +798,20 @@ const generateFilteredWarMessage = (warDetails: any) => {
 
       {activeTab === 'MensajeGuerra' && (
         <WarInfoMessage
-          generateFilteredWarMessage={generateFilteredWarMessage}
+          generateFilteredWarMessage={generateFilteredWarMessageLocal}
           predictMessage={predictMessage}
+          includeThreeStars={includeThreeStars}
+          setIncludeThreeStars={setIncludeThreeStars}
+          includeTwoStars={includeTwoStars}
+          setIncludeTwoStars={setIncludeTwoStars}
+          includeOneStar={includeOneStar}
+          setIncludeOneStar={setIncludeOneStar}
+          includeMissingAttacks={includeMissingAttacks}
+          setIncludeMissingAttacks={setIncludeMissingAttacks}
+          includeOneMissingAttack={includeOneMissingAttack}
+          setIncludeOneMissingAttack={setIncludeOneMissingAttack}
+          includeTwoMissingAttacks={includeTwoMissingAttacks}
+          setIncludeTwoMissingAttacks={setIncludeTwoMissingAttacks}
         />
       )}
 

@@ -105,7 +105,16 @@ export const getStarsGroup = (
     if (member.attacks && member.attacks.length > 0) {
       member.attacks.forEach((attack) => {
         if (attack.stars >= 1 && attack.stars <= 3) {
-          starsGroup[attack.stars].push(`${member.name} (${member.townhallLevel})`);
+          // Buscar información del rival en el targetClan
+          let rivalInfo = '';
+          if (targetClan && targetClan.members) {
+            const rival = targetClan.members.find(m => m.tag === attack.defenderTag);
+            if (rival) {
+              rivalInfo = ` 🆚 #${rival.mapPosition}.- ${rival.name} (TH${rival.townhallLevel})`;
+            }
+          }
+          const attackInfo = ` #${member.mapPosition}.- ${member.name} (TH${member.townhallLevel})${rivalInfo} - ${attack.destructionPercentage}%`;
+          starsGroup[attack.stars].push(attackInfo);
         }
       });
     }
@@ -120,14 +129,92 @@ export const getNoAttackList = (
   const noAttack: string[] = [];
   members.forEach((member) => {
     const attacksDone = member.attacks ? member.attacks.length : 0;
-    if (attacksDone < attacksPerMember) {
-      noAttack.push(`${member.name} (${member.townhallLevel})`);
+    const attacksMissing = attacksPerMember - attacksDone;
+    if (attacksMissing > 0) {
+      noAttack.push(`${member.name} (TH${member.townhallLevel}) le faltan ${attacksMissing} ataque(s)`);
     }
   });
   return noAttack;
 };
 
+export const getPlayersWithMissingAttacks = (
+  members: Member[],
+  attacksPerMember: number = 1
+): { [key: number]: string[] } => {
+  const missingAttacks: { [key: number]: string[] } = { 1: [], 2: [] };
+  members.forEach((member) => {
+    const attacksDone = member.attacks ? member.attacks.length : 0;
+    const attacksMissing = attacksPerMember - attacksDone;
+    if (attacksMissing > 0 && attacksMissing <= 2) {
+      missingAttacks[attacksMissing].push(`${member.name} (TH${member.townhallLevel}) le faltan ${attacksMissing} ataque(s)`);
+    }
+  });
+  return missingAttacks;
+};
+
+// Función mejorada para generar mensajes filtrados
+export const generateFilteredWarMessage = (
+  warDetails: WarDetails,
+  filters: {
+    includeThreeStars: boolean;
+    includeTwoStars: boolean;
+    includeOneStar: boolean;
+    includeMissingAttacks: boolean;
+    includeOneMissingAttack: boolean;
+    includeTwoMissingAttacks: boolean;
+  }
+): string => {
+  if (!warDetails) return '';
+  
+  const clanTag = getClanTag().replace('%23', '#');
+  const myClan = getMyClan(warDetails, clanTag);
+  const targetClan = getTargetClan(warDetails, clanTag);
+  if (!myClan) return '';
+  
+  const attacksPerMember = warDetails.attacksPerMember || 1;
+  const starsGroup = getStarsGroup(myClan.members, targetClan);
+  const noAttack = getNoAttackList(myClan.members, attacksPerMember);
+  const missingAttacks = getPlayersWithMissingAttacks(myClan.members, attacksPerMember);
+  
+  let message = `\n📢 Estado de la guerra: ${myClan.status || 'Desconocido'}\n`;
+  
+  // Filtrar e incluir secciones según los filtros
+  if (filters.includeThreeStars && starsGroup[3].length > 0) {
+    message += `🌟🌟🌟 3 Estrellas (🎉 Felicidades 🎉)\n${starsGroup[3].join('\n')}\n\n`;
+  }
+  
+  if (filters.includeTwoStars && starsGroup[2].length > 0) {
+    message += `🌟🌟 2 Estrellas (⚔️ Aceptable ⚔️)\n${starsGroup[2].join('\n')}\n\n`;
+  }
+  
+  if (filters.includeOneStar && starsGroup[1].length > 0) {
+    message += `🌟 1 Estrella (❌No aceptable❌)\n${starsGroup[1].join('\n')}\n\n`;
+  }
+  
+  if (filters.includeMissingAttacks && noAttack.length > 0) {
+    let missingSection = '';
+    
+    if (filters.includeOneMissingAttack && missingAttacks[1].length > 0) {
+      missingSection = missingAttacks[1].join('\n');
+    } else if (filters.includeTwoMissingAttacks && missingAttacks[2].length > 0) {
+      missingSection = missingAttacks[2].join('\n');
+    } else if (!filters.includeOneMissingAttack && !filters.includeTwoMissingAttacks) {
+      missingSection = noAttack.join('\n');
+    }
+    
+    if (missingSection) {
+      const totalMissing = filters.includeOneMissingAttack ? missingAttacks[1].length :
+                          filters.includeTwoMissingAttacks ? missingAttacks[2].length :
+                          noAttack.length;
+      message += `❌PERSONAS QUE NO HAN ATACADO AÚN\nTotal de personas con ataques pendientes: ${totalMissing}\n\n${missingSection}\n\n`;
+    }
+  }
+  
+  return message.trim();
+};
+
 export const generateWarMessage = (warDetails: WarDetails) => {
+  
   if (!warDetails) return '';
   const clanTag = getClanTag().replace('%23', '#');
   const myClan = getMyClan(warDetails, clanTag);
@@ -136,6 +223,7 @@ export const generateWarMessage = (warDetails: WarDetails) => {
   const attacksPerMember = warDetails.attacksPerMember || 1;
   const starsGroup = getStarsGroup(myClan.members, targetClan);
   const noAttack = getNoAttackList(myClan.members, attacksPerMember);
+  debugger
   return `\n📢 Estado de la guerra: ${myClan.status || 'Desconocido'}\n🌟🌟🌟\n${starsGroup[3].join('\n') || 'Ningún ataque de 3 estrellas'}\n\n🌟🌟\n${starsGroup[2].join('\n') || 'Ningún ataque de 2 estrellas'}\n\n🌟\n${starsGroup[1].join('\n') || 'Ningún ataque de 1 estrella'}\n\n❌\n${noAttack.join('\n') || 'Todos atacaron'}\n  `;
 };
 

@@ -161,11 +161,11 @@ export const TableWrapper = () => {
       const clanTag = typeof window !== 'undefined' ? localStorage.getItem('clanTag') : null;
       if (clanTag === '%232QL0GCQGQ') {
          return {
-            th: '15',
-            rey: '90',
-            reina: '90',
-            centinela: '65',
-            luchadora: '40',
+            th: '16',
+            rey: '93',
+            reina: '93',
+            centinela: '73',
+            luchadora: '43',
             principe: '70',
          };
       } else if (clanTag === '%232RG9R9JVP') {
