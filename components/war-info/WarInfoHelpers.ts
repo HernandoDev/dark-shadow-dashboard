@@ -176,7 +176,10 @@ export const generateFilteredWarMessage = (
   const noAttack = getNoAttackList(myClan.members, attacksPerMember);
   const missingAttacks = getPlayersWithMissingAttacks(myClan.members, attacksPerMember);
   
-  let message = `\n📢 Estado de la guerra: ${myClan.status || 'Desconocido'}\n`;
+  let message = ''
+  if (myClan.status) {
+  message += `\n📢 Estado de la guerra: ${myClan.status || 'Desconocido'}\n\n`;
+  }
   
   // Filtrar e incluir secciones según los filtros
   if (filters.includeThreeStars && starsGroup[3].length > 0) {
