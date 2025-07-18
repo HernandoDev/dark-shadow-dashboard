@@ -146,7 +146,7 @@ export const getPlayersWithMissingAttacks = (
     const attacksDone = member.attacks ? member.attacks.length : 0;
     const attacksMissing = attacksPerMember - attacksDone;
     if (attacksMissing > 0 && attacksMissing <= 2) {
-      missingAttacks[attacksMissing].push(`${member.name} (TH${member.townhallLevel}) le faltan ${attacksMissing} ataque(s)`);
+      missingAttacks[attacksMissing].push(`*${member.name} (TH${member.townhallLevel}) le faltan ${attacksMissing} ataque(s)`);
     }
   });
   return missingAttacks;
