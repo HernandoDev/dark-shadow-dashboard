@@ -87,11 +87,11 @@ export const Content = () => {
          setLeageGroupsSaves(response.leagueGroups);
          let data = await APIClashService.getAttackLogs();
          setAttackLogs(data);
-         
+
          const response2 = await APIClashService.getClanMembers(); // Clan Principal
          const memberNames = response2.items.map((member: { tag: string }) => member.tag);
          // Define the type for playerStats
-         setMembers(memberNames); 
+         setMembers(memberNames);
 
          // Group attacks by player and calculate total stars, average percentage, and most used army
          interface Attack {
@@ -182,7 +182,7 @@ export const Content = () => {
 
    // Nuevo useEffect para calcular el resumen de liga
    React.useEffect(() => {
-      
+
       if (!warLeageSaves || warLeageSaves.length === 0 || !members.length) return;
 
       const clanTag = getClanTag().replace('%23', '#');
@@ -194,14 +194,19 @@ export const Content = () => {
          totalStars: number;
          totalDestruction: number;
          totalAttacks: number;
+         desventaja: number;
       }> = {};
 
       warLeageSaves.forEach((war: any) => {
          let warMembers: any[] = [];
+         let WarOpponentMembers: any[] = [];
+
          if (war.content?.clan?.tag === clanTag) {
             warMembers = war.content.clan.members || [];
+            WarOpponentMembers = war.content.opponent.members || [];
          } else if (war.content?.opponent?.tag === clanTag) {
             warMembers = war.content.opponent.members || [];
+            WarOpponentMembers = war.content.clan.members || [];
          }
 
          warMembers.forEach((member: any) => {
@@ -217,7 +222,34 @@ export const Content = () => {
                         totalStars: 0,
                         totalDestruction: 0,
                         totalAttacks: 0,
+                        desventaja: 0,
                      };
+                  }
+                  let opponent = WarOpponentMembers.find((opponent: any) => {
+                     return opponent.tag === attack.defenderTag;
+                  });
+                  let memberUpdate = warMembers.find((memberAux: any) => {
+                     return memberAux.tag === attack.attackerTag;
+                  });
+
+                  const TH_SUPERIOR = memberUpdate.townhallLevel - opponent.townhallLevel <= -1
+                  const TH_INFERIOR = memberUpdate.townhallLevel - opponent.townhallLevel >= 1
+                
+
+                  if (TH_SUPERIOR && attack.stars === 3) {
+                     playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel
+                  }
+
+                  if (TH_SUPERIOR && attack.stars === 1) {
+                     playerMap[member.tag].desventaja += 0.25
+                  }
+
+
+                  if (TH_INFERIOR && attack.stars !== 3) {
+                     playerMap[member.tag].desventaja += 1 + memberUpdate.townhallLevel - opponent.townhallLevel;
+                  }
+                  if (TH_INFERIOR && attack.stars === 3) {
+                     playerMap[member.tag].desventaja += (memberUpdate.townhallLevel - opponent.townhallLevel) / 1.3;
                   }
                   playerMap[member.tag].totalStars += attack.stars;
                   playerMap[member.tag].totalDestruction += attack.destructionPercentage;
@@ -232,8 +264,9 @@ export const Content = () => {
          .map(p => {
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
-          return {
+            const factor = 1 - Math.tanh(p.desventaja / (25 * Math.log(p.totalAttacks) + 2)) / 2;
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4) * factor;
+            return {
                tag: p.tag,
                name: p.name,
                townhallLevel: p.townhallLevel,
@@ -241,6 +274,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                avgDestruction,
                totalAttacks: p.totalAttacks,
                score,
+               desventaja: p.desventaja
             };
          })
          .sort((a, b) =>
@@ -266,14 +300,19 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          totalStars: number;
          totalDestruction: number;
          totalAttacks: number;
+         desventaja: number;
       }> = {};
 
       warSaves.forEach((war: any) => {
          let warMembers: any[] = [];
+         let WarOpponentMembers: any[] = [];
+
          if (war.content?.clan?.tag === clanTag) {
             warMembers = war.content.clan.members || [];
+            WarOpponentMembers = war.content.opponent.members || [];
          } else if (war.content?.opponent?.tag === clanTag) {
             warMembers = war.content.opponent.members || [];
+            WarOpponentMembers = war.content.clan.members || [];
          }
          warMembers.forEach((member: any) => {
             if (!memberTags.has(member.tag)) return; // Solo miembros actuales
@@ -287,7 +326,33 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                         totalStars: 0,
                         totalDestruction: 0,
                         totalAttacks: 0,
+                        desventaja: 0, // Inicializar desventaja
                      };
+                  }
+                  let opponent = WarOpponentMembers.find((opponent: any) => {
+                     return opponent.tag === attack.defenderTag;
+                  });
+                  let memberUpdate = warMembers.find((memberAux: any) => {
+                     return memberAux.tag === attack.attackerTag;
+                  });
+                  const TH_SUPERIOR = memberUpdate.townhallLevel - opponent.townhallLevel <= -1
+                  const TH_INFERIOR = memberUpdate.townhallLevel - opponent.townhallLevel >= 1
+                  
+
+                  if (TH_SUPERIOR && attack.stars === 3) {
+                     playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel
+                  }
+
+                  if (TH_SUPERIOR && attack.stars === 1) {
+                     playerMap[member.tag].desventaja += 0.25
+                  }
+
+
+                  if (TH_INFERIOR && attack.stars !== 3) {
+                     playerMap[member.tag].desventaja += 1 + memberUpdate.townhallLevel - opponent.townhallLevel;
+                  }
+                  if (TH_INFERIOR && attack.stars === 3) {
+                     playerMap[member.tag].desventaja += (memberUpdate.townhallLevel - opponent.townhallLevel) / 1.3;
                   }
                   playerMap[member.tag].totalStars += attack.stars;
                   playerMap[member.tag].totalDestruction += attack.destructionPercentage;
@@ -302,7 +367,8 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          .map(p => {
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
-            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
+            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4) * (1 - Math.tanh(p.desventaja / 10) / 2);
+
             return {
                tag: p.tag,
                name: p.name,
@@ -311,6 +377,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                avgDestruction,
                totalAttacks: p.totalAttacks,
                score,
+               desventaja: p.desventaja
             };
          })
          .sort((a, b) =>
@@ -330,7 +397,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
       const armyMap: Record<string, string[]> = {};
       if (attackLogs && Array.isArray(attackLogs)) {
          // Contar ataques por tipo de ejército para cada jugador (por nombre)
-         
+
          const armyCount: Record<string, Record<string, number>> = {};
          attackLogs.forEach((log: any) => {
             if (!armyCount[log.member]) armyCount[log.member] = {};
@@ -364,15 +431,15 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          scoreWar?: number;
          scoreLiga?: number;
          topArmies?: string[];
+         desventaja?: number; // Mantener desventaja para el cálculo
       }> = {};
 
       summaryWar.forEach((p: any) => {
          if (!memberTags.has(p.tag)) return;
          const avgStars = p.avgStars;
          const totalAttacks = p.totalAttacks;
-               let aux = (1 + Math.log(p.totalAttacks) / 4)
-         
-            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
+         const factor = 1 - Math.tanh(p.desventaja / (25 * Math.log(p.totalAttacks) + 5)) / 2;
+         const score = avgStars * (1 + Math.log(p.totalAttacks) / 4) * factor;
          combinedMap[p.tag] = {
             tag: p.tag,
             name: p.name,
@@ -388,7 +455,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
             totalAttacksWar: p.totalAttacks,
             scoreWar: score,
             scoreLiga: 0,
-            // topArmies se agrega después
+            desventaja: p.desventaja,
          };
       });
 
@@ -396,9 +463,10 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          if (!memberTags.has(p.tag)) return;
          const avgStars = p.avgStars;
          const totalAttacks = p.totalAttacks;
-         let aux = (1 + Math.log(p.totalAttacks) / 4)
-         
-            const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
+         let aux1 = (1 + Math.log(p.totalAttacks) / 4)
+         const factor = 1 - Math.tanh(p.desventaja / (25 * Math.log(p.totalAttacks) + 5)) / 2;
+         const score = avgStars * (1 + Math.log(p.totalAttacks) / 4) * factor;
+         debugger
          if (!combinedMap[p.tag]) {
             combinedMap[p.tag] = {
                tag: p.tag,
@@ -415,6 +483,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                totalAttacksWar: 0,
                scoreWar: 0,
                scoreLiga: 0,
+               desventaja: 0, // Inicializar desventaja
             };
          }
          combinedMap[p.tag].totalStars += p.avgStars * p.totalAttacks;
@@ -424,6 +493,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
          combinedMap[p.tag].totalDestructionLiga = p.avgDestruction * p.totalAttacks;
          combinedMap[p.tag].totalAttacksLiga = p.totalAttacks;
          combinedMap[p.tag].scoreLiga = score * LIGA_FACTOR;
+         combinedMap[p.tag].desventaja = p.desventaja;
       });
 
       // Asignar topArmies por nombre (name)
@@ -594,7 +664,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
 
                      }}
                   >
-                     Top 15 Jugadores 
+                     Top 15 Jugadores
                   </Text>
                   <Flex
                      css={{
@@ -603,7 +673,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                         'flexWrap': 'wrap',
                         'justifyContent': 'center',
                         'maxWidth': '100dvw',
-                      
+
                      }}
                      direction={'row'}
                   >
@@ -624,7 +694,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                         },
                      }}
                   >
-                     Peores 5 Jugadores 
+                     Peores 5 Jugadores
                   </Text>
                   <Flex
                      css={{
@@ -633,7 +703,7 @@ const score = avgStars * (1 + Math.log(p.totalAttacks) / 4);
                         'flexWrap': 'wrap',
                         'justifyContent': 'center',
                         'maxWidth': '100dvw',
-                      
+
                      }}
                      direction={'row'}
                   >
