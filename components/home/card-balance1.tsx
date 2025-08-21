@@ -71,15 +71,20 @@ export const CardBalance1 = ({ player, position }: CardBalance1Props) => {
                </Text>
                {/* Mostrar topArmies si existen */}
                {player.topArmies && player.topArmies.length > 0 && (
-                  <Flex direction={'column'} css={{ width: '100%', gap: '$1' }}>
+                  // <Flex direction={'column'} css={{ width: '100%', gap: '$1' }}>
+                  //    <Text span css={{ color: 'white' }} size={'$md'} weight={'bold'}>
+                  //       Ejércitos más usados:
+                  //    </Text>
+                  //    {player.topArmies.map((army, idx) => (
+                  //       <Text key={idx} span css={{ color: 'white' }} size={'$sm'}>
+                  //          {idx + 1}. {army}
+                  //       </Text>
+                  //    ))}
+                  // </Flex>
+                      <Flex direction={'column'} css={{ width: '100%', gap: '$1' }}>
                      <Text span css={{ color: 'white' }} size={'$md'} weight={'bold'}>
-                        Ejércitos más usados:
+                       
                      </Text>
-                     {player.topArmies.map((army, idx) => (
-                        <Text key={idx} span css={{ color: 'white' }} size={'$sm'}>
-                           {idx + 1}. {army}
-                        </Text>
-                     ))}
                   </Flex>
                )}
                <hr style={{ width: '100%', borderColor: 'yellow', opacity: 0.6 }} />
