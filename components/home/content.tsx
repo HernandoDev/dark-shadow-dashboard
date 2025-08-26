@@ -237,7 +237,7 @@ export const Content = () => {
                 
 
                   if (TH_SUPERIOR && attack.stars === 3) {
-                     playerMap[member.tag].desventaja -= 1;
+                     playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel;
                   }
 
                   if (TH_SUPERIOR && attack.stars === 1) {
