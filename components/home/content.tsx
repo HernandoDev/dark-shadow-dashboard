@@ -237,11 +237,11 @@ export const Content = () => {
                 
 
                   if (TH_SUPERIOR && attack.stars === 3) {
-                     playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel
+                     playerMap[member.tag].desventaja -= 0.5;
                   }
 
                   if (TH_SUPERIOR && attack.stars === 1) {
-                     playerMap[member.tag].desventaja += 0.25
+                     playerMap[member.tag].desventaja += 0.25;
                   }
 
 
@@ -249,7 +249,7 @@ export const Content = () => {
                      playerMap[member.tag].desventaja += 1 + memberUpdate.townhallLevel - opponent.townhallLevel;
                   }
                   if (TH_INFERIOR && attack.stars === 3) {
-                     playerMap[member.tag].desventaja += (memberUpdate.townhallLevel - opponent.townhallLevel) / 1.3;
+                     playerMap[member.tag].desventaja += (memberUpdate.townhallLevel - opponent.townhallLevel) / 1.5;
                   }
                   playerMap[member.tag].totalStars += attack.stars;
                   playerMap[member.tag].totalDestruction += attack.destructionPercentage;
