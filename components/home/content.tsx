@@ -237,7 +237,7 @@ export const Content = () => {
                 
 
                   if (TH_SUPERIOR && attack.stars === 3) {
-                     playerMap[member.tag].desventaja -= 0.5;
+                     playerMap[member.tag].desventaja -= 1;
                   }
 
                   if (TH_SUPERIOR && attack.stars === 1) {
