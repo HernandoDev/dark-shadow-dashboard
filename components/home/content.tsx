@@ -184,6 +184,25 @@ export const Content = () => {
    React.useEffect(() => {
 
       if (!warLeageSaves || warLeageSaves.length === 0 || !members.length) return;
+   const minDate = new Date('2025-09-01T00:00:00Z');
+   const filteredWarSavesLeage = warLeageSaves.filter(war => {
+      const start = war.content?.startTime;
+      if (!start) return false;
+      // Handles both ISO and custom formats like "20250430T022151.000Z"
+      let warDate;
+      if (start.length >= 8 && start.includes('T')) {
+         // Custom format: YYYYMMDDTHHmmss.000Z
+         const year = start.substring(0, 4);
+         const month = start.substring(4, 6);
+         const day = start.substring(6, 8);
+         warDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
+      } else {
+         warDate = new Date(start);
+      }
+      return warDate >= minDate;
+   });
+
+   if (filteredWarSavesLeage.length === 0) return;
 
       const clanTag = getClanTag().replace('%23', '#');
       const memberTags = new Set(members);
@@ -197,7 +216,7 @@ export const Content = () => {
          desventaja: number;
       }> = {};
 
-      warLeageSaves.forEach((war: any) => {
+      filteredWarSavesLeage.forEach((war: any) => {
          let warMembers: any[] = [];
          let WarOpponentMembers: any[] = [];
 
@@ -234,7 +253,7 @@ export const Content = () => {
 
                   const TH_SUPERIOR = memberUpdate.townhallLevel - opponent.townhallLevel <= -1
                   const TH_INFERIOR = memberUpdate.townhallLevel - opponent.townhallLevel >= 1
-                
+
 
                   if (TH_SUPERIOR && attack.stars === 3) {
                      playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel;
@@ -289,7 +308,25 @@ export const Content = () => {
    // Nuevo useEffect para calcular el resumen de guerras normales
    React.useEffect(() => {
       if (!warSaves || warSaves.length === 0 || !members.length) return;
+      const minDate = new Date('2025-09-01T00:00:00Z');
+      const filteredWarSaves = warSaves.filter(war => {
+         const start = war.content?.startTime;
+         if (!start) return false;
+         // Handles both ISO and custom formats like "20250430T022151.000Z"
+         let warDate;
+         if (start.length >= 8 && start.includes('T')) {
+            // Custom format: YYYYMMDDTHHmmss.000Z
+            const year = start.substring(0, 4);
+            const month = start.substring(4, 6);
+            const day = start.substring(6, 8);
+            warDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
+         } else {
+            warDate = new Date(start);
+         }
+         return warDate >= minDate;
+      });
 
+      if (filteredWarSaves.length === 0) return;
       const clanTag = getClanTag().replace('%23', '#');
       const memberTags = new Set(members);
 
@@ -303,7 +340,7 @@ export const Content = () => {
          desventaja: number;
       }> = {};
 
-      warSaves.forEach((war: any) => {
+      filteredWarSaves.forEach((war: any) => {
          let warMembers: any[] = [];
          let WarOpponentMembers: any[] = [];
 
@@ -337,14 +374,14 @@ export const Content = () => {
                   });
                   const TH_SUPERIOR = memberUpdate.townhallLevel - opponent.townhallLevel <= -1
                   const TH_INFERIOR = memberUpdate.townhallLevel - opponent.townhallLevel >= 1
-                  
+
 
                   if (TH_SUPERIOR && attack.stars === 3) {
-                     playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel
+                     playerMap[member.tag].desventaja += 0.25;
                   }
 
                   if (TH_SUPERIOR && attack.stars === 1) {
-                     playerMap[member.tag].desventaja += 0.25
+                     playerMap[member.tag].desventaja += 0.5;
                   }
 
 
