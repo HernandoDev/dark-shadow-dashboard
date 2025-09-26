@@ -380,7 +380,7 @@ export const Content = () => {
                      playerMap[member.tag].desventaja += memberUpdate.townhallLevel - opponent.townhallLevel;
                   }
 
-                  if (TH_SUPERIOR && attack.stars  !== 3) {
+                  if (TH_SUPERIOR && attack.stars === 1) {
                      playerMap[member.tag].desventaja += 0.25;
                   }
 
