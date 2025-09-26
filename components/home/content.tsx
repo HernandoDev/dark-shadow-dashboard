@@ -30,6 +30,7 @@ type Player = {
 };
 
 export const Content = () => {
+   const LIGA_FACTOR = 2.5;
    const [attackLogs, setAttackLogs] = React.useState<any[] | null>(null);
    const [topPlayers, setTopPlayers] = React.useState<Player[]>([]);
    const [chartData, setChartData] = React.useState<{ attack: string; stars: number }[]>([]);
@@ -686,7 +687,8 @@ export const Content = () => {
                                  <b>Guerras normales:</b> Se suman todos los ataques realizados por cada jugador, calculando su media de estrellas y destrucción.<br />
                                  <b>Guerras de liga:</b> Se realiza el mismo cálculo, pero los resultados de liga tienen un peso mayor  en el ranking combinado.<br />
                                  <b>Ranking combinado:</b> Se suman los resultados de ambas modalidades, ponderando la liga, y se calcula un "score" que tiene en cuenta la media de estrellas y el número de ataques realizados.<br />
-                                 Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
+                                 <br />MULTIPLICADOR DE LIGA: {LIGA_FACTOR} (Los ataques de liga tienen un peso {LIGA_FACTOR} veces mayor que los de guerra normal)
+                                 <br />Este sistema permite identificar tanto a los jugadores más destacados como a los que necesitan mejorar, considerando tanto la cantidad como la calidad de sus ataques, y dando mayor relevancia a las guerras de liga.
                               </Text>
                            )}
                         </Box>
