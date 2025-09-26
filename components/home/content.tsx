@@ -546,9 +546,7 @@ export const Content = () => {
             // Score combinado: scoreWar + scoreLiga
             const score = (p.scoreWar || 0) + (p.scoreLiga || 0);
             
-            if(p.name ==='MarcoRayo'){
-               debugger
-            }
+           
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
             return {
