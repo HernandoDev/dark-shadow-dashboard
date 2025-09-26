@@ -503,8 +503,7 @@ export const Content = () => {
          const totalAttacks = p.totalAttacks;
          let aux1 = (1 + Math.log(p.totalAttacks) / 4)
          const factor = 1 - Math.tanh(p.desventaja / (25 * Math.log(p.totalAttacks) + 5)) / 2;
-         const score = avgStars * (1 + Math.log(p.totalAttacks) / 4) * factor;
-         debugger
+         const score = (avgStars + 0.03 * p.avgDestruction) * (1 + Math.log(p.totalAttacks) / 4) * factor;
          if (!combinedMap[p.tag]) {
             combinedMap[p.tag] = {
                tag: p.tag,
@@ -546,6 +545,10 @@ export const Content = () => {
          .map(p => {
             // Score combinado: scoreWar + scoreLiga
             const score = (p.scoreWar || 0) + (p.scoreLiga || 0);
+            
+            if(p.name ==='MarcoRayo'){
+               debugger
+            }
             const avgStars = p.totalStars / p.totalAttacks;
             const avgDestruction = p.totalDestruction / p.totalAttacks;
             return {
