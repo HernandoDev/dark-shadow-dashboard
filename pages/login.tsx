@@ -14,6 +14,7 @@ const Login = () => {
             gaboadmin: 'gaboadmin',
             mrayo123: 'mrayo123',
             nandods: 'nandods',
+            papisuite: 'papisuite',
             maxpvp: 'maxpvp',
             cris: 'cris',
             dsluna123: 'dsluna123',
